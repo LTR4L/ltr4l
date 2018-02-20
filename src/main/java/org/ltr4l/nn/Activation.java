@@ -1,62 +1,63 @@
 package org.ltr4l.nn;
 
 public interface Activation {
-    double output(double input);
-    double derivative(double input);
+  double output(double input);
 
-    class Identity implements Activation {
+  double derivative(double input);
 
-        @Override
-        public double output(double input) {
-            return input;
-        }
+  class Identity implements Activation {
 
-        @Override
-        public double derivative(double input) {
-            return 1;
-        }
+    @Override
+    public double output(double input) {
+      return input;
     }
 
-    class Sigmoid implements Activation {
+    @Override
+    public double derivative(double input) {
+      return 1;
+    }
+  }
 
-        @Override
-        public double output(double input) {
-            return 1 / (1 + Math.exp(- input));
-        }
+  class Sigmoid implements Activation {
 
-        @Override
-        public double derivative(double input) {
-            double output = output(input);
-            return (output)*(1 - output);
-        }
+    @Override
+    public double output(double input) {
+      return 1 / (1 + Math.exp(-input));
     }
 
-    class ReLu implements Activation {
+    @Override
+    public double derivative(double input) {
+      double output = output(input);
+      return (output) * (1 - output);
+    }
+  }
 
-        @Override
-        public double output(double input) {
-            return Math.max(0.01, input);
-        }
+  class ReLu implements Activation {
 
-        @Override
-        public double derivative(double input) {
-            return input <= 0 ? 0 : 1;
-        }
+    @Override
+    public double output(double input) {
+      return Math.max(0.01, input);
     }
 
-    class ActivationFactory {
-        public static Activation getActivator (String actName){
-            switch (actName.toLowerCase()) {
-                case "identity":
-                    return new Identity();
-                case "sigmoid":
-                    return new Sigmoid();
-                case "relu":
-                    return new ReLu();
-                default:
-                    return null;
-            }
-        }
+    @Override
+    public double derivative(double input) {
+      return input <= 0 ? 0 : 1;
     }
+  }
+
+  class ActivationFactory {
+    public static Activation getActivator(String actName) {
+      switch (actName.toLowerCase()) {
+        case "identity":
+          return new Identity();
+        case "sigmoid":
+          return new Sigmoid();
+        case "relu":
+          return new ReLu();
+        default:
+          return null;
+      }
+    }
+  }
 }
 

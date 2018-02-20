@@ -4,26 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Document {
-    private int Label;
-    private List<Double> features;
+  private int Label;
+  private List<Double> features;
 
-    Document() {
-        features = new ArrayList<>();
-    }
+  Document() {
+    features = new ArrayList<>();
+  }
 
-    public int getLabel() {
-        return Label;
-    }
+  public int getLabel() {
+    return Label;
+  }
 
-    protected void setLabel(int newLabel) {
-        Label = newLabel;
-    }
+  protected void setLabel(int newLabel) {
+    Label = newLabel;
+  }
 
-    public List<Double> getFeatures() {
-        return features;
-    }
+  public List<Double> getFeatures() {
+    return features;
+  }
 
-    protected void addFeature(double feature) {
-        features.add(feature);
-    }
+  protected void addFeature(double feature) {
+    features.add(feature);
+  }
 }
