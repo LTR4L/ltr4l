@@ -6,14 +6,13 @@ Implementation of some LTR Algorithms.
 
 You will need to install the following:
 
-1. Java 8
+1. Java 8+
 
-2. Maven (Not required to run, however the following instructions will assume Maven has been installed.)
+2. Apache Ant 1.8+ (Not required to run, however the following instructions will assume Apache Ant has been installed.)
 
 ## Data
 
-You can download OHSUMED, LETOR MQ2007, LETOR MQ2008 from the following link:
-https://onedrive.live.com/?authkey=%21ACnoZZSZVfHPJd0&id=8FEADC23D838BDA8%21107&cid=8FEADC23D838BDA8
+You can download OHSUMED, LETOR MQ2007, LETOR MQ2008 from [this web page](https://www.microsoft.com/en-us/research/project/letor-learning-rank-information-retrieval/).
 
 **Dataset Descriptions**
 
@@ -34,32 +33,31 @@ Each row is a query-document pair. The first column is relevance label of this p
 
 ## How to execute program
 
-1- Download the project from ""
+1- Download the project from Github
+
 ```
-git clone https://
+git clone https://github.com/LTR4L/ltr4l.git
 ```
 
-2- open the terminal
+2- go to the project folder
 
-3- go to the project folder
 ```
-$ cd /path/to/project/
-```
-4- package jar file
-```
-$ mvn clean compile package
-```
-5- go to target folder:
-```
-$ cd target/
+$ cd ltr4l
 ```
 
-5-run the following command :
+3- package jar file
+
 ```
-java -jar data/MQ2008/Fold1/train.txt data/MQ2008/Fold1/vali.txt confs/ranknet.config
+$ ant clean package
 ```
 
-6- open data file:
+4-run the following command :
+
+```
+java -jar LTR4L-X.X.X.jar data/MQ2008/Fold1/train.txt data/MQ2008/Fold1/vali.txt confs/ranknet.config
+```
+
+5- open data file:
 ```
 open data.csv
 ```
