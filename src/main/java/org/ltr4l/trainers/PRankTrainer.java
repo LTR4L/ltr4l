@@ -125,7 +125,7 @@ class PRank {
     return thresholds.length;
   }
 
-  protected double predictRelScore(Document doc) {
+  private double predictRelScore(Document doc) {
     double wx = 0;
     for (int i = 0; i < doc.getFeatures().size(); i++) {
       double feature = doc.getFeatures().get(i);
