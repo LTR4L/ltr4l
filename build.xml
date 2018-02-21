@@ -1,0 +1,67 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="org.LTR4L-project" default="compile" basedir=".">
+
+    <property name="src.dir" value="src"/>
+    <property name="cls.dir" value="classes"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="test.result.dir" value="test-result"/>
+
+    <property name="PRODUCT_NAME" value="LTR4L"/>
+    <property name="PRODUCT_VERSION" value="0.1-dev"/>
+    <property name="product.jar" value="${PRODUCT_NAME}-${PRODUCT_VERSION}.jar"/>
+
+    <target name="compile" description="compile source and test code">
+        <mkdir dir="${cls.dir}"/>
+        <javac srcdir="${src.dir}/main/java" destdir="${cls.dir}" debug="on" includes="**/*.java">
+            <classpath path="${cls.dir}"/>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+        </javac>
+        <javac srcdir="${src.dir}/test/java" destdir="${cls.dir}" debug="on" includes="**/*Test.java">
+            <classpath path="${cls.dir}"/>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="test" depends="compile" description="run all tests">
+        <mkdir dir="${test.result.dir}"/>
+        <junit printsummary="on">
+            <classpath path="${cls.dir}"/>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+            <formatter type="plain"/>
+            <batchtest fork="yes" todir="${test.result.dir}">
+                <fileset dir="${src.dir}/test/java" includes="**/*Test.java"/>
+            </batchtest>
+        </junit>
+    </target>
+
+
+    <target name="jar" depends="compile" description="make jar file">
+        <jar destfile="${product.jar}" basedir="${cls.dir}">
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Main-Class" value="org.ltr4l.Main"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="package" depends="jar" description="make package"/>
+
+    <target name="clean" description="clean all">
+        <delete dir="${cls.dir}"/>
+        <delete dir="${test.result.dir}"/>
+        <delete>
+            <fileset dir="." includes="${product.jar}"/>
+        </delete>
+    </target>
+
+    <target name="ivy-bootstrap" description="--> retrieve dependencies with ivy">
+        <ivy:retrieve />
+        <ivy:retrieve sync="true" type="jar" />
+    </target>
+
+</project>
