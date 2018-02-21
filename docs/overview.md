@@ -301,4 +301,27 @@ elapsed time is quite large compared to other algorithms, despite this reduction
 ![Alt Text](figures/RankNetNDCG.jpg)
 ![Alt Text](figures/RankNetError.jpg)
 
+As an example of the importance of tuning and the difference datasets can make, here are the results of RankNet
+performed on MQ2008:
+
+|Parameter|Value|
+|:-:|:-:|
+|Algorithm|RankNet|
+|Dataset|LETOR:MQ2008 Fold 1|
+|Optimizer|Adam|
+|Weights Initialization|Xavier|
+|Bias Initialization|Constant (0.1)|
+|Layers|[46, 10, 1]|
+|Hidden Activation|Sigmoid|
+|Output Activation|Sigmoid|
+|Loss Function|Square Error|
+|Epochs|100|
+|Learning Rate|0.00001|
+|Regularization|L2|
+|Regularization Rate|0.01|
+|Time Elapsed| 41.9s|
+
+![Alt Text](figures/RankNetNDCG2008.jpg)
+![Alt Text](figures/RankNetError2008.jpg)
+
 
