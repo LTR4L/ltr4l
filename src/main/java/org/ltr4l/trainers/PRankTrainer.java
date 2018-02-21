@@ -9,43 +9,28 @@ import org.ltr4l.tools.RankEval;
 import org.ltr4l.tools.Report;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class PRankTrainer extends LTRTrainer {
   final private PRank ranker;
   private double maxScore;
+  private final  List<Document> trainingDocList;
 
   PRankTrainer(QuerySet training, QuerySet validation, Config configs) {
     super(training, validation, configs.getNumIterations());
     maxScore = 0.0;
     ranker = new PRank(training.getFeatureLength(), QuerySet.findMaxLabel(trainingSet));
+    trainingDocList = new ArrayList<>();
+    for (Query query : trainingSet)
+      trainingDocList.addAll(query.getDocList());
   }
 
   @Override
   public void train() {
-    //List<Query> tSet = new ArrayList<>(trainingSet);
-    //Collections.shuffle(tSet);
-    //Collections.shuffle(trainingSet);
-    for (Query query : trainingSet) {
-      //Collections.shuffle(query.getDocList());
-      for (Document doc : query.getDocList()) {
-        ranker.updateWeights(doc);
-      }
-    }
-  }
-
-  public void validate(int iter, int pos) {
-/*        Collections.shuffle(validationSet);
-        for(Query query : validationSet){
-            Collections.shuffle(query.getDocList());
-        }*/
-    double newScore = RankEval.ndcgAvg(this, validationSet, pos);
-    if (newScore > maxScore) {
-      maxScore = newScore;
-    }
-    double[] losses = calculateLoss();
-    System.out.println(iter + "  " + newScore);
-    Report.report(iter, newScore, losses[0], losses[1]);
+    Collections.shuffle(trainingDocList);
+    for (Document doc : trainingDocList)
+      ranker.updateWeights(doc);
   }
 
   protected double calculateLoss(List<Query> queries) {
