@@ -103,6 +103,8 @@ public class Config {
         return new Optimizer.MomentumFactory();
       case "nesterov":
         return new Optimizer.NesterovFactory();
+      case "adagrad":
+        return new Optimizer.AdagradFactory();
       default:
         return null;
     }
