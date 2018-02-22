@@ -127,9 +127,6 @@ function is used to measure loss, and thus two documents are required for backpr
 to document pairs). Therefore, RankNet is considered a pairwise approach, document pairs are
 used as instances during training.
 
-For the experiment, to give an accurate idea of how long RankNet takes, we looked at every document pair.
-However, in the actual implementation, we only looked at 1/6 of the pairs. We have provided the results for both.
-
 #### FRankNet
 
 Type: Feed-forward neural network  
@@ -219,6 +216,7 @@ However in
 In this section, we provide some graphs of NDCG and Loss, as well as the parameters used and elapsed time.
 Note that elapsed time can vary quite a bit depending on the parameters (especially on the number of hidden layers, activation, etc...),
 and is only provided to give a general idea of the speed of the algorithm. Even with no change in parameters, the elapsed time can vary.
+Note that this is the time required for all epochs to finish: i.e. for all training and validation to complete.
 
 #### PRank
 
@@ -278,8 +276,9 @@ work in progress.
 #### RankNet
 
 Note: The document pairs used are only the pairs which have different labels (i.e. two documents with label of "0")
-are ignored during training. In addition, only 1/6 of the document pairs are actually used during training; note that
-elapsed time is quite large compared to other algorithms, despite this reduction in the document pairs.
+are ignored during training. In addition, only a maximum 1/6 of the queries are actually used during training (randomly selected each time).
+Note that elapsed time is quite large compared to other algorithms, despite this reduction in the document pairs.
+Also note the steady rise in NDCG and fall in loss despite the reduction of document pairs used.
 
 |Parameter|Value|
 |:-:|:-:|
@@ -291,12 +290,12 @@ elapsed time is quite large compared to other algorithms, despite this reduction
 |Layers|[46, 10, 1]|
 |Hidden Activation|Identity|
 |Output Activation|Sigmoid|
-|Loss Function|Square Error|
+|Loss Function|Cross Entropy|
 |Epochs|100|
 |Learning Rate|0.00001|
 |Regularization|L2|
 |Regularization Rate|0.01|
-|Time Elapsed| 134.169s|
+|Time Elapsed| 122.318s|
 
 ![Alt Text](figures/RankNetNDCG.jpg)
 ![Alt Text](figures/RankNetError.jpg)
@@ -314,14 +313,92 @@ performed on MQ2008:
 |Layers|[46, 10, 1]|
 |Hidden Activation|Sigmoid|
 |Output Activation|Sigmoid|
-|Loss Function|Square Error|
+|Loss Function|Cross Entropy|
 |Epochs|100|
 |Learning Rate|0.00001|
 |Regularization|L2|
 |Regularization Rate|0.01|
-|Time Elapsed| 41.9s|
+|Time Elapsed| 38.262s|
 
 ![Alt Text](figures/RankNetNDCG2008.jpg)
 ![Alt Text](figures/RankNetError2008.jpg)
 
 
+#### FRankNet
+
+Note: FRankNet is still work in progress.
+
+|Parameter|Value|
+|:-:|:-:|
+|Algorithm|FRankNet|
+|Dataset|LETOR:MQ2008 Fold 1|
+|Optimizer|Momentum|
+|Weights Initialization|Gaussian|
+|Bias Initialization|Constant (0.1)|
+|Layers|[46, 5, 1]|
+|Hidden Activation|Sigmoid|
+|Output Activation|Sigmoid|
+|Loss Function|Cross Entropy|
+|Epochs|100|
+|Learning Rate|0.001|
+|Regularization|L2|
+|Regularization Rate|0.01|
+|Time Elapsed| 17.186s|
+
+![Alt Text](figures/FRankNetNDCG2008.jpg)
+![Alt Text](figures/FRankNetError2008.jpg)
+
+
+#### LambdaRank
+
+Note: LambdaRank is still work in progress.
+
+
+
+
+
+#### SortNet
+
+|Parameter|Value|
+|:-:|:-:|
+|Algorithm|SortNet|
+|Dataset|LETOR:MQ2008 Fold 1|
+|Optimizer|Momentum|
+|Weights Initialization|Xavier|
+|Bias Initialization|Constant (0.1)|
+|Layers|[46, 3, 1]|
+|Hidden Activation|Sigmoid|
+|Output Activation|Sigmoid|
+|Loss Function|Square Error|
+|Epochs|100|
+|Learning Rate|0.01|
+|Regularization|L2|
+|Regularization Rate|0.01|
+|Time Elapsed| 20.091s|
+
+
+![Alt Text](figures/SortNetNDCG2008.jpg)
+![Alt Text](figures/SortNetError2008.jpg)
+
+#### ListNet
+
+|Parameter|Value|
+|:-:|:-:|
+|Algorithm|ListNet|
+|Dataset|LETOR:MQ2007 Fold 1|
+|Optimizer|Adam|
+|Weights Initialization|Xavier|
+|Bias Initialization|Constant (0.1)|
+|Layers|[46, 15, 1] (Doubled)|
+|Hidden Activation|Identity|
+|Output Activation|Sigmoid|
+|Loss Function|Cross Entropy|
+|Epochs|100|
+|Learning Rate|0.001|
+|Regularization|L2|
+|Regularization Rate|0.01|
+|Time Elapsed| 65.3s|
+
+
+![Alt Text](figures/ListNetNDCG.jpg)
+![Alt Text](figures/ListNetError.jpg)
