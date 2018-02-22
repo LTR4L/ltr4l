@@ -4,6 +4,7 @@
     <property name="cls.dir" value="classes"/>
     <property name="lib.dir" value="lib"/>
     <property name="test.result.dir" value="test-result"/>
+    <property name="conf.dir" value="confs"/>
 
     <property name="PRODUCT_NAME" value="LTR4L"/>
     <property name="PRODUCT_VERSION" value="0.1-dev"/>
@@ -50,6 +51,16 @@
     </target>
 
     <target name="package" depends="jar" description="make package"/>
+
+    <target name="run" depends="compile" description="run Main program">
+        <property name="train" value="data/MQ2008/Fold1/train.txt"/>
+        <property name="valid" value="data/MQ2008/Fold1/vali.txt"/>
+        <property name="algo" value="ranknet"/>
+        <java classname="org.ltr4l.Main">
+            <arg line="${train} ${valid} ${conf.dir}/${algo}.config"/>
+            <classpath path="${cls.dir}"/>
+        </java>
+    </target>
 
     <target name="clean" description="clean all">
         <delete dir="${cls.dir}"/>
