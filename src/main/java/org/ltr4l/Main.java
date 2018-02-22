@@ -1,9 +1,7 @@
 package org.ltr4l;
 
 import java.io.BufferedWriter;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -25,8 +23,8 @@ public class Main {
     String configPath = args[2];
 
     prepareDataFile(null);
-    QuerySet trainingSet = processQuerySets(trainingPath);
-    QuerySet validationSet = processQuerySets(validationPath);
+    QuerySet trainingSet = QuerySet.create(trainingPath);
+    QuerySet validationSet = QuerySet.create(validationPath);
     Config configs = Config.get(configPath);
 
     String algorithm = configs.getName();
@@ -35,15 +33,6 @@ public class Main {
     trainer.trainAndValidate();
     long endTime = System.currentTimeMillis();
     System.out.println("Took " + (endTime - startTime) + " ms to complete epochs.");
-  }
-
-  private static QuerySet processQuerySets(String path) throws IOException {
-    FileInputStream input = new FileInputStream(path);
-    InputStreamReader reader = new InputStreamReader(input);
-    QuerySet querySet = new QuerySet();
-    querySet.parseQueries(reader);
-    reader.close();
-    return querySet;
   }
 
   private static void prepareDataFile(String dataSavePath) throws IOException {
