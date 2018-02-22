@@ -24,7 +24,7 @@ public class RankNetTrainer extends MLPTrainer {
     super(training, validation, config, true);
     int featureLength = trainingSet.get(0).getFeatureLength();
     Object[][] networkShape = Arrays.copyOf(config.getNetworkShape(), config.getNetworkShape().length + 1);
-    networkShape[networkShape.length - 1] = new Object[]{1, new Activation.Sigmoid()};
+    networkShape[networkShape.length - 1] = new Object[]{1, new Activation.Identity()};
     Optimizer.OptimizerFactory optFact = config.getOptFact();
     Regularization regularization = config.getReguFunction();
     String weightModel = config.getWeightInit();
@@ -56,19 +56,23 @@ public class RankNetTrainer extends MLPTrainer {
     else
       return -1d;
     double loss = 0d;
+    int nullQueryNum = 0;
     for (Document[][] query : docPairs) {
-      if (query == null)
+      if (query == null){
+        nullQueryNum++;
         continue;
+      }
       double queryLoss = 0d;
       for (Document[] pair : query) {
         double s1 = rmlp.forwardProp(pair[0]);
         double s2 = rmlp.forwardProp(pair[1]);
-        double output = Math.pow(1 + Math.exp(s2 - s1), -1);
+        //double output = Math.pow(1 + Math.exp(s2 - s1), -1);
+        double output = new Activation.Sigmoid().output(s1 - s2);
         queryLoss += new Error.ENTROPY().error(output, 1d) / (double) query.length;
       }
       loss += queryLoss;
     }
-    return loss / (double) docPairs.size();
+    return loss / (double) (docPairs.size() - nullQueryNum);
   }
 
   @Override
@@ -80,7 +84,7 @@ public class RankNetTrainer extends MLPTrainer {
     for (int i = 0; i < trainingPairs.size() / 6; i++) {
       int iq = new Random().nextInt(trainingPairs.size());
       if (trainingPairs.get(iq) == null) {
-        i--;
+        //i--;  //Note: if all queries have null for document pairs, will loop infinitely.
         continue;
       }
       for (Document[] docPair : trainingPairs.get(iq)) { //for each document pair in query iq
