@@ -57,9 +57,10 @@ $ ant clean package
 java -jar LTR4L-X.X.X.jar data/MQ2008/Fold1/train.txt data/MQ2008/Fold1/vali.txt confs/ranknet.config
 ```
 
-5- open data file:
+5- open the report file:
+
 ```
-open data.csv
+open report.csv
 ```
 
 ## Changing parameters/configurations
