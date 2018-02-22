@@ -1,0 +1,6 @@
+<ivy-module version="2.0">
+    <info organisation="org.ltr4l" module="org.ltr4l"/>
+    <dependencies>
+        <dependency org="junit" name="junit" rev="4.12"/>
+    </dependencies>
+</ivy-module>

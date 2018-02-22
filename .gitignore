@@ -1,0 +1,10 @@
+.idea
+*.iml
+Data
+data
+lib
+classes
+test-result
+target
+LTR4L-*.jar
+*.csv

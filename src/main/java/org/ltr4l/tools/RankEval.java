@@ -1,11 +1,11 @@
 package org.ltr4l.tools;
 
+import java.util.Comparator;
+import java.util.List;
+
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.trainers.Trainer;
-
-import java.util.Comparator;
-import java.util.List;
 
 public class RankEval {
 
@@ -48,7 +48,7 @@ public class RankEval {
             try{
                 total += ndcg(trainer.sortP(query), position);
             } catch (IllegalArgumentException e) {
-                System.out.println("Comparing method violates its general contract!");
+                System.err.println("Comparing method violates its general contract!");
                 badQ++;
             }
 

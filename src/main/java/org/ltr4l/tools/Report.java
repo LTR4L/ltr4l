@@ -1,28 +1,37 @@
 package org.ltr4l.tools;
 
-import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.io.PrintWriter;
 
 public class Report {
-  public static void report(int iter, double ndcg, double tloss, double vloss) {
-    report("data/data.csv", iter, ndcg, tloss, vloss);
+
+  private static final String DEFAULT_REPORT_FILE = "report.csv";
+  private final PrintWriter pw;
+
+  public static Report getReport(){
+    return getReport(DEFAULT_REPORT_FILE);
   }
 
-  //Change design so that bufferedWriter is only opened once?
-  public static void report(String filepath, int iter, double ndcg, double tloss, double vloss) {
+  public static Report getReport(String file){
     try {
-      if (!Files.exists(Paths.get(filepath)))
-        Files.createFile(Paths.get(filepath));
-      BufferedWriter bw = Files.newBufferedWriter(Paths.get(filepath), StandardOpenOption.APPEND);
-      bw.append(iter + "," + ndcg + "," + tloss + "," + vloss);
-      bw.newLine();
-      bw.close();
+      return new Report(file);
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
+  }
 
+  private Report(String file) throws IOException {
+    pw = new PrintWriter(new FileOutputStream(file));
+    pw.println(",NDCG@10,tr_loss,va_loss");  // header for CSV file
+  }
+
+  public void log(int iter, double ndcg, double tloss, double vloss){
+    System.out.printf("%d tr_loss: %f va_loss: %f ndcg@10: %f\n", iter, tloss, vloss, ndcg);
+    pw.printf("%d,%f,%f,%f\n", iter, ndcg, tloss, vloss);
+  }
+
+  public void close(){
+    if(pw != null) pw.close();
   }
 }
