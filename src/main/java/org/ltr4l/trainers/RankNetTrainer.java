@@ -56,23 +56,23 @@ public class RankNetTrainer extends MLPTrainer {
     else
       return -1d;
     double loss = 0d;
-    int nullQueryNum = 0;
+    int processedQueryNum = 0;
     for (Document[][] query : docPairs) {
-      if (query == null){
-        nullQueryNum++;
+      if (query == null)
         continue;
-      }
+      processedQueryNum++;
       double queryLoss = 0d;
       for (Document[] pair : query) {
         double s1 = rmlp.forwardProp(pair[0]);
         double s2 = rmlp.forwardProp(pair[1]);
         //double output = Math.pow(1 + Math.exp(s2 - s1), -1);
-        double output = new Activation.Sigmoid().output(s1 - s2);
-        queryLoss += new Error.ENTROPY().error(output, 1d) / (double) query.length;
+        //double output = new Activation.Sigmoid().output(s1 - s2);
+        //queryLoss += new Error.ENTROPY().error(output, 1d);
+        queryLoss += Math.log(1 + Math.exp(s2 - s1));
       }
-      loss += queryLoss;
+      loss += queryLoss / query.length;
     }
-    return loss / (double) (docPairs.size() - nullQueryNum);
+    return loss / processedQueryNum; //(double) (docPairs.size() - nullQueryNum);
   }
 
   @Override
