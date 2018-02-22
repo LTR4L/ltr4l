@@ -1,12 +1,15 @@
 package org.ltr4l.tools;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+
 import org.ltr4l.nn.Activation;
 import org.ltr4l.nn.Optimizer;
 import org.ltr4l.nn.Regularization;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
 
 public class Config {
   private int numIterations;
@@ -20,7 +23,18 @@ public class Config {
   private int PNum;
   private String name;
 
-  public Config(Reader reader) throws IOException {
+  public static Config get(String file){
+    try(InputStream is = new FileInputStream(file)){
+      try(Reader reader = new InputStreamReader(is)){
+        Config configs = new Config(reader);
+        return configs;
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private Config(Reader reader) throws IOException {
     numIterations = -1;
     learningRate = -1;
     optFact = null;

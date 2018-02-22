@@ -1,9 +1,5 @@
 package org.ltr4l;
 
-import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Config;
-import org.ltr4l.trainers.Trainer;
-
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,6 +7,10 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+
+import org.ltr4l.query.QuerySet;
+import org.ltr4l.tools.Config;
+import org.ltr4l.trainers.Trainer;
 
 /**
  * LTR Project
@@ -27,7 +27,7 @@ public class Main {
     prepareDataFile(null);
     QuerySet trainingSet = processQuerySets(trainingPath);
     QuerySet validationSet = processQuerySets(validationPath);
-    Config configs = processConfigs(configPath);
+    Config configs = Config.get(configPath);
 
     String algorithm = configs.getName();
     Trainer trainer = Trainer.TrainerFactory.getTrainer(algorithm, trainingSet, validationSet, configs);
@@ -44,14 +44,6 @@ public class Main {
     querySet.parseQueries(reader);
     reader.close();
     return querySet;
-  }
-
-  private static Config processConfigs(String configPath) throws IOException {
-    FileInputStream input = new FileInputStream(configPath);
-    InputStreamReader reader = new InputStreamReader(input);
-    Config configs = new Config(reader);
-    reader.close();
-    return configs;
   }
 
   private static void prepareDataFile(String dataSavePath) throws IOException {
