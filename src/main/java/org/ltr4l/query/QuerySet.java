@@ -47,7 +47,7 @@ public class QuerySet {
 
   public int getFeatureLength() {
     if (queries.isEmpty()) {
-      System.out.println("No valid documents.");
+      System.err.println("No valid documents.");
       return -1;
     }
     return queries.get(0).getFeatureLength();
