@@ -136,7 +136,7 @@ public class Config {
 
   public Regularization getReguFunction() {
     if (reguFunction == null) {
-      System.out.println("No regularization specified, default will be L2.");
+      System.err.println("No regularization specified, default will be L2.");
       return Regularization.RegularizationFactory.getRegularization("L2");
     }
     return reguFunction;
@@ -150,7 +150,7 @@ public class Config {
   //Have
   public Optimizer.OptimizerFactory getOptFact() {
     if (optFact == null) {
-      System.out.println("No or invalid optimizer specified. Will use default SGD.");
+      System.err.println("No or invalid optimizer specified. Will use default SGD.");
       return new Optimizer.sgdFactory();
     }
     return optFact;
