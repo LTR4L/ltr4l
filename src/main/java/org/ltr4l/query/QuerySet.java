@@ -1,7 +1,10 @@
 package org.ltr4l.query;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +15,19 @@ public class QuerySet {
 
   public QuerySet() {
     queries = new ArrayList<>();
+  }
+
+  public static QuerySet create(String file){
+    try(InputStream is = new FileInputStream(file)){
+      try(Reader reader = new InputStreamReader(is)){
+        QuerySet querySet = new QuerySet();
+        querySet.parseQueries(reader);
+        return querySet;
+      }
+    }
+    catch (IOException e){
+      throw new RuntimeException(e);
+    }
   }
 
   public static int findMaxLabel(List<Query> queries) {
