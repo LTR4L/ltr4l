@@ -1,5 +1,4 @@
 language: java
-install: ant deps
 os: linux
 jdk:
   - oraclejdk8
@@ -7,8 +6,9 @@ jdk:
 
 cache:
   directories:
-    - $HOME/.m2
-    - $HOME/.ivy
+    - $HOME/.ivy2
+
+install: ant ivy-bootstrap
 
 script:
-  - ant ivy-bootstrap test
+  - ant test
