@@ -1,3 +1,19 @@
+/*
+ * Copyright 2018 org.LTR4L
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.ltr4l.trainers;
 
 import org.ltr4l.tools.Config;
@@ -11,25 +27,26 @@ import java.util.*;
 public class OAPBPMTrainer extends LTRTrainer {
   final private OAPBPMRank ranker;
   private double maxScore;
+  private final  List<Document> trainingDocList;
 
   OAPBPMTrainer(QuerySet training, QuerySet validation, Config config) {
     super(training, validation, config.getNumIterations());
     maxScore = 0d;
     ranker = new OAPBPMRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet), config.getPNum(), config.getBernNum());
-
+    trainingDocList = new ArrayList<>();
+    for (Query query : trainingSet)
+      trainingDocList.addAll(query.getDocList());
   }
 
   @Override
   public void train() {
-    //List<Query> tSet = new ArrayList<>(trainingSet);
-    //Collections.shuffle(tSet);
-    //Collections.shuffle(trainingSet);
-    for (Query query : trainingSet) {
-      //Collections.shuffle(query.getDocList());
+    for (Document doc : trainingDocList)
+      ranker.updateWeights(doc);
+/*    for (Query query : trainingSet) {
       for (Document doc : query.getDocList()) {
         ranker.updateWeights(doc);
       }
-    }
+    }*/
   }
 
   protected double calculateLoss(List<Query> queries) {
@@ -43,11 +60,8 @@ public class OAPBPMTrainer extends LTRTrainer {
 
   @Override
   public List<Document> sortP(Query query) {
-    //List<Document> ranks = new ArrayList<>(query.getDocList()); //PROBLEM?
     List<Document> ranks = query.getDocList();
-    //Collections.shuffle(ranks);
-    ranks.sort(Comparator.comparingInt(ranker::predict).reversed());  //to put in order of highest to lowest
-    //ranks.sort((doc1, doc2) -> Integer.compare(predict(doc2), predict(doc1)));
+    ranks.sort(Comparator.comparingInt(ranker::predict).reversed());
     return ranks;
   }
 }
