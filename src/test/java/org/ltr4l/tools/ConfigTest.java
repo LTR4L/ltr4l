@@ -107,7 +107,7 @@ public class ConfigTest {
     Assert.assertTrue(config1.getOptFact() instanceof Optimizer.AdamFactory);
 
     Config config2 = Config.get(new StringReader("name:OAP\noptimizer:SGD"));
-    Assert.assertTrue(config2.getOptFact() instanceof Optimizer.sgdFactory);
+    Assert.assertTrue(config2.getOptFact() instanceof Optimizer.SGDFactory);
 
     Config config3 = Config.get(new StringReader("name:OAP\noptimizer:momentum"));
     Assert.assertTrue(config3.getOptFact() instanceof Optimizer.MomentumFactory);
@@ -117,7 +117,7 @@ public class ConfigTest {
 
     // if unknown optimizer is specified, it returns SGD
     Config config5 = Config.get(new StringReader("name:OAP\noptimizer:myGreatestOptimizer!"));
-    Assert.assertTrue(config5.getOptFact() instanceof Optimizer.sgdFactory);
+    Assert.assertTrue(config5.getOptFact() instanceof Optimizer.SGDFactory);
   }
 
   @Test

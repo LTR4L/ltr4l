@@ -57,7 +57,7 @@ public interface Optimizer {
     }
   }
 
-  class sgd implements Optimizer {
+  class SGD implements Optimizer {
 
     @Override
     public double optimize(double dw, double rate, long iter) {
@@ -65,11 +65,11 @@ public interface Optimizer {
     }
   }
 
-  class sgdFactory implements OptimizerFactory {
+  class SGDFactory implements OptimizerFactory {
 
     @Override
     public Optimizer getOptimizer() {
-      return new sgd();
+      return new SGD();
     }
   }
 
