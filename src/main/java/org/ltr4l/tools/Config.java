@@ -112,7 +112,7 @@ public class Config {
         case "adam":
           return new Optimizer.AdamFactory();
         case "sgd":
-          return new Optimizer.sgdFactory();
+          return new Optimizer.SGDFactory();
         case "momentum":
           return new Optimizer.MomentumFactory();
         case "nesterov":
@@ -154,7 +154,7 @@ public class Config {
   public Optimizer.OptimizerFactory getOptFact() {
     if (optFact == null) {
       System.err.println("No or invalid optimizer specified. Will use default SGD.");
-      return new Optimizer.sgdFactory();
+      return new Optimizer.SGDFactory();
     }
     return optFact;
   }
