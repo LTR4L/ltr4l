@@ -1,4 +1,4 @@
-#LTR4L
+# LTR4L
 
 Learning-to-Rank for Apache Lucene (compatibility with Apache Lucene is still a work-in-progress).
 
