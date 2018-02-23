@@ -68,6 +68,16 @@ abstract class MLPTrainer extends LTRTrainer {
   }
 
   @Override
+  protected void logWeights(){
+    mlp.recordWeights();
+  }
+
+  @Override
+  protected void saveBestWeights(){
+    model.log(mlp.getBestWeights());
+  }
+
+  @Override
   public List<Document> sortP(Query query) {
     List<Document> ranks = new ArrayList<>(query.getDocList());
     ranks.sort(Comparator.comparingDouble(mlp::predict).reversed());

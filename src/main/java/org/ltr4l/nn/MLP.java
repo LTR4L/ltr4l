@@ -30,6 +30,7 @@ public class MLP {
   protected int numAccumulatedDer;
   protected int nWeights;
   protected Regularization regularization;
+  protected List<List<List<Double>>> bestWeights;
 
   //CONSTRUCT NETWORK
   public MLP(int inputDim, Object[][] networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
@@ -39,6 +40,7 @@ public class MLP {
     //[4 , Softmax ]
     //[1 , Identity]
     //]
+    bestWeights = null;
     iter = 1;
     numAccumulatedDer = 0;
     this.regularization = regularization;
@@ -95,14 +97,18 @@ public class MLP {
     }
   }
 
-  public List<List<List<Double>>> getWeights() {
+  public void recordWeights() {
     //Note: went with collect as it is necessary to get a list of all weights anyway.
-    return network.stream().map(layer -> layer.stream()
+    bestWeights = network.stream().map(layer -> layer.stream()
         .map(node -> node.getOutputEdges().stream()
             .map(Edge::getWeight)
             .collect(Collectors.toList()))
         .collect(Collectors.toList()))
         .collect(Collectors.toList());
+  }
+
+  public List<List<List<Double>>> getBestWeights(){
+    return bestWeights;
   }
 
   public double predict(Document doc) {

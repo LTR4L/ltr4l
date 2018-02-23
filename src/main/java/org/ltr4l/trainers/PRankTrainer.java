@@ -43,6 +43,16 @@ public class PRankTrainer extends LTRTrainer {
   }
 
   @Override
+  protected void logWeights() {
+    model.log(ranker.getBestWeights());
+  }
+
+  @Override
+  protected void saveBestWeights() {
+    ranker.recordWeights();
+  }
+
+  @Override
   public void train() {
     Collections.shuffle(trainingDocList);
     for (Document doc : trainingDocList)
@@ -67,8 +77,9 @@ public class PRankTrainer extends LTRTrainer {
 }
 
 class PRank {
-  double[] weights;
-  double[] thresholds;
+  protected double[] weights;
+  protected double[] thresholds;
+  private double[] bestWeights;
 
   PRank(int featureLength, int maxLabel) {
     if (featureLength > 0 && maxLabel > 0) {
@@ -87,6 +98,14 @@ class PRank {
 
   public double[] getThresholds() {
     return thresholds;
+  }
+
+  public void recordWeights(){
+    bestWeights = Arrays.copyOf(weights, weights.length);
+  }
+
+  public double[] getBestWeights() {
+    return bestWeights;
   }
 
   public void updateWeights(Document doc) {

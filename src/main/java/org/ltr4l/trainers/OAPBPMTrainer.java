@@ -42,11 +42,16 @@ public class OAPBPMTrainer extends LTRTrainer {
   public void train() {
     for (Document doc : trainingDocList)
       ranker.updateWeights(doc);
-/*    for (Query query : trainingSet) {
-      for (Document doc : query.getDocList()) {
-        ranker.updateWeights(doc);
-      }
-    }*/
+  }
+
+  @Override
+  protected void logWeights() {
+    model.log(ranker.getBestWeights());
+  }
+
+  @Override
+  protected void saveBestWeights() {
+    ranker.recordWeights();
   }
 
   protected double calculateLoss(List<Query> queries) {
