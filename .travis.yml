@@ -8,4 +8,4 @@ cache:
     - $HOME/.ivy
 
 script:
-  - ant test
+  - ant ivy-bootstrap test
