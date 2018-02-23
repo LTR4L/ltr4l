@@ -21,6 +21,7 @@ import org.ltr4l.tools.Error;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
+import org.ltr4l.tools.Model;
 
 import java.util.*;
 
@@ -45,12 +46,12 @@ public class OAPBPMTrainer extends LTRTrainer {
   }
 
   @Override
-  protected void logWeights() {
+  protected void logWeights(Model model) {
     model.log(ranker.getBestWeights());
   }
 
   @Override
-  protected void saveBestWeights() {
+  protected void updateBestWeights() {
     ranker.recordWeights();
   }
 

@@ -24,6 +24,7 @@ import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.nn.Regularization;
+import org.ltr4l.tools.Model;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -68,13 +69,13 @@ abstract class MLPTrainer extends LTRTrainer {
   }
 
   @Override
-  protected void logWeights(){
-    mlp.recordWeights();
+  protected void logWeights(Model model){
+    model.log(mlp.getBestWeights());
   }
 
   @Override
-  protected void saveBestWeights(){
-    model.log(mlp.getBestWeights());
+  protected void updateBestWeights(){
+    mlp.recordWeights();
   }
 
   @Override

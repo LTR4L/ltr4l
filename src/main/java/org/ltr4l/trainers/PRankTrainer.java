@@ -16,13 +16,11 @@
 
 package org.ltr4l.trainers;
 
-import org.ltr4l.tools.Config;
-import org.ltr4l.tools.Error;
+import org.ltr4l.tools.*;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.RankEval;
-import org.ltr4l.tools.Report;
+import org.ltr4l.tools.Error;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,12 +41,12 @@ public class PRankTrainer extends LTRTrainer {
   }
 
   @Override
-  protected void logWeights() {
+  protected void logWeights(Model model) {
     model.log(ranker.getBestWeights());
   }
 
   @Override
-  protected void saveBestWeights() {
+  protected void updateBestWeights() {
     ranker.recordWeights();
   }
 

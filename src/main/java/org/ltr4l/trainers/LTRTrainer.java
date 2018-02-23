@@ -30,7 +30,6 @@ public abstract class LTRTrainer implements Trainer {
   protected List<Query> validationSet;
   double maxScore;
   protected final Report report;
-  protected final Model model;
 
   LTRTrainer(QuerySet training, QuerySet validation, int epochNum) {
     this.epochNum = epochNum;
@@ -38,7 +37,6 @@ public abstract class LTRTrainer implements Trainer {
     validationSet = validation.getQueries();
     maxScore = 0d;
     this.report = Report.getReport();  // TODO: use default Report for now...
-    this.model = Model.getModel();
   }
 
   abstract double calculateLoss(List<Query> queries);
@@ -53,10 +51,9 @@ public abstract class LTRTrainer implements Trainer {
     double newScore = RankEval.ndcgAvg(this, validationSet, pos);
     if (newScore > maxScore) {
       maxScore = newScore;
-      saveBestWeights();
+      updateBestWeights();
     }
     double[] losses = calculateLoss();
-    logWeights();
     report.log(iter, newScore, losses[0], losses[1]);
   }
 
@@ -67,10 +64,12 @@ public abstract class LTRTrainer implements Trainer {
       validate(i);
     }
     report.close();
+    Model model = Model.getModel();
+    logWeights(model);
     model.close();
   }
 
-  protected abstract void logWeights();
+  protected abstract void logWeights(Model model);
 
-  protected abstract void saveBestWeights();
+  protected abstract void updateBestWeights();
 }
