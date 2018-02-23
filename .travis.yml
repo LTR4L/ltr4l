@@ -1,0 +1,11 @@
+language: java
+os: linux
+jdk: oraclejdk8
+
+cache:
+  directories:
+    - $HOME/.m2
+    - $HOME/.ivy
+
+script:
+  - ant test
