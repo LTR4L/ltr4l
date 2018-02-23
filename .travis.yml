@@ -8,7 +8,12 @@ cache:
   directories:
     - $HOME/.ivy2
 
-install: ant ivy-bootstrap
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install ivy -y
+
+install:
+  - ant ivy-bootstrap
 
 script:
   - ant test
