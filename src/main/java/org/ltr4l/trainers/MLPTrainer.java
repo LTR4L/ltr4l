@@ -41,7 +41,7 @@ abstract class MLPTrainer extends LTRTrainer {
   }
 
   protected double calculateLoss(List<Query> queries) {
-    // Note: appears to be just as use of nested loops without streams.
+    // Note: appears to be just as fast use of nested loops without streams.
     // However, I have not tested it thoroughly.
     double loss = 0d;
     for (Query query : queries) {

@@ -11,6 +11,7 @@ import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -22,7 +23,8 @@ public class RankNetTrainer extends MLPTrainer {
   RankNetTrainer(QuerySet training, QuerySet validation, Config config) {
     super(training, validation, config, true);
     int featureLength = trainingSet.get(0).getFeatureLength();
-    Object[][] networkShape = config.getNetworkShape();
+    Object[][] networkShape = Arrays.copyOf(config.getNetworkShape(), config.getNetworkShape().length + 1);
+    networkShape[networkShape.length - 1] = new Object[]{1, new Activation.Identity()};
     Optimizer.OptimizerFactory optFact = config.getOptFact();
     Regularization regularization = config.getReguFunction();
     String weightModel = config.getWeightInit();
@@ -54,20 +56,23 @@ public class RankNetTrainer extends MLPTrainer {
     else
       return -1d;
     double loss = 0d;
+    int processedQueryNum = 0;
     for (Document[][] query : docPairs) {
       if (query == null)
         continue;
-      //loss += Arrays.stream(query).mapToDouble( pair -> new ENTROPY().error(Math.pow(1 + Math.exp(rmlp.forwardProp(pair[1]) - rmlp.forwardProp(pair[0])), -1), 1d)).sum() / query.length;
+      processedQueryNum++;
       double queryLoss = 0d;
       for (Document[] pair : query) {
         double s1 = rmlp.forwardProp(pair[0]);
         double s2 = rmlp.forwardProp(pair[1]);
-        double output = Math.pow(1 + Math.exp(s2 - s1), -1);
-        queryLoss += new Error.ENTROPY().error(output, 1d) / (double) query.length;
+        //double output = Math.pow(1 + Math.exp(s2 - s1), -1);
+        //double output = new Activation.Sigmoid().output(s1 - s2);
+        //queryLoss += new Error.ENTROPY().error(output, 1d);
+        queryLoss += Math.log(1 + Math.exp(s2 - s1));
       }
-      loss += queryLoss;
+      loss += queryLoss / query.length;
     }
-    return loss / (double) docPairs.size();
+    return loss / processedQueryNum; //(double) (docPairs.size() - nullQueryNum);
   }
 
   @Override
@@ -79,7 +84,7 @@ public class RankNetTrainer extends MLPTrainer {
     for (int i = 0; i < trainingPairs.size() / 6; i++) {
       int iq = new Random().nextInt(trainingPairs.size());
       if (trainingPairs.get(iq) == null) {
-        i--;
+        //i--;  //Note: if all queries have null for document pairs, will loop infinitely.
         continue;
       }
       for (Document[] docPair : trainingPairs.get(iq)) { //for each document pair in query iq

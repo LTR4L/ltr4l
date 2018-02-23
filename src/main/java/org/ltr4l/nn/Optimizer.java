@@ -107,5 +107,30 @@ public interface Optimizer {
       return new Nesterov();
     }
   }
+
+  class Adagrad implements Optimizer {
+    private final double eps;
+    private double cache;
+
+    Adagrad(){
+      cache = 0.0;
+      eps = 1e-6;
+    }
+
+    @Override
+    public double optimize(double dw, double rate, long iter) {
+      cache = dw * dw;
+      return - rate * dw / (Math.sqrt(cache) + eps);
+    }
+  }
+
+  class AdagradFactory implements OptimizerFactory {
+
+    @Override
+    public Optimizer getOptimizer() {
+      return new Adagrad();
+    }
+  }
+
 }
 
