@@ -32,6 +32,7 @@ public class ListNetMLP {
   protected double accErrorDer_ptSum;
   protected int nWeights;
   protected Regularization regularization;
+  List<List<List<Double>>> bestWeights;
 
   //CONSTRUCT NETWORK
   public ListNetMLP(int inputDim, Object[][] networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
@@ -97,6 +98,20 @@ public class ListNetMLP {
       default:
         return new Random().nextGaussian();
     }
+  }
+
+  public void recordWeights() {
+    //Note: went with collect as it is necessary to get a list of all weights anyway.
+    bestWeights = network.stream().map(layer -> layer.stream()
+        .map(node -> node.getOutputEdges().stream()
+            .map(edge -> edge.getWeight())
+            .collect(Collectors.toList()))
+        .collect(Collectors.toList()))
+        .collect(Collectors.toList());
+  }
+
+  public List<List<List<Double>>> getBestWeights(){
+    return bestWeights;
   }
 
   public double predict(Document doc) {

@@ -25,6 +25,7 @@ import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.nn.Regularization;
+import org.ltr4l.tools.Model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,6 +57,16 @@ public class ListNetTrainer extends LTRTrainer {
       String weightModel = config.getWeightInit();
       lmlp = new ListNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
     }
+  }
+
+  @Override
+  protected void logWeights(Model model){
+    model.log(lmlp.getBestWeights());
+  }
+
+  @Override
+  protected void updateBestWeights(){
+    lmlp.recordWeights();
   }
 
   @Override

@@ -22,6 +22,7 @@ import org.ltr4l.query.Document;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class SortNetMLP {
   private List<List<SNode>> network;
@@ -29,6 +30,7 @@ public class SortNetMLP {
   private int numAccumulatedDer;
   private int nWeights;
   private Regularization regularization;
+  private List<List<List<Double>>> bestWeights;
 
   //Construct Network
   public SortNetMLP(int inputDim, Object[][] networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
@@ -40,6 +42,7 @@ public class SortNetMLP {
     //]
     //]
     iter = 1;
+    bestWeights = null;
     numAccumulatedDer = 0;
     this.regularization = regularization;
     nWeights = inputDim * (int) networkShape[0][0];  //Number of weights used for Xavier initialization.
@@ -125,6 +128,20 @@ public class SortNetMLP {
       default:
         return new Random().nextGaussian();
     }
+  }
+
+  public void recordWeights() {
+    //Note: went with collect as it is necessary to get a list of all weights anyway.
+    bestWeights = network.stream().map(layer -> layer.stream()
+        .map(node -> node.getOutputEdges().stream()
+            .map(edge -> edge.getWeight())
+            .collect(Collectors.toList()))
+        .collect(Collectors.toList()))
+        .collect(Collectors.toList());
+  }
+
+  public List<List<List<Double>>> getBestWeights(){
+    return bestWeights;
   }
 
   // if > 0, doc1 is predicted to be more relevant than doc2

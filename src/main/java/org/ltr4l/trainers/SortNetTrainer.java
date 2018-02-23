@@ -25,6 +25,7 @@ import org.ltr4l.nn.SortNetMLP;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
+import org.ltr4l.tools.Model;
 
 import java.util.*;
 
@@ -66,6 +67,16 @@ public class SortNetTrainer extends LTRTrainer {
             validationPairs.add(documentPairs);
         }*/
 
+  }
+
+  @Override
+  protected void logWeights(Model model) {
+    model.log(smlp.getBestWeights());
+  }
+
+  @Override
+  protected void updateBestWeights() {
+    smlp.recordWeights();
   }
 
   //The following implementation is used for speed up.
