@@ -11,6 +11,7 @@ cache:
 before_install:
   - sudo apt-get update
   - sudo apt-get install ivy -y
+  - sudo ln -s -T /usr/share/java/ivy.jar /usr/share/ant/lib/ivy*.jar
 
 install:
   - ant ivy-bootstrap
