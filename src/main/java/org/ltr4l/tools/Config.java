@@ -42,12 +42,16 @@ public class Config {
   public static Config get(String file){
     try(InputStream is = new FileInputStream(file)){
       try(Reader reader = new InputStreamReader(is)){
-        Config configs = new Config(reader);
+        Config configs = get(reader);
         return configs;
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public static Config get(Reader reader) throws IOException {
+    return new Config(reader);
   }
 
   private Config(Reader reader) throws IOException {
