@@ -23,7 +23,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Properties;
 
-import org.ltr4l.nn.Activation;
+import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
 import org.ltr4l.nn.Regularization;
 
@@ -35,7 +35,7 @@ public class Config {
   private final Regularization reguFunction;
   private final String weightInit;
   private double reguRate;
-  private final Object[][] networkShape;
+  private final NetworkShape networkShape;
   private final double bernNum;
   private final int PNum;
   private final String name;
@@ -66,7 +66,7 @@ public class Config {
     reguFunction = Regularization.RegularizationFactory.getRegularization(getStrProp(props, "reguFunction", "L2"));
     weightInit = getStrProp(props, "weightInit", "zero");   // TODO: default value "zero" is correct??
     reguRate = getDoubleProp(props, "reguRate", 0); // TODO: default value 0 is correct??
-    networkShape = parseLayers(props);
+    networkShape = NetworkShape.parseSetting(props.getProperty("layers"));
     bernNum = getDoubleProp(props, "bernoulli", 0.03);
     PNum = getIntProp(props, "N", 1);   // TODO: default value 1 is appropriate?
   }
@@ -159,32 +159,7 @@ public class Config {
     return optFact;
   }
 
-  private Object[][] parseLayers(Properties props){
-    String value = props.getProperty("layers");
-    if(value == null){
-      return new Object[][]{{1, new Activation.Identity()}};
-    }
-    else{
-      String[] layersInfo = value.split(" ");
-      Object[][] nShape = new Object[layersInfo.length][2];
-      for (int i = 0; i < layersInfo.length; i++) {
-        String[] layerShape = layersInfo[i].split(",");
-        Integer nodeNum = Integer.parseInt(layerShape[0]);
-        //Default number of nodes is 1
-        if (nodeNum == null || nodeNum < 0) {
-          nodeNum = 1;
-        }
-        if (Activation.ActivationFactory.getActivator(layerShape[1]) == null)
-          nShape[i] = new Object[]{nodeNum, new Activation.Identity()};
-
-        else
-          nShape[i] = new Object[]{Integer.parseInt(layerShape[0]), Activation.ActivationFactory.getActivator(layerShape[1])};
-      }
-      return nShape;
-    }
-  }
-
-  public Object[][] getNetworkShape() {
+  public NetworkShape getNetworkShape() {
     return networkShape;
   }
 

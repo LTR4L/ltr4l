@@ -16,20 +16,19 @@
 
 package org.ltr4l.trainers;
 
-import org.ltr4l.tools.Config;
-import org.ltr4l.tools.Error;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import org.ltr4l.nn.Activation;
+import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
 import org.ltr4l.nn.RankNetMLP;
 import org.ltr4l.nn.Regularization;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import org.ltr4l.tools.Config;
 
 public class RankNetTrainer extends MLPTrainer {
   protected RankNetMLP rmlp;
@@ -39,8 +38,8 @@ public class RankNetTrainer extends MLPTrainer {
   RankNetTrainer(QuerySet training, QuerySet validation, Config config) {
     super(training, validation, config, true);
     int featureLength = trainingSet.get(0).getFeatureLength();
-    Object[][] networkShape = Arrays.copyOf(config.getNetworkShape(), config.getNetworkShape().length + 1);
-    networkShape[networkShape.length - 1] = new Object[]{1, new Activation.Identity()};
+    NetworkShape networkShape = config.getNetworkShape();
+    networkShape.add(1, new Activation.Identity());
     Optimizer.OptimizerFactory optFact = config.getOptFact();
     Regularization regularization = config.getReguFunction();
     String weightModel = config.getWeightInit();

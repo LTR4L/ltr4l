@@ -20,7 +20,7 @@ import java.util.List;
 
 public class RankNetMLP extends MLP {
 
-  public RankNetMLP(int inputDim, Object[][] networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
+  public RankNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
     super(inputDim, networkShape, optFact, regularization, weightModel);
   }
 

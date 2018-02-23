@@ -22,6 +22,7 @@ import java.util.Properties;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ltr4l.nn.Activation;
+import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
 import org.ltr4l.nn.Regularization;
 
@@ -151,20 +152,17 @@ public class ConfigTest {
   @Test
   public void testGetNetworkShape() throws Exception {
     Config config1 = Config.get(new StringReader("name:OAP\nlayers:5,Identity 1,Sigmoid"));
-    Object[][] obj1 = config1.getNetworkShape();
-    Assert.assertEquals(2, obj1.length);
-    Assert.assertEquals(2, obj1[0].length);
-    Assert.assertEquals(5, obj1[0][0]);
-    Assert.assertTrue(obj1[0][1] instanceof Activation.Identity);
-    Assert.assertEquals(2, obj1[1].length);
-    Assert.assertEquals(1, obj1[1][0]);
-    Assert.assertTrue(obj1[1][1] instanceof Activation.Sigmoid);
+    NetworkShape ns1 = config1.getNetworkShape();
+    Assert.assertEquals(2, ns1.size());
+    Assert.assertEquals(5, ns1.getLayerSetting(0).getNum());
+    Assert.assertTrue(ns1.getLayerSetting(0).getActivation() instanceof Activation.Identity);
+    Assert.assertEquals(1, ns1.getLayerSetting(1).getNum());
+    Assert.assertTrue(ns1.getLayerSetting(1).getActivation() instanceof Activation.Sigmoid);
 
     Config config2 = Config.get(new StringReader("name:OAP\nlayers:15,Sigmoid"));
-    Object[][] obj2 = config2.getNetworkShape();
-    Assert.assertEquals(1, obj2.length);
-    Assert.assertEquals(2, obj2[0].length);
-    Assert.assertEquals(15, obj2[0][0]);
-    Assert.assertTrue(obj2[0][1] instanceof Activation.Sigmoid);
+    NetworkShape ns2 = config2.getNetworkShape();
+    Assert.assertEquals(1, ns2.size());
+    Assert.assertEquals(15, ns2.getLayerSetting(0).getNum());
+    Assert.assertTrue(ns2.getLayerSetting(0).getActivation() instanceof Activation.Sigmoid);
   }
 }
