@@ -24,11 +24,11 @@ import org.ltr4l.nn.Activation;
 import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
 import org.ltr4l.nn.RankNetMLP;
-import org.ltr4l.nn.Regularization;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
+import org.ltr4l.tools.Regularization;
 
 public class RankNetTrainer extends MLPTrainer {
   protected RankNetMLP rmlp;

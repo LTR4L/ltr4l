@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package org.ltr4l.nn;
+package org.ltr4l.tools;
 
 public interface Regularization {
+
+  public static Type DEFAULT = Type.L2;
 
   double output(double weight);
 
   double derivative(double weight);
 
-  class L1 implements Regularization {
+  public class L1 implements Regularization {
 
     @Override
     public double output(double weight) {
@@ -38,7 +40,7 @@ public interface Regularization {
 
   }
 
-  class L2 implements Regularization {
+  public class L2 implements Regularization {
 
     @Override
     public double output(double weight) {
@@ -51,18 +53,21 @@ public interface Regularization {
     }
   }
 
-  class RegularizationFactory {
+  public class RegularizationFactory {
 
-    public static Regularization getRegularization(String regularization) {
-      switch (regularization) {
-        case "L1":
+    public static Regularization getRegularization(Type type) {
+      switch (type) {
+        case L1:
           return new L1();
-        case "L2":
+        case L2:
           return new L2();
         default:
-          return null;
+          return new L2();
       }
     }
   }
-}
 
+  public enum Type {
+    L1, L2;
+  }
+}

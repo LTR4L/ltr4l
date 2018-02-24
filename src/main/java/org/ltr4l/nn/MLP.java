@@ -23,13 +23,14 @@ import java.util.stream.Collectors;
 
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
+import org.ltr4l.tools.Regularization;
 
 public class MLP {
   protected List<List<Node>> network;
   protected long iter;
   protected int numAccumulatedDer;
   protected int nWeights;
-  protected Regularization regularization;
+  protected final Regularization regularization;
 
   //CONSTRUCT NETWORK
   public MLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
