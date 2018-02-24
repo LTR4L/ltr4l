@@ -22,13 +22,14 @@ import java.util.Random;
 
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
+import org.ltr4l.tools.Regularization;
 
 public class SortNetMLP {
   private List<List<SNode>> network;
   private long iter;
   private int numAccumulatedDer;
   private int nWeights;
-  private Regularization regularization;
+  private final Regularization regularization;
 
   //Construct Network
   public SortNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {

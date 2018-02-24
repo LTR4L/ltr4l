@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.ltr4l.nn.Activation;
 import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
-import org.ltr4l.nn.Regularization;
 
 public class ConfigTest {
 

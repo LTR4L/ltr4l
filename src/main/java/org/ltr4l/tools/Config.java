@@ -25,7 +25,6 @@ import java.util.Properties;
 
 import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
-import org.ltr4l.nn.Regularization;
 
 public class Config {
 
@@ -63,7 +62,8 @@ public class Config {
     numIterations = getIntProp(props, "numIterations", 100);
     learningRate = getDoubleProp(props, "learningRate", 0);   // TODO: default value 0 is correct??
     optFact = chooseOptFact(props);
-    reguFunction = Regularization.RegularizationFactory.getRegularization(getStrProp(props, "reguFunction", "L2"));
+    Regularization.Type reguType = Regularization.Type.valueOf(getStrProp(props, "reguFunction", Regularization.DEFAULT.name()));
+    reguFunction = Regularization.RegularizationFactory.getRegularization(reguType);
     weightInit = getStrProp(props, "weightInit", "zero");   // TODO: default value "zero" is correct??
     reguRate = getDoubleProp(props, "reguRate", 0); // TODO: default value 0 is correct??
     networkShape = NetworkShape.parseSetting(props.getProperty("layers"));
@@ -138,10 +138,6 @@ public class Config {
   }
 
   public Regularization getReguFunction() {
-    if (reguFunction == null) {
-      System.err.println("No regularization specified, default will be L2.");
-      return Regularization.RegularizationFactory.getRegularization("L2");
-    }
     return reguFunction;
   }
 

@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
+import org.ltr4l.tools.Regularization;
 
 public class ListNetMLP {
 
@@ -31,7 +32,7 @@ public class ListNetMLP {
   protected double accErrorDer_exSum;
   protected double accErrorDer_ptSum;
   protected int nWeights;
-  protected Regularization regularization;
+  protected final Regularization regularization;
 
   //CONSTRUCT NETWORK
   public ListNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {

@@ -23,12 +23,12 @@ import java.util.List;
 import org.ltr4l.nn.MLP;
 import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
-import org.ltr4l.nn.Regularization;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
+import org.ltr4l.tools.Regularization;
 
 abstract class MLPTrainer extends LTRTrainer {
   protected MLP mlp;

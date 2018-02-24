@@ -20,12 +20,12 @@ import org.ltr4l.nn.Activation;
 import org.ltr4l.nn.MLP;
 import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
-import org.ltr4l.nn.Regularization;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
+import org.ltr4l.tools.Regularization;
 
 public class NNRankTrainer extends MLPTrainer {
   private final int outputNodeNumber;
