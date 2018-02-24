@@ -48,7 +48,7 @@ public interface Activation {
     }
   }
 
-  class ReLu implements Activation {
+  class ReLU implements Activation {
 
     @Override
     public double output(double input) {
@@ -62,18 +62,22 @@ public interface Activation {
   }
 
   class ActivationFactory {
-    public static Activation getActivator(String actName) {
-      switch (actName.toLowerCase()) {
-        case "identity":
+    public static Activation getActivator(Type type) {
+      switch (type) {
+        case Identity:
           return new Identity();
-        case "sigmoid":
+        case Sigmoid:
           return new Sigmoid();
-        case "relu":
-          return new ReLu();
+        case ReLU:
+          return new ReLU();
         default:
-          return null;
+          return new Identity();
       }
     }
+  }
+
+  public enum Type {
+    Identity, Sigmoid, ReLU;
   }
 }
 

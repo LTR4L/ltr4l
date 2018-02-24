@@ -127,8 +127,10 @@ public class ConfigTest {
 
     Config config2 = Config.get(new StringReader("name:OAP\nreguFunction:L2"));
     Assert.assertTrue(config2.getReguFunction() instanceof Regularization.L2);
+  }
 
-    // if unknown regularization function is specified, it returns L2
+  @Test(expected = IllegalArgumentException.class)
+  public void testGetRegularizationFunctionIAE() throws Exception {
     Config config3 = Config.get(new StringReader("name:OAP\nreguFunction:myGreatestRegularizationFunc!"));
     Assert.assertTrue(config3.getReguFunction() instanceof Regularization.L2);
   }
