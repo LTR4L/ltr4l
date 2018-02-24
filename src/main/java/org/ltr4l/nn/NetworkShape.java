@@ -37,11 +37,8 @@ public class NetworkShape {
           nodeNum = 1;
         }
 
-        Activation actFunc = Activation.ActivationFactory.getActivator(layerShape[1]);
-        if (actFunc == null)
-          nShape.add(nodeNum, new Activation.Identity());
-        else
-          nShape.add(nodeNum, actFunc);
+        Activation actFunc = Activation.ActivationFactory.getActivator(Activation.Type.valueOf(layerShape[1]));
+        nShape.add(nodeNum, actFunc);
       }
       return nShape;
     }

@@ -44,7 +44,7 @@ public class NetworkShapeTest {
     NetworkShape ns1 = NetworkShape.parseSetting("9,ReLU 4,Identity 10,Sigmoid");
     Assert.assertEquals(3, ns1.size());
     Assert.assertEquals(9, ns1.getLayerSetting(0).getNum());
-    Assert.assertTrue(ns1.getLayerSetting(0).getActivation() instanceof Activation.ReLu);
+    Assert.assertTrue(ns1.getLayerSetting(0).getActivation() instanceof Activation.ReLU);
     Assert.assertEquals(4, ns1.getLayerSetting(1).getNum());
     Assert.assertTrue(ns1.getLayerSetting(1).getActivation() instanceof Activation.Identity);
     Assert.assertEquals(10, ns1.getLayerSetting(2).getNum());
