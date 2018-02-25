@@ -16,18 +16,23 @@
 
 package org.ltr4l.trainers;
 
-import org.ltr4l.tools.Config;
-import org.ltr4l.tools.Error;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import org.ltr4l.nn.Activation;
+import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
-import org.ltr4l.nn.Regularization;
 import org.ltr4l.nn.SortNetMLP;
+
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Model;
 
-import java.util.*;
+import org.ltr4l.tools.Model;
+import org.ltr4l.tools.Config;
+import org.ltr4l.tools.Error;
+import org.ltr4l.tools.Regularization;
 
 public class SortNetTrainer extends LTRTrainer {
   protected SortNetMLP smlp;
@@ -46,8 +51,8 @@ public class SortNetTrainer extends LTRTrainer {
     maxScore = 0;
     targets = new double[][]{{1, 0}, {0, 1}};
     int featureLength = trainingSet.get(0).getFeatureLength();
-    Object[][] networkShape = Arrays.copyOf(config.getNetworkShape(), config.getNetworkShape().length + 1);
-    networkShape[networkShape.length - 1] = new Object[]{1, new Activation.Sigmoid()}; //one output node, but will be doubled during creation
+    NetworkShape networkShape = config.getNetworkShape();
+    networkShape.add(1, new Activation.Sigmoid());
     Optimizer.OptimizerFactory optFact = config.getOptFact();
     Regularization regularization = config.getReguFunction();
     String weightModel = config.getWeightInit();
@@ -99,9 +104,9 @@ public class SortNetTrainer extends LTRTrainer {
         double prediction = smlp.predict(doc1, doc2);
         if (delta * prediction < threshold) {
           if (delta > 0)
-            smlp.backProp(targets[0], new Error.SQUARE());
+            smlp.backProp(targets[0], new Error.Square());
           else
-            smlp.backProp(targets[1], new Error.SQUARE());
+            smlp.backProp(targets[1], new Error.Square());
 
           smlp.updateWeights(lrRate, rgRate);
         }
@@ -144,8 +149,8 @@ public class SortNetTrainer extends LTRTrainer {
       double queryLoss = 0d;
       for (Document[] pair : pairs) {
         double[] outputs = smlp.forwardProp(pair[0], pair[1]);
-        queryLoss += new Error.SQUARE().error(outputs[0], targets[0][0]);
-        queryLoss += new Error.SQUARE().error(outputs[1], targets[0][1]);
+        queryLoss += new Error.Square().error(outputs[0], targets[0][0]);
+        queryLoss += new Error.Square().error(outputs[1], targets[0][1]);
       }
       loss += queryLoss / (double) pairs.length;
     }

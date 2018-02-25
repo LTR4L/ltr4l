@@ -16,24 +16,25 @@
 
 package org.ltr4l.nn;
 
-import org.ltr4l.tools.Error;
-import org.ltr4l.query.Document;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
+
+import org.ltr4l.query.Document;
+import org.ltr4l.tools.Error;
+import org.ltr4l.tools.Regularization;
 
 public class SortNetMLP {
   private List<List<SNode>> network;
   private long iter;
   private int numAccumulatedDer;
   private int nWeights;
-  private Regularization regularization;
   private List<List<List<Double>>> bestWeights;
+  private final Regularization regularization;
 
   //Construct Network
-  public SortNetMLP(int inputDim, Object[][] networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
+  public SortNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
     //Network shape describes number of nodes and their activation. Example:
     //[
     //[12, Sigmoid ]
@@ -45,11 +46,11 @@ public class SortNetMLP {
     bestWeights = null;
     numAccumulatedDer = 0;
     this.regularization = regularization;
-    nWeights = inputDim * (int) networkShape[0][0];  //Number of weights used for Xavier initialization.
+    nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
     network = new ArrayList<>();
 
-    for (int i = 1; i < networkShape.length; i++) {
-      nWeights += (int) networkShape[i - 1][0] * (int) networkShape[i][0];
+    for (int i = 1; i < networkShape.size(); i++) {
+      nWeights += networkShape.getLayerSetting(i - 1).getNum() * networkShape.getLayerSetting(i).getNum();
     }
 
     //Construct the initial layer:
@@ -63,11 +64,10 @@ public class SortNetMLP {
     inputLayer.addAll(inputLayerPrime);
 
     //Construct the rest of the layers and edges:
-    for (int layerId = 0; layerId < networkShape.length; layerId++) {
-      int numNodes = (int) networkShape[layerId][0];
-      Activation activation = (Activation) networkShape[layerId][1];
+    for (int layerId = 0; layerId < networkShape.size(); layerId++) {
+      int numNodes = networkShape.getLayerSetting(layerId).getNum();
+      Activation activation = networkShape.getLayerSetting(layerId).getActivation();
       double bias = weightModel.toLowerCase().equals("zero") ? 0 : 0.01;
-
 
       List<SNode> currentLayer = new ArrayList<>();
       List<SNode> layerPrime = new ArrayList<>();

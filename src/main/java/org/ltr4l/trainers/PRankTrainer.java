@@ -23,8 +23,13 @@ import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Error;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import org.ltr4l.tools.Config;
 
 public class PRankTrainer extends LTRTrainer {
   final private PRank ranker;
@@ -61,7 +66,7 @@ public class PRankTrainer extends LTRTrainer {
     double loss = 0d;
     for (Query query : queries) {
       List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> new Error.SQUARE().error(ranker.predict(doc), doc.getLabel())).sum() / docList.size();
+      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(ranker.predict(doc), doc.getLabel())).sum() / docList.size();
     }
     return loss / queries.size();
   }

@@ -16,19 +16,21 @@
 
 package org.ltr4l.trainers;
 
-import org.ltr4l.tools.Config;
-import org.ltr4l.tools.Error;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 import org.ltr4l.nn.MLP;
+import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.nn.Regularization;
-import org.ltr4l.tools.Model;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import org.ltr4l.tools.Model;
+import org.ltr4l.tools.Config;
+import org.ltr4l.tools.Error;
+import org.ltr4l.tools.Regularization;
 
 abstract class MLPTrainer extends LTRTrainer {
   protected MLP mlp;
@@ -49,7 +51,7 @@ abstract class MLPTrainer extends LTRTrainer {
     maxScore = 0;
     if (!hasOtherMLP) {
       int featureLength = trainingSet.get(0).getFeatureLength();
-      Object[][] networkShape = config.getNetworkShape();
+      NetworkShape networkShape = config.getNetworkShape();
       Optimizer.OptimizerFactory optFact = config.getOptFact();
       Regularization regularization = config.getReguFunction();
       String weightModel = config.getWeightInit();
@@ -63,7 +65,7 @@ abstract class MLPTrainer extends LTRTrainer {
     double loss = 0d;
     for (Query query : queries) {
       List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> new Error.SQUARE().error(mlp.predict(doc), doc.getLabel())).sum() / docList.size();
+      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(mlp.predict(doc), doc.getLabel())).sum() / docList.size();
     }
     return loss / queries.size();
   }
