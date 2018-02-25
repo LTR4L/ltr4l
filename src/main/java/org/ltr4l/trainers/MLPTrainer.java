@@ -34,7 +34,6 @@ import org.ltr4l.tools.Regularization;
 
 abstract class MLPTrainer extends LTRTrainer {
   protected MLP mlp;
-  protected double maxScore;
   protected double lrRate;
   protected double rgRate;
 
@@ -72,7 +71,7 @@ abstract class MLPTrainer extends LTRTrainer {
 
   @Override
   protected void logWeights(Model model){
-    model.log(mlp.getBestWeights());
+    model.log(mlp.getBestWeights(), maxScore);
   }
 
   @Override

@@ -36,7 +36,6 @@ import org.ltr4l.tools.Regularization;
 
 public class SortNetTrainer extends LTRTrainer {
   protected SortNetMLP smlp;
-  protected double maxScore;
   protected double lrRate;
   protected double rgRate;
   double[][] targets;
@@ -48,7 +47,6 @@ public class SortNetTrainer extends LTRTrainer {
     super(training, validation, config.getNumIterations());
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
-    maxScore = 0;
     targets = new double[][]{{1, 0}, {0, 1}};
     int featureLength = trainingSet.get(0).getFeatureLength();
     NetworkShape networkShape = config.getNetworkShape();
@@ -76,7 +74,7 @@ public class SortNetTrainer extends LTRTrainer {
 
   @Override
   protected void logWeights(Model model) {
-    model.log(smlp.getBestWeights());
+    model.log(smlp.getBestWeights(), maxScore );
   }
 
   @Override
