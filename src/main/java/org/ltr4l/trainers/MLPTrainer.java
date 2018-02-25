@@ -63,7 +63,7 @@ abstract class MLPTrainer extends LTRTrainer {
     double loss = 0d;
     for (Query query : queries) {
       List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> new Error.SQUARE().error(mlp.predict(doc), doc.getLabel())).sum() / docList.size();
+      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(mlp.predict(doc), doc.getLabel())).sum() / docList.size();
     }
     return loss / queries.size();
   }

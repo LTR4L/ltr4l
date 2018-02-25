@@ -22,8 +22,7 @@ public interface Error {
 
   double der(double output, double target);
 
-
-  class SQUARE implements Error {
+  public class Square implements Error {
 
     @Override
     public double error(double output, double target) {
@@ -37,12 +36,11 @@ public interface Error {
 
   }
 
-  class ENTROPY implements Error {
+  /*
+  public class Entropy implements Error {
 
     @Override
     public double error(double output, double target) {
-      if (output == 0 || output == 1)
-        System.out.println("error " + output);
       return -target * (Math.log(output)) - (1 - target) * Math.log(1 - output);
     }
 
@@ -51,21 +49,31 @@ public interface Error {
       return (-target / output) + ((1 - target) / (1 - output));
     }
   }
+  */
 
-  class LISTENTROPY implements Error {
+  /**
+   * Calculate cross entropy error with <a href="https://en.wikipedia.org/wiki/One-hot">one-hot encoding</a>.
+   * To avoid {@link java.lang.Double#NaN}, we always add a small value {@link #DELTA} to #output parameter.
+   * TODO: but if output == -DELTA, the result could be NaN...
+   */
+  public class Entropy implements Error {
+
+    static final double DELTA = 1e-8;
 
     @Override
     public double error(double output, double target) {
-      return -target * Math.log(output);
+      assert(output >= 0);
+      return -target * Math.log(output + DELTA);
     }
 
     @Override
     public double der(double output, double target) {
-      return -target / output;
+      assert(output >= 0);
+      return -target / (output + DELTA);
     }
   }
 
-  class FIDELITY implements Error {
+  public class Fidelity implements Error {
 
     @Override
     public double error(double output, double target) {

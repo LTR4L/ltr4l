@@ -91,9 +91,9 @@ public class SortNetTrainer extends LTRTrainer {
         double prediction = smlp.predict(doc1, doc2);
         if (delta * prediction < threshold) {
           if (delta > 0)
-            smlp.backProp(targets[0], new Error.SQUARE());
+            smlp.backProp(targets[0], new Error.Square());
           else
-            smlp.backProp(targets[1], new Error.SQUARE());
+            smlp.backProp(targets[1], new Error.Square());
 
           smlp.updateWeights(lrRate, rgRate);
         }
@@ -136,8 +136,8 @@ public class SortNetTrainer extends LTRTrainer {
       double queryLoss = 0d;
       for (Document[] pair : pairs) {
         double[] outputs = smlp.forwardProp(pair[0], pair[1]);
-        queryLoss += new Error.SQUARE().error(outputs[0], targets[0][0]);
-        queryLoss += new Error.SQUARE().error(outputs[1], targets[0][1]);
+        queryLoss += new Error.Square().error(outputs[0], targets[0][0]);
+        queryLoss += new Error.Square().error(outputs[1], targets[0][1]);
       }
       loss += queryLoss / (double) pairs.length;
     }
