@@ -75,7 +75,7 @@ public class ListNetTrainer extends LTRTrainer {
     for (Query query : querySet) {
       double targetSum = query.getDocList().stream().mapToDouble(i -> Math.exp(i.getLabel())).sum();
       double outputSum = query.getDocList().stream().mapToDouble(i -> Math.exp(lmlp.forwardProp(i))).sum();
-      double qLoss = query.getDocList().stream().mapToDouble(i -> new Error.LISTENTROPY().error( //-Py(log(Pfx))
+      double qLoss = query.getDocList().stream().mapToDouble(i -> new Error.Entropy().error( //-Py(log(Pfx))
           Math.exp(lmlp.forwardProp(i)) / outputSum, //output: exp(f(x)) / sum(f(x))
           i.getLabel() / targetSum))                 //target: y / sum(exp(y))
           .sum(); //sum over all documents                // Should it be exp(y)/sum(exp(y))?

@@ -73,7 +73,7 @@ public class NNRankTrainer extends MLPTrainer {
         int output = (int) mlp.predict(doc);
         int label = doc.getLabel();
         if (output != label) {
-          mlp.backProp(targetLabel(label), new Error.SQUARE());
+          mlp.backProp(targetLabel(label), new Error.Square());
           mlp.updateWeights(lrRate, rgRate);
         }
       }
