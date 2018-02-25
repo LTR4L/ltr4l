@@ -129,9 +129,9 @@ public class SortNetTrainer extends LTRTrainer {
                         double pred = smlp.predict(doc1, doc2);
                         if (delta * pred < threshold) { //Then backprop
                             if (delta > 0)
-                                smlp.backProp(targets[0], new SQUARE());
+                                smlp.backProp(targets[0], new Square());
                             else
-                                smlp.backProp(targets[1], new SQUARE());
+                                smlp.backProp(targets[1], new Square());
                             smlp.updateWeights(lrRate, rgRate);
                         }
                     }
