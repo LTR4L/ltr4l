@@ -103,7 +103,7 @@ public class ListNetMLP {
 
   public void recordWeights() {
     //Note: went with collect as it is necessary to get a list of all weights anyway.
-    bestWeights = network.stream().map(layer -> layer.stream()
+    bestWeights = network.stream().filter(layer -> layer.get(0).getOutputEdges() != null).map(layer -> layer.stream()
         .map(node -> node.getOutputEdges().stream()
             .map(edge -> edge.getWeight())
             .collect(Collectors.toList()))
@@ -260,9 +260,9 @@ public class ListNetMLP {
 
   public List<List<List<Double>>> getWeights() {
     //Note: went with collect as it is necessary to get a list of all weights anyway.
-    return network.stream().map(layer -> layer.stream()
+    return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null).map(layer -> layer.stream()
         .map(node -> node.getOutputEdges().stream()
-            .map(LEdge::getWeight)
+            .map(edge -> edge.getWeight())
             .collect(Collectors.toList()))
         .collect(Collectors.toList()))
         .collect(Collectors.toList());

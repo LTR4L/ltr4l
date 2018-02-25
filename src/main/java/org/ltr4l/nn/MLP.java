@@ -99,13 +99,25 @@ public class MLP {
   }
 
   public void recordWeights() {
-    //Note: went with collect as it is necessary to get a list of all weights anyway.
-    bestWeights = network.stream().map(layer -> layer.stream()
-        .map(node -> node.getOutputEdges().stream()
-            .map(Edge::getWeight)
+    bestWeights = network.stream().filter(layer -> layer.get(0).getOutputEdges() != null)
+        .map(layer -> layer.stream()
+          .map(node -> node.getOutputEdges().stream()
+            .map(edge -> edge.getWeight())
             .collect(Collectors.toList()))
-        .collect(Collectors.toList()))
+          .collect(Collectors.toList()))
         .collect(Collectors.toList());
+    //Code below will also assign bestWeights to desired list.
+    /*    List<List<List<Double>>> weightList = new ArrayList<>();
+    for (int layerId = 0; layerId < network.size() - 2; layerId++) {
+      List<Node> layer = network.get(layerId);
+      List<List<Double>> layerWeights = new ArrayList<>();
+      weightList.add(layerWeights);
+      for (Node node : layer) {
+        layerWeights.add(
+            node.getOutputEdges().stream().map(edge -> edge.getWeight()).collect(Collectors.toList()));
+      }
+    }
+    bestWeights = weightList*/
   }
 
   public List<List<List<Double>>> getBestWeights(){
