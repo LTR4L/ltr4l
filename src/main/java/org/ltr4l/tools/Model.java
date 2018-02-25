@@ -42,12 +42,11 @@ public class Model {
   }
 
   public void log(double[] weights){
-    System.out.println(Arrays.toString(weights));
+    pw.println(Arrays.toString(weights));
   }
 
   public void log(List<List<List<Double>>> weights) {
-    System.out.println(weights);
-
+    pw.println(weights);
   }
 
   public void close(){
