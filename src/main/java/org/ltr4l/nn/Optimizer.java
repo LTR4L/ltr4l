@@ -18,6 +18,8 @@ package org.ltr4l.nn;
 
 public interface Optimizer {
 
+  public static final Type DEFAULT = Type.sgd;
+
   double optimize(double dw, double rate, long iter);
 
   interface OptimizerFactory {
@@ -148,5 +150,24 @@ public interface Optimizer {
     }
   }
 
-}
+  public static Optimizer.OptimizerFactory getFactory(Type type) {
+    switch (type) {
+      case adam:
+        return new Optimizer.AdamFactory();
+      case sgd:
+        return new Optimizer.SGDFactory();
+      case momentum:
+        return new Optimizer.MomentumFactory();
+      case nesterov:
+        return new Optimizer.NesterovFactory();
+      case adagrad:
+        return new Optimizer.AdagradFactory();
+      default:
+        return new Optimizer.SGDFactory();
+    }
+  }
 
+  public enum Type {
+    adam, sgd, momentum, nesterov, adagrad;
+  }
+}

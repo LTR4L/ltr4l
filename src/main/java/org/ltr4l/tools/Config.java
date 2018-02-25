@@ -33,7 +33,7 @@ public class Config {
   private final Optimizer.OptimizerFactory optFact;
   private final Regularization reguFunction;
   private final String weightInit;
-  private double reguRate;
+  private final double reguRate;
   private final NetworkShape networkShape;
   private final double bernNum;
   private final int PNum;
@@ -61,7 +61,8 @@ public class Config {
     name = getReqStrProp(props, "name");
     numIterations = getIntProp(props, "numIterations", 100);
     learningRate = getDoubleProp(props, "learningRate", 0);   // TODO: default value 0 is correct??
-    optFact = chooseOptFact(props);
+    Optimizer.Type optType = Optimizer.Type.valueOf(getStrProp(props, "optimizer", Optimizer.DEFAULT.name()));
+    optFact = Optimizer.getFactory(optType);
     Regularization.Type reguType = Regularization.Type.valueOf(getStrProp(props, "reguFunction", Regularization.DEFAULT.name()));
     reguFunction = Regularization.RegularizationFactory.getRegularization(reguType);
     weightInit = getStrProp(props, "weightInit", "zero");   // TODO: default value "zero" is correct??
@@ -102,27 +103,6 @@ public class Config {
     String value = props.getProperty(name);
     if(value == null) throw new IllegalArgumentException(String.format("parameter \"%s\" must be set in config file", name));
     return Double.parseDouble(value);
-  }
-
-  private Optimizer.OptimizerFactory chooseOptFact(Properties props) {
-    String opt = props.getProperty("optimizer");
-    if(opt == null) return null;
-    else{
-      switch (opt.toLowerCase()) {
-        case "adam":
-          return new Optimizer.AdamFactory();
-        case "sgd":
-          return new Optimizer.SGDFactory();
-        case "momentum":
-          return new Optimizer.MomentumFactory();
-        case "nesterov":
-          return new Optimizer.NesterovFactory();
-        case "adagrad":
-          return new Optimizer.AdagradFactory();
-        default:
-          return null;
-      }
-    }
   }
 
   public double getLearningRate() {

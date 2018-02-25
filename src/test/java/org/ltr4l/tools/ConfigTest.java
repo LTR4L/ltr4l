@@ -103,10 +103,10 @@ public class ConfigTest {
 
   @Test
   public void testGetOptimizerFactory() throws Exception {
-    Config config1 = Config.get(new StringReader("name:OAP\noptimizer:Adam"));
+    Config config1 = Config.get(new StringReader("name:OAP\noptimizer:adam"));
     Assert.assertTrue(config1.getOptFact() instanceof Optimizer.AdamFactory);
 
-    Config config2 = Config.get(new StringReader("name:OAP\noptimizer:SGD"));
+    Config config2 = Config.get(new StringReader("name:OAP\noptimizer:sgd"));
     Assert.assertTrue(config2.getOptFact() instanceof Optimizer.SGDFactory);
 
     Config config3 = Config.get(new StringReader("name:OAP\noptimizer:momentum"));
@@ -115,7 +115,13 @@ public class ConfigTest {
     Config config4 = Config.get(new StringReader("name:OAP\noptimizer:nesterov"));
     Assert.assertTrue(config4.getOptFact() instanceof Optimizer.NesterovFactory);
 
-    // if unknown optimizer is specified, it returns SGD
+    // if no optimizer is specified, it returns SGD
+    Config config5 = Config.get(new StringReader("name:OAP\n"));
+    Assert.assertTrue(config5.getOptFact() instanceof Optimizer.SGDFactory);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testGetOptimizerFactoryIAE() throws Exception {
     Config config5 = Config.get(new StringReader("name:OAP\noptimizer:myGreatestOptimizer!"));
     Assert.assertTrue(config5.getOptFact() instanceof Optimizer.SGDFactory);
   }
