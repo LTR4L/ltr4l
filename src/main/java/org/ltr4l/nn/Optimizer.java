@@ -91,6 +91,14 @@ public interface Optimizer {
     }
   }
 
+  class MomentumFactory implements OptimizerFactory {
+
+    @Override
+    public Optimizer getOptimizer() {
+      return new Momentum();
+    }
+  }
+
   class Nesterov implements Optimizer {
     private final double beta;
     private double mp;
@@ -107,14 +115,6 @@ public interface Optimizer {
       mp = m;
       m = beta * m - rate * dw;
       return -beta * mp + (1 + beta) * m;
-    }
-  }
-
-  class MomentumFactory implements OptimizerFactory {
-
-    @Override
-    public Optimizer getOptimizer() {
-      return new Momentum();
     }
   }
 
