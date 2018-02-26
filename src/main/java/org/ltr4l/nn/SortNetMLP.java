@@ -30,7 +30,6 @@ public class SortNetMLP {
   private long iter;
   private int numAccumulatedDer;
   private int nWeights;
-  private List<List<List<Double>>> bestWeights;
   private final Regularization regularization;
 
   //Construct Network
@@ -43,7 +42,6 @@ public class SortNetMLP {
     //]
     //]
     iter = 1;
-    bestWeights = null;
     numAccumulatedDer = 0;
     this.regularization = regularization;
     nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
@@ -130,18 +128,13 @@ public class SortNetMLP {
     }
   }
 
-  public void recordWeights() {
-    //Note: went with collect as it is necessary to get a list of all weights anyway.
-    bestWeights = network.stream().filter(layer -> layer.get(0).getOutputEdges() != null).map(layer -> layer.stream()
+  public List<List<List<Double>>> obtainWeights(){
+    return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null).map(layer -> layer.stream()
         .map(node -> node.getOutputEdges().stream()
             .map(edge -> edge.getWeight())
             .collect(Collectors.toList()))
         .collect(Collectors.toList()))
         .collect(Collectors.toList());
-  }
-
-  public List<List<List<Double>>> getBestWeights(){
-    return bestWeights;
   }
 
   // if > 0, doc1 is predicted to be more relevant than doc2

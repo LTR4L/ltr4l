@@ -53,11 +53,6 @@ public class OAPBPMTrainer extends LTRTrainer {
     model.log(ranker.getBestWeights());
   }
 
-  @Override
-  protected void updateBestWeights() {
-    ranker.recordWeights();
-  }
-
   protected double calculateLoss(List<Query> queries) {
     double loss = 0d;
     for (Query query : queries) {
