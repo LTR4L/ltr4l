@@ -33,4 +33,13 @@ public class WeightInitializerTest {
   public void testGetUnknownType() throws Exception {
     WeightInitializer.get("MyGreatestWeightInitializer!", 100);
   }
+
+  @Test
+  public void testGetInitialBias() throws Exception {
+    WeightInitializer weightInit1 = WeightInitializer.get(WeightInitializer.Type.zero.name(), 100);
+    Assert.assertEquals(0, weightInit1.getInitialBias(), 0.001);
+
+    WeightInitializer weightInit2 = WeightInitializer.get(WeightInitializer.DEFAULT.name(), 100);
+    Assert.assertEquals(0.01, weightInit2.getInitialBias(), 0.001);
+  }
 }
