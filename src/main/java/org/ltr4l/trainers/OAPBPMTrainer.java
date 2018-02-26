@@ -50,7 +50,7 @@ public class OAPBPMTrainer extends LTRTrainer {
 
   @Override
   protected void logWeights(Model model) {
-    model.log(ranker.getBestWeights(), maxScore);
+    model.log(ranker.getBestWeights());
   }
 
   @Override

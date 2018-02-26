@@ -28,7 +28,7 @@ public abstract class LTRTrainer implements Trainer {
   protected int epochNum;
   protected List<Query> trainingSet;
   protected List<Query> validationSet;
-  protected double maxScore;
+  double maxScore;
   protected final Report report;
 
   LTRTrainer(QuerySet training, QuerySet validation, int epochNum) {

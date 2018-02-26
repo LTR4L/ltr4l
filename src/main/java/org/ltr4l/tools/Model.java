@@ -41,16 +41,11 @@ public class Model {
     return getModel(DEFAULT_MODEL_FILE);
   }
 
-  //TODO: Print configuration used.
-  public void log(double[] weights, double maxScore){
-    pw.println("Max NDCG@10 score: " + maxScore);
-    pw.println("Model:");
+  public void log(double[] weights){
     pw.println(Arrays.toString(weights));
   }
 
-  public void log(List<List<List<Double>>> weights, double maxScore) {
-    pw.println("Max NDCG@10 score: " + maxScore);
-    pw.println("Model:");
+  public void log(List<List<List<Double>>> weights) {
     pw.println(weights);
   }
 
