@@ -25,6 +25,7 @@ import java.util.Properties;
 
 import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
+import org.ltr4l.nn.WeightInitializer;
 
 public class Config {
 
@@ -66,7 +67,7 @@ public class Config {
     optFact = Optimizer.getFactory(optType);
     Regularization.Type reguType = Regularization.Type.valueOf(getStrProp(props, "reguFunction", Regularization.DEFAULT.name()));
     reguFunction = Regularization.RegularizationFactory.getRegularization(reguType);
-    weightInit = getStrProp(props, "weightInit", "zero");   // TODO: default value "zero" is correct??
+    weightInit = getStrProp(props, "weightInit", WeightInitializer.DEFAULT.name());
     reguRate = getDoubleProp(props, "reguRate", 0); // TODO: default value 0 is correct??
     networkShape = NetworkShape.parseSetting(props.getProperty("layers"));
     bernNum = getDoubleProp(props, "bernoulli", 0.03);

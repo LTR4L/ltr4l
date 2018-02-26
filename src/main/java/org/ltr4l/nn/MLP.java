@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.ltr4l.query.Document;
@@ -31,9 +32,9 @@ public class MLP {
   protected List<List<Node>> network;
   protected long iter;
   protected int numAccumulatedDer;
-  protected int nWeights;
   protected final Regularization regularization;
   protected static final String DEFAULT_MODEL_FILE = "model.txt";
+  protected final WeightInitializer weightInit;
 
   //CONSTRUCT NETWORK
   public MLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
@@ -46,12 +47,13 @@ public class MLP {
     iter = 1;
     numAccumulatedDer = 0;
     this.regularization = regularization;
-    nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
+    int nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
     network = new ArrayList<>();
 
     for (int i = 1; i < networkShape.size(); i++) {
       nWeights += networkShape.getLayerSetting(i - 1).getNum() * networkShape.getLayerSetting(i).getNum();
     }
+    weightInit = WeightInitializer.get(weightModel, nWeights);
 
     //Start with constructing the input layer
     List<Node> currentLayer = new ArrayList<>();
@@ -61,12 +63,12 @@ public class MLP {
     network.add(currentLayer);
 
     //Construct hidden layers
+    final double bias = weightInit.getInitialBias();
     for (int layerNum = 0; layerNum < networkShape.size(); layerNum++) {
       currentLayer = new ArrayList<>();
       network.add(currentLayer);
       int nodeNum = networkShape.getLayerSetting(layerNum).getNum();
       Activation activation = networkShape.getLayerSetting(layerNum).getActivation();
-      double bias = weightModel.toLowerCase().equals("zero") ? 0 : 0.01;
 
       for (int i = 0; i < nodeNum; i++) {
         Node currentNode = new Node(activation);
@@ -75,14 +77,13 @@ public class MLP {
         currentLayer.add(currentNode);
 
         for (Node previousNode : network.get(layerNum)) {    //Note network.get(layerNum) is previous layer!
-          Edge edge = new Edge(previousNode, currentNode, optFact.getOptimizer(), weightInit(weightModel));
+          Edge edge = new Edge(previousNode, currentNode, optFact.getOptimizer(), weightInit.getNextRandomInitialWeight());
           currentNode.addInputEdge(edge);
           previousNode.addOutputEdge(edge);
         }
       }
     }
   }
-
 
   private List<List<List<Double>>> obtainWeights(){
     return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null)

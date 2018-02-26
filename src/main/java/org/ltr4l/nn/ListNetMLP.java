@@ -22,7 +22,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.ltr4l.query.Document;
@@ -35,9 +34,9 @@ public class ListNetMLP {
   protected long iter;
   protected double accErrorDer_exSum;
   protected double accErrorDer_ptSum;
-  protected int nWeights;
   protected final Regularization regularization;
   protected static final String DEFAULT_MODEL_FILE = "model.txt";
+  protected final WeightInitializer weightInit;
 
   //CONSTRUCT NETWORK
   public ListNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
@@ -51,12 +50,13 @@ public class ListNetMLP {
     accErrorDer_exSum = 0;
     accErrorDer_ptSum = 0;
     this.regularization = regularization;
-    nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
+    int nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
     network = new ArrayList<>();
 
     for (int i = 1; i < networkShape.size(); i++) {
       nWeights += networkShape.getLayerSetting(i - 1).getNum() * networkShape.getLayerSetting(i).getNum();
     }
+    weightInit = WeightInitializer.get(weightModel, nWeights);
 
     //Start with constructing the input layer
     List<LNode> currentLayer = new ArrayList<>();
@@ -66,12 +66,12 @@ public class ListNetMLP {
     network.add(currentLayer);
 
     //Construct hidden layers
+    final double bias = weightInit.getInitialBias();
     for (int layerNum = 0; layerNum < networkShape.size(); layerNum++) {
       currentLayer = new ArrayList<>();
       network.add(currentLayer);
       int nodeNum = networkShape.getLayerSetting(layerNum).getNum();
       Activation activation = networkShape.getLayerSetting(layerNum).getActivation();
-      double bias = weightModel.toLowerCase().equals("zero") ? 0 : 0.01;
 
       for (int i = 0; i < nodeNum; i++) {
         LNode currentNode = new LNode(activation);
@@ -80,29 +80,13 @@ public class ListNetMLP {
         currentLayer.add(currentNode);
 
         for (LNode previousNode : network.get(layerNum)) {    //Note network.get(layerNum) is previous layer!
-          LEdge edge = new LEdge(previousNode, currentNode, optFact.getOptimizer(), weightInit(weightModel));
+          LEdge edge = new LEdge(previousNode, currentNode, optFact.getOptimizer(), weightInit.getNextRandomInitialWeight());
           currentNode.addInputEdge(edge);
           previousNode.addOutputEdge(edge);
         }
       }
     }
     network.get(network.size() - 1).get(0).setOutputDer(1); //Set the last node's output derivative to 1
-  }
-
-  private double weightInit(String init) {
-    init.toLowerCase();
-    switch (init) {
-      case "xavier":
-        return new Random().nextGaussian() / nWeights;
-      case "normal":
-        return new Random().nextGaussian();
-      case "uniform":
-        return new Random().nextDouble();
-      case "zero":
-        return 0d;
-      default:
-        return new Random().nextGaussian();
-    }
   }
 
   private List<List<List<Double>>> obtainWeights(){
