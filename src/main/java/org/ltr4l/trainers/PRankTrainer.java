@@ -51,11 +51,6 @@ public class PRankTrainer extends LTRTrainer {
   }
 
   @Override
-  protected void updateBestWeights() {
-    ranker.recordWeights();
-  }
-
-  @Override
   public void train() {
     Collections.shuffle(trainingDocList);
     for (Document doc : trainingDocList)
@@ -82,7 +77,6 @@ public class PRankTrainer extends LTRTrainer {
 class PRank {
   protected double[] weights;
   protected double[] thresholds;
-  private double[] bestWeights;
 
   PRank(int featureLength, int maxLabel) {
     if (featureLength > 0 && maxLabel > 0) {
@@ -103,12 +97,8 @@ class PRank {
     return thresholds;
   }
 
-  public void recordWeights(){
-    bestWeights = Arrays.copyOf(weights, weights.length);
-  }
-
   public double[] getBestWeights() {
-    return bestWeights;
+    return weights;
   }
 
   public void updateWeights(Document doc) {

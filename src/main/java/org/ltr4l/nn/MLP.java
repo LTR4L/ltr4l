@@ -30,7 +30,6 @@ public class MLP {
   protected long iter;
   protected int numAccumulatedDer;
   protected int nWeights;
-  protected List<List<List<Double>>> bestWeights;
   protected final Regularization regularization;
 
   //CONSTRUCT NETWORK
@@ -41,7 +40,6 @@ public class MLP {
     //[4 , Softmax ]
     //[1 , Identity]
     //]
-    bestWeights = null;
     iter = 1;
     numAccumulatedDer = 0;
     this.regularization = regularization;
@@ -98,30 +96,14 @@ public class MLP {
     }
   }
 
-  public void recordWeights() {
-    bestWeights = network.stream().filter(layer -> layer.get(0).getOutputEdges() != null)
+  public List<List<List<Double>>> obtainWeights(){
+    return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null)
         .map(layer -> layer.stream()
-          .map(node -> node.getOutputEdges().stream()
-            .map(edge -> edge.getWeight())
+            .map(node -> node.getOutputEdges().stream()
+                .map(edge -> edge.getWeight())
+                .collect(Collectors.toList()))
             .collect(Collectors.toList()))
-          .collect(Collectors.toList()))
         .collect(Collectors.toList());
-    //Code below will also assign bestWeights to desired list.
-    /*    List<List<List<Double>>> weightList = new ArrayList<>();
-    for (int layerId = 0; layerId < network.size() - 2; layerId++) {
-      List<Node> layer = network.get(layerId);
-      List<List<Double>> layerWeights = new ArrayList<>();
-      weightList.add(layerWeights);
-      for (Node node : layer) {
-        layerWeights.add(
-            node.getOutputEdges().stream().map(edge -> edge.getWeight()).collect(Collectors.toList()));
-      }
-    }
-    bestWeights = weightList*/
-  }
-
-  public List<List<List<Double>>> getBestWeights(){
-    return bestWeights;
   }
 
   public double predict(Document doc) {

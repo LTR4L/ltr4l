@@ -51,7 +51,6 @@ public abstract class LTRTrainer implements Trainer {
     double newScore = RankEval.ndcgAvg(this, validationSet, pos);
     if (newScore > maxScore) {
       maxScore = newScore;
-      updateBestWeights();
     }
     double[] losses = calculateLoss();
     report.log(iter, newScore, losses[0], losses[1]);
@@ -71,5 +70,4 @@ public abstract class LTRTrainer implements Trainer {
 
   protected abstract void logWeights(Model model);
 
-  protected abstract void updateBestWeights();
 }

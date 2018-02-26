@@ -72,12 +72,7 @@ abstract class MLPTrainer extends LTRTrainer {
 
   @Override
   protected void logWeights(Model model){
-    model.log(mlp.getBestWeights());
-  }
-
-  @Override
-  protected void updateBestWeights(){
-    mlp.recordWeights();
+    model.log(mlp.obtainWeights());
   }
 
   @Override
