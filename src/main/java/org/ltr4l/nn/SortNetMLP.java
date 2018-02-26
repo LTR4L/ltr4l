@@ -33,7 +33,6 @@ public class SortNetMLP {
   private List<List<SNode>> network;
   private long iter;
   private int numAccumulatedDer;
-  private int nWeights;
   private final Regularization regularization;
   protected static final String DEFAULT_MODEL_FILE = "model.txt";
 
@@ -49,7 +48,7 @@ public class SortNetMLP {
     iter = 1;
     numAccumulatedDer = 0;
     this.regularization = regularization;
-    nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
+    int nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
     network = new ArrayList<>();
 
     for (int i = 1; i < networkShape.size(); i++) {

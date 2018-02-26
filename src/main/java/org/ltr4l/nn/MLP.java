@@ -19,7 +19,8 @@ package org.ltr4l.nn;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ltr4l.query.Document;
@@ -82,21 +83,6 @@ public class MLP {
     }
   }
 
-  private double weightInit(String init) {
-    init.toLowerCase();
-    switch (init) {
-      case "xavier":
-        return new Random().nextGaussian() / nWeights;
-      case "normal":
-        return new Random().nextGaussian();
-      case "uniform":
-        return new Random().nextDouble();
-      case "zero":
-        return 0d;
-      default:
-        return new Random().nextGaussian();
-    }
-  }
 
   private List<List<List<Double>>> obtainWeights(){
     return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null)
