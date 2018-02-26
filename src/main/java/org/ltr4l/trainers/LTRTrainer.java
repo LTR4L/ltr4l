@@ -63,11 +63,12 @@ public abstract class LTRTrainer implements Trainer {
       validate(i);
     }
     report.close();
-    Model model = Model.getModel();
+    logWeights();
+/*    Model model = Model.getModel();
     logWeights(model);
-    model.close();
+    model.close();*/
   }
 
-  protected abstract void logWeights(Model model);
+  protected abstract void logWeights();
 
 }

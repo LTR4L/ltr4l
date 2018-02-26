@@ -61,8 +61,8 @@ public class ListNetTrainer extends LTRTrainer {
   }
 
   @Override
-  protected void logWeights(Model model){
-    model.log(lmlp.obtainWeights());
+  public void logWeights(){
+    lmlp.writeModel();
   }
 
   @Override

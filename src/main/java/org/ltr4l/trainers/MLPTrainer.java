@@ -71,8 +71,8 @@ abstract class MLPTrainer extends LTRTrainer {
   }
 
   @Override
-  protected void logWeights(Model model){
-    model.log(mlp.obtainWeights());
+  protected void logWeights(){
+    mlp.writeModel();
   }
 
   @Override
@@ -81,4 +81,5 @@ abstract class MLPTrainer extends LTRTrainer {
     ranks.sort(Comparator.comparingDouble(mlp::predict).reversed());
     return ranks;
   }
+
 }

@@ -75,8 +75,8 @@ public class SortNetTrainer extends LTRTrainer {
   }
 
   @Override
-  protected void logWeights(Model model) {
-    model.log(smlp.obtainWeights());
+  public void logWeights(){
+    smlp.writeModel();
   }
 
   //The following implementation is used for speed up.

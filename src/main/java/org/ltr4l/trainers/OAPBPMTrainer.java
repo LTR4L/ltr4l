@@ -48,11 +48,6 @@ public class OAPBPMTrainer extends LTRTrainer {
       ranker.updateWeights(doc);
   }
 
-  @Override
-  protected void logWeights(Model model) {
-    model.log(ranker.getBestWeights());
-  }
-
   protected double calculateLoss(List<Query> queries) {
     double loss = 0d;
     for (Query query : queries) {
@@ -67,6 +62,11 @@ public class OAPBPMTrainer extends LTRTrainer {
     List<Document> ranks = query.getDocList();
     ranks.sort(Comparator.comparingInt(ranker::predict).reversed());
     return ranks;
+  }
+
+  @Override
+  public void logWeights(){
+    ranker.writeModel();
   }
 }
 

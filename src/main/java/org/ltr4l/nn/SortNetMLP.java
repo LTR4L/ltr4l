@@ -16,6 +16,9 @@
 
 package org.ltr4l.nn;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -31,6 +34,7 @@ public class SortNetMLP {
   private int numAccumulatedDer;
   private int nWeights;
   private final Regularization regularization;
+  protected static final String DEFAULT_MODEL_FILE = "model.txt";
 
   //Construct Network
   public SortNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
@@ -128,13 +132,26 @@ public class SortNetMLP {
     }
   }
 
-  public List<List<List<Double>>> obtainWeights(){
+  private List<List<List<Double>>> obtainWeights(){
     return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null).map(layer -> layer.stream()
         .map(node -> node.getOutputEdges().stream()
             .map(edge -> edge.getWeight())
             .collect(Collectors.toList()))
         .collect(Collectors.toList()))
         .collect(Collectors.toList());
+  }
+
+  public void writeModel() {
+    writeModel(DEFAULT_MODEL_FILE);
+  }
+
+  public void writeModel(String file){
+    try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
+      pw.println(obtainWeights());
+
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   // if > 0, doc1 is predicted to be more relevant than doc2

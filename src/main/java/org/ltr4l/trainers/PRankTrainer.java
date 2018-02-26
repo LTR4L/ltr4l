@@ -22,6 +22,9 @@ import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Error;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.IntStream;
 import java.util.ArrayList;
@@ -46,8 +49,8 @@ public class PRankTrainer extends LTRTrainer {
   }
 
   @Override
-  protected void logWeights(Model model) {
-    model.log(ranker.getBestWeights());
+  protected void logWeights(){
+    ranker.writeModel();
   }
 
   @Override
@@ -77,6 +80,7 @@ public class PRankTrainer extends LTRTrainer {
 class PRank {
   protected double[] weights;
   protected double[] thresholds;
+  protected static final String DEFAULT_MODEL_FILE = "model.txt";
 
   PRank(int featureLength, int maxLabel) {
     if (featureLength > 0 && maxLabel > 0) {
@@ -99,6 +103,19 @@ class PRank {
 
   public double[] getBestWeights() {
     return weights;
+  }
+
+  public void writeModel() {
+    writeModel(DEFAULT_MODEL_FILE);
+  }
+
+  public void writeModel(String file){
+    try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
+      pw.println(Arrays.toString(weights));
+
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public void updateWeights(Document doc) {
@@ -146,5 +163,7 @@ class PRank {
     }
     return wx;
   }
+
+
 
 }
