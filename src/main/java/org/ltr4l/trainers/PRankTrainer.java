@@ -16,7 +16,6 @@
 
 package org.ltr4l.trainers;
 
-import org.ltr4l.tools.*;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
@@ -38,9 +37,11 @@ public class PRankTrainer extends LTRTrainer {
   final private PRank ranker;
   private double maxScore;
   private final  List<Document> trainingDocList;
+  private final Config config;
 
-  PRankTrainer(QuerySet training, QuerySet validation, Config configs) {
-    super(training, validation, configs.getNumIterations());
+  PRankTrainer(QuerySet training, QuerySet validation, Config config) {
+    super(training, validation, config.getNumIterations());
+    this.config = config;
     maxScore = 0.0;
     ranker = new PRank(training.getFeatureLength(), QuerySet.findMaxLabel(trainingSet));
     trainingDocList = new ArrayList<>();
@@ -50,7 +51,7 @@ public class PRankTrainer extends LTRTrainer {
 
   @Override
   protected void logWeights(){
-    ranker.writeModel();
+    ranker.writeModel(config.getProps());
   }
 
   @Override
@@ -105,17 +106,20 @@ class PRank {
     return weights;
   }
 
-  public void writeModel() {
-    writeModel(DEFAULT_MODEL_FILE);
-  }
-
-  public void writeModel(String file){
+  public void writeModel(Properties props, String file) {
     try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
-      pw.println(Arrays.toString(weights));
+      props.store(pw, "Saved model");
+      pw.println("model=" + Arrays.toString(weights)); //To ensure model gets written at the end.
+      //props.setProperty("model", obtainWeights().toString());
+      //props.store(pw, "Saved model");
 
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public void writeModel(Properties prop){
+    writeModel(prop, DEFAULT_MODEL_FILE);
   }
 
   public void updateWeights(Document doc) {
@@ -163,7 +167,5 @@ class PRank {
     }
     return wx;
   }
-
-
 
 }

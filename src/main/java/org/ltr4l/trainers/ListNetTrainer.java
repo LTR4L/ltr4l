@@ -27,7 +27,6 @@ import org.ltr4l.nn.Optimizer;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Model;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
@@ -37,6 +36,7 @@ public class ListNetTrainer extends LTRTrainer {
   private double lrRate;
   private double rgRate;
   private ListNetMLP lmlp;
+  private final Config config;
 
   ListNetTrainer(QuerySet training, QuerySet validation, Config config) {
     this(training, validation, config, false);
@@ -46,6 +46,7 @@ public class ListNetTrainer extends LTRTrainer {
   //It gives child classes the ability to assign an extended MLP.
   ListNetTrainer(QuerySet training, QuerySet validation, Config config, boolean hasOtherMLP) {
     super(training, validation, config.getNumIterations());
+    this.config = config;
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
@@ -62,7 +63,7 @@ public class ListNetTrainer extends LTRTrainer {
 
   @Override
   public void logWeights(){
-    lmlp.writeModel();
+    lmlp.writeModel(config.getProps());
   }
 
   @Override

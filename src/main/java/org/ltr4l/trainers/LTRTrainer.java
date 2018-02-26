@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Model;
 import org.ltr4l.tools.RankEval;
 import org.ltr4l.tools.Report;
 
@@ -64,9 +63,6 @@ public abstract class LTRTrainer implements Trainer {
     }
     report.close();
     logWeights();
-/*    Model model = Model.getModel();
-    logWeights(model);
-    model.close();*/
   }
 
   protected abstract void logWeights();

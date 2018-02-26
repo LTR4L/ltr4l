@@ -29,7 +29,6 @@ import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 
-import org.ltr4l.tools.Model;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
@@ -39,13 +38,15 @@ public class SortNetTrainer extends LTRTrainer {
   protected double maxScore;
   protected double lrRate;
   protected double rgRate;
-  double[][] targets;
+  protected double[][] targets;
+  protected final Config config;
   //protected List<Document[][]> trainingPairs;
   //protected List<Document[][]> validationPairs;
 
 
   SortNetTrainer(QuerySet training, QuerySet validation, Config config) {
     super(training, validation, config.getNumIterations());
+    this.config = config;
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
@@ -76,7 +77,7 @@ public class SortNetTrainer extends LTRTrainer {
 
   @Override
   public void logWeights(){
-    smlp.writeModel();
+    smlp.writeModel(config.getProps());
   }
 
   //The following implementation is used for speed up.

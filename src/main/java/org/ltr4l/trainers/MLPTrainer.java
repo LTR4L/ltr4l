@@ -27,7 +27,6 @@ import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 
-import org.ltr4l.tools.Model;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
@@ -37,6 +36,7 @@ abstract class MLPTrainer extends LTRTrainer {
   protected double maxScore;
   protected double lrRate;
   protected double rgRate;
+  protected Config config;
 
   MLPTrainer(QuerySet training, QuerySet validation, Config config) {
     this(training, validation, config, false);
@@ -46,6 +46,7 @@ abstract class MLPTrainer extends LTRTrainer {
   //It gives child classes the ability to assign an extended MLP.
   MLPTrainer(QuerySet training, QuerySet validation, Config config, boolean hasOtherMLP) {
     super(training, validation, config.getNumIterations());
+    this.config = config;
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
@@ -72,7 +73,7 @@ abstract class MLPTrainer extends LTRTrainer {
 
   @Override
   protected void logWeights(){
-    mlp.writeModel();
+    mlp.writeModel(config.getProps());
   }
 
   @Override

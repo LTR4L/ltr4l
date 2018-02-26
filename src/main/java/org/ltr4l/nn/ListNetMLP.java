@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -113,17 +114,20 @@ public class ListNetMLP {
         .collect(Collectors.toList());
   }
 
-  public void writeModel() {
-    writeModel(DEFAULT_MODEL_FILE);
-  }
-
-  public void writeModel(String file){
+  public void writeModel(Properties props, String file) {
     try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
-      pw.println(obtainWeights());
+      props.store(pw, "Saved model");
+      pw.println("model=" + obtainWeights()); //To ensure model gets written at the end.
+      //props.setProperty("model", obtainWeights().toString());
+      //props.store(pw, "Saved model");
 
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public void writeModel(Properties prop){
+    writeModel(prop, DEFAULT_MODEL_FILE);
   }
 
   public double predict(Document doc) {

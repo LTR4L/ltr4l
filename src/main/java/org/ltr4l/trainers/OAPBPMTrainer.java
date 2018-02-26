@@ -24,7 +24,6 @@ import java.util.Random;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Model;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 
@@ -32,9 +31,11 @@ public class OAPBPMTrainer extends LTRTrainer {
   final private OAPBPMRank ranker;
   private double maxScore;
   private final  List<Document> trainingDocList;
+  private final Config configs;
 
   OAPBPMTrainer(QuerySet training, QuerySet validation, Config config) {
     super(training, validation, config.getNumIterations());
+    this.configs = config;
     maxScore = 0d;
     ranker = new OAPBPMRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet), config.getPNum(), config.getBernNum());
     trainingDocList = new ArrayList<>();
@@ -66,7 +67,7 @@ public class OAPBPMTrainer extends LTRTrainer {
 
   @Override
   public void logWeights(){
-    ranker.writeModel();
+    ranker.writeModel(configs.getProps());
   }
 }
 
