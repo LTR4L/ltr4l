@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.ltr4l.nn.Activation;
 import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
+import org.ltr4l.nn.WeightInitializer;
 
 public class ConfigTest {
 
@@ -79,7 +80,7 @@ public class ConfigTest {
 
     Assert.assertEquals(100, config.getNumIterations());
     Assert.assertEquals(0, config.getLearningRate(), 0.001);
-    Assert.assertEquals("zero", config.getWeightInit());
+    Assert.assertEquals(WeightInitializer.DEFAULT.name(), config.getWeightInit());
     Assert.assertEquals(0.03, config.getBernNum(), 0.0001);
     Assert.assertEquals(1, config.getPNum());
     Assert.assertEquals(0, config.getReguRate(), 0.0001);

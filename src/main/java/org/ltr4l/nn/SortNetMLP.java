@@ -18,7 +18,6 @@ package org.ltr4l.nn;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
@@ -28,8 +27,8 @@ public class SortNetMLP {
   private List<List<SNode>> network;
   private long iter;
   private int numAccumulatedDer;
-  private int nWeights;
   private final Regularization regularization;
+  private final WeightInitializer weightInit;
 
   //Construct Network
   public SortNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
@@ -43,12 +42,13 @@ public class SortNetMLP {
     iter = 1;
     numAccumulatedDer = 0;
     this.regularization = regularization;
-    nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
+    int nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
     network = new ArrayList<>();
 
     for (int i = 1; i < networkShape.size(); i++) {
       nWeights += networkShape.getLayerSetting(i - 1).getNum() * networkShape.getLayerSetting(i).getNum();
     }
+    weightInit = WeightInitializer.get(weightModel, nWeights);
 
     //Construct the initial layer:
     List<SNode> inputLayer = new ArrayList<>();
@@ -61,10 +61,10 @@ public class SortNetMLP {
     inputLayer.addAll(inputLayerPrime);
 
     //Construct the rest of the layers and edges:
+    final double bias = weightInit.getInitialBias();
     for (int layerId = 0; layerId < networkShape.size(); layerId++) {
       int numNodes = networkShape.getLayerSetting(layerId).getNum();
       Activation activation = networkShape.getLayerSetting(layerId).getActivation();
-      double bias = weightModel.toLowerCase().equals("zero") ? 0 : 0.01;
 
       List<SNode> currentLayer = new ArrayList<>();
       List<SNode> layerPrime = new ArrayList<>();
@@ -88,7 +88,7 @@ public class SortNetMLP {
         for (int nodeId = 0; nodeId < prevLayer.size() / 2; nodeId++) {
           SNode prevSNode0 = prevLayer.get(nodeId);
           SNode prevSNode1 = prevLayer.get(nodeId + prevLayer.size() / 2);
-          double weight = weightInit(weightModel);
+          double weight = weightInit.getNextRandomInitialWeight();
           SNode[] prevNodePair = {prevSNode0, prevSNode1};
           SEdge sEdge = new SEdge(prevNodePair, sNodePair, opt, weight);
 
@@ -98,7 +98,7 @@ public class SortNetMLP {
           sNode1.addInputEdge(sEdge);
 
           //Get another weight, and set up an edge for reversed pair.
-          weight = weightInit(weightModel);
+          weight = weightInit.getNextRandomInitialWeight();
           prevNodePair = new SNode[]{prevSNode1, prevSNode0};
           sEdge = new SEdge(prevNodePair, sNodePair, opt, weight);
           prevSNode1.addOutputEdge(sEdge);
@@ -108,22 +108,6 @@ public class SortNetMLP {
         }
       }
       currentLayer.addAll(layerPrime);
-    }
-  }
-
-  private double weightInit(String init) {
-    init.toLowerCase();
-    switch (init) {
-      case "xavier":
-        return new Random().nextGaussian() / nWeights;
-      case "normal":
-        return new Random().nextGaussian();
-      case "uniform":
-        return new Random().nextDouble();
-      case "zero":
-        return 0;
-      default:
-        return new Random().nextGaussian();
     }
   }
 
