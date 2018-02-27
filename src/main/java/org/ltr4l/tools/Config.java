@@ -39,6 +39,7 @@ public class Config {
   private final double bernNum;
   private final int PNum;
   private final String name;
+  private final Properties props;
 
   public static Config get(String file){
     try(InputStream is = new FileInputStream(file)){
@@ -56,7 +57,7 @@ public class Config {
   }
 
   private Config(Reader reader) throws IOException {
-    Properties props = new Properties();
+    props = new Properties(); //Changed to class variable for printing model.
     props.load(reader);
 
     name = getReqStrProp(props, "name");
@@ -150,5 +151,9 @@ public class Config {
 
   public String getName() {
     return name;
+  }
+
+  public Properties getProps() {
+    return props;
   }
 }

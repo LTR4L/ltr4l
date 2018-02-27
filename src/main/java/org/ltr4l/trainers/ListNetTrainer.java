@@ -20,16 +20,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import org.ltr4l.nn.Activation;
-import org.ltr4l.nn.ListNetMLP;
-import org.ltr4l.nn.NetworkShape;
-import org.ltr4l.nn.Optimizer;
+import org.ltr4l.nn.*;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
+
 
 public class ListNetTrainer extends LTRTrainer {
   private double lrRate;
@@ -43,7 +41,7 @@ public class ListNetTrainer extends LTRTrainer {
   //This constructor exists solely for the purpose of child classes
   //It gives child classes the ability to assign an extended MLP.
   ListNetTrainer(QuerySet training, QuerySet validation, Config config, boolean hasOtherMLP) {
-    super(training, validation, config.getNumIterations());
+    super(training, validation, config);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
@@ -85,10 +83,9 @@ public class ListNetTrainer extends LTRTrainer {
   }
 
   @Override
-  public List<Document> sortP(Query query) {
-    List<Document> ranks = new ArrayList<>(query.getDocList());
-    ranks.sort(Comparator.comparingDouble(lmlp::predict).reversed());
-    return ranks;
+  Ranker getRanker() {
+    return lmlp;
   }
+
 }
 

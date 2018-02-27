@@ -23,9 +23,11 @@ import java.util.List;
 import org.ltr4l.nn.MLP;
 import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
+import org.ltr4l.nn.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
+
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
@@ -35,6 +37,7 @@ abstract class MLPTrainer extends LTRTrainer {
   protected double maxScore;
   protected double lrRate;
   protected double rgRate;
+  //protected Config config;
 
   MLPTrainer(QuerySet training, QuerySet validation, Config config) {
     this(training, validation, config, false);
@@ -43,7 +46,7 @@ abstract class MLPTrainer extends LTRTrainer {
   //This constructor exists solely for the purpose of child classes
   //It gives child classes the ability to assign an extended MLP.
   MLPTrainer(QuerySet training, QuerySet validation, Config config, boolean hasOtherMLP) {
-    super(training, validation, config.getNumIterations());
+    super(training, validation, config);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
@@ -57,21 +60,27 @@ abstract class MLPTrainer extends LTRTrainer {
     }
   }
 
+  @Override
+  protected Ranker getRanker(){
+    return mlp;
+  }
+
   protected double calculateLoss(List<Query> queries) {
     // Note: appears to be just as fast use of nested loops without streams.
     // However, I have not tested it thoroughly.
     double loss = 0d;
     for (Query query : queries) {
       List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(mlp.predict(doc), doc.getLabel())).sum() / docList.size();
+      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(mlp.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
     }
     return loss / queries.size();
   }
 
-  @Override
+/*  @Override
   public List<Document> sortP(Query query) {
     List<Document> ranks = new ArrayList<>(query.getDocList());
-    ranks.sort(Comparator.comparingDouble(mlp::predict).reversed());
+    ranks.sort((docA, docB) -> Double.compare(mlp.predict(docB.getFeatures()), mlp.predict(docA.getFeatures()))); //reversed for high to low.
     return ranks;
-  }
+  }*/
+
 }

@@ -16,10 +16,14 @@
 
 package org.ltr4l.trainers;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.ltr4l.nn.Ranker;
+import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
+import org.ltr4l.tools.Config;
 import org.ltr4l.tools.RankEval;
 import org.ltr4l.tools.Report;
 
@@ -29,9 +33,12 @@ public abstract class LTRTrainer implements Trainer {
   protected List<Query> validationSet;
   double maxScore;
   protected final Report report;
+  protected Ranker ranker;
+  protected Config config;
 
-  LTRTrainer(QuerySet training, QuerySet validation, int epochNum) {
-    this.epochNum = epochNum;
+  LTRTrainer(QuerySet training, QuerySet validation, Config config) {
+    this.config = config;
+    epochNum = config.getNumIterations();
     trainingSet = training.getQueries();
     validationSet = validation.getQueries();
     maxScore = 0d;
@@ -61,7 +68,19 @@ public abstract class LTRTrainer implements Trainer {
       train();
       validate(i);
     }
-
     report.close();
+    if (ranker == null) ranker = getRanker();
+    ranker.writeModel(config.getProps());
   }
+
+  abstract Ranker getRanker();
+
+  @Override
+  public List<Document> sortP(Query query){
+    if (ranker == null) ranker = getRanker();
+    List<Document> ranks = new ArrayList<>(query.getDocList());
+    ranks.sort((docA, docB) -> Double.compare(ranker.predict(docB.getFeatures()), ranker.predict(docA.getFeatures()))); //reversed for high to low.
+    return ranks;
+  }
+
 }

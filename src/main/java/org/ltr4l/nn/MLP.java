@@ -16,15 +16,19 @@
 
 package org.ltr4l.nn;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
-public class MLP {
+public class MLP extends Ranker {
   protected List<List<Node>> network;
   protected long iter;
   protected int numAccumulatedDer;
@@ -80,18 +84,32 @@ public class MLP {
     }
   }
 
-  public List<List<List<Double>>> getWeights() {
-    //Note: went with collect as it is necessary to get a list of all weights anyway.
-    return network.stream().map(layer -> layer.stream()
-        .map(node -> node.getOutputEdges().stream()
-            .map(Edge::getWeight)
+  private List<List<List<Double>>> obtainWeights(){
+    return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null)
+        .map(layer -> layer.stream()
+            .map(node -> node.getOutputEdges().stream()
+                .map(edge -> edge.getWeight())
+                .collect(Collectors.toList()))
             .collect(Collectors.toList()))
-        .collect(Collectors.toList()))
         .collect(Collectors.toList());
   }
 
-  public double predict(Document doc) {
-    return forwardProp(doc);
+  @Override
+  public void writeModel(Properties props, String file) {
+    try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
+      props.store(pw, "Saved model");
+      pw.println("model=" + obtainWeights()); //To ensure model gets written at the end.
+      //props.setProperty("model", obtainWeights().toString());
+      //props.store(pw, "Saved model");
+
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public double predict(List<Double> features){
+    return forwardProp(features);
   }
 
   //Feed forward propagation
@@ -118,7 +136,6 @@ public class MLP {
   public double forwardProp(Document doc) {
     List<Double> features = doc.getFeatures();
     return forwardProp(features);
-
   }
 
   //This is for one output node.

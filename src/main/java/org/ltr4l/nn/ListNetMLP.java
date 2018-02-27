@@ -16,15 +16,19 @@
 
 package org.ltr4l.nn;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
-public class ListNetMLP {
+public class ListNetMLP extends Ranker {
 
   protected List<List<LNode>> network;
   protected long iter;
@@ -84,8 +88,35 @@ public class ListNetMLP {
     network.get(network.size() - 1).get(0).setOutputDer(1); //Set the last node's output derivative to 1
   }
 
+  private List<List<List<Double>>> obtainWeights(){
+    return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null).map(layer -> layer.stream()
+        .map(node -> node.getOutputEdges().stream()
+            .map(edge -> edge.getWeight())
+            .collect(Collectors.toList()))
+        .collect(Collectors.toList()))
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public void writeModel(Properties props, String file) {
+    try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
+      props.store(pw, "Saved model");
+      pw.println("model=" + obtainWeights()); //To ensure model gets written at the end.
+      //props.setProperty("model", obtainWeights().toString());
+      //props.store(pw, "Saved model");
+
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public double predict(List<Double> features){
+    return forwardProp(features);
+  }
+
   public double predict(Document doc) {
-    return forwardProp(doc);
+    return predict(doc.getFeatures());
   }
 
   //Feed forward propagation
@@ -229,9 +260,9 @@ public class ListNetMLP {
 
   public List<List<List<Double>>> getWeights() {
     //Note: went with collect as it is necessary to get a list of all weights anyway.
-    return network.stream().map(layer -> layer.stream()
+    return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null).map(layer -> layer.stream()
         .map(node -> node.getOutputEdges().stream()
-            .map(LEdge::getWeight)
+            .map(edge -> edge.getWeight())
             .collect(Collectors.toList()))
         .collect(Collectors.toList()))
         .collect(Collectors.toList());

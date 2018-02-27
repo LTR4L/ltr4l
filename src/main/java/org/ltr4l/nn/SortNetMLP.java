@@ -16,14 +16,19 @@
 
 package org.ltr4l.nn;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
-public class SortNetMLP {
+public class SortNetMLP extends Ranker {
   private List<List<SNode>> network;
   private long iter;
   private int numAccumulatedDer;
@@ -111,10 +116,38 @@ public class SortNetMLP {
     }
   }
 
+  private List<List<List<Double>>> obtainWeights(){
+    return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null).map(layer -> layer.stream()
+        .map(node -> node.getOutputEdges().stream()
+            .map(edge -> edge.getWeight())
+            .collect(Collectors.toList()))
+        .collect(Collectors.toList()))
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public void writeModel(Properties props, String file) {
+    try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
+      props.store(pw, "Saved model");
+      pw.println("model=" + obtainWeights()); //To ensure model gets written at the end.
+      //props.setProperty("model", obtainWeights().toString());
+      //props.store(pw, "Saved model");
+
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   // if > 0, doc1 is predicted to be more relevant than doc2
   // if < 0, doc1 is predicted to be less relevant than doc 2.
   public double predict(Document doc1, Document doc2) {
     double[] output = forwardProp(doc1, doc2);
+    return output[0] - output[1];
+  }
+
+  @Override
+  public double predict(List<Double> features){
+    double[] output = forwardProp(features);
     return output[0] - output[1];
   }
 

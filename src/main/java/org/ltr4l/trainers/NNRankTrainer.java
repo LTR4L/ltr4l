@@ -27,6 +27,8 @@ import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
+import java.util.List;
+
 public class NNRankTrainer extends MLPTrainer {
   private final int outputNodeNumber;
 
@@ -46,9 +48,9 @@ public class NNRankTrainer extends MLPTrainer {
     //As the structure of the output layer has changed, predict needs to be overridden.
     mlp = new MLP(featureLength, networkShape, optFact, regularization, weightModel) {
       @Override
-      public double predict(Document doc) {
+      public double predict(List<Double> features) {
         double threshold = 0.5;
-        forwardProp(doc);
+        forwardProp(features);
         for (int nodeId = 0; nodeId < network.get(network.size() - 1).size(); nodeId++) {
           Node node = network.get(network.size() - 1).get(nodeId);
           if (node.getOutput() < threshold)
@@ -70,7 +72,7 @@ public class NNRankTrainer extends MLPTrainer {
   public void train() {
     for (Query query : trainingSet) {
       for (Document doc : query.getDocList()) {
-        int output = (int) mlp.predict(doc);
+        int output = (int) mlp.predict(doc.getFeatures());
         int label = doc.getLabel();
         if (output != label) {
           mlp.backProp(targetLabel(label), new Error.Square());

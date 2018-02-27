@@ -16,27 +16,34 @@
 
 package org.ltr4l.trainers;
 
+import org.ltr4l.nn.Ranker;
+import org.ltr4l.query.Document;
+import org.ltr4l.query.Query;
+import org.ltr4l.query.QuerySet;
+import org.ltr4l.tools.Error;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.*;
+import java.util.stream.IntStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.IntStream;
 
-import org.ltr4l.query.Document;
-import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
-import org.ltr4l.tools.Error;
 
 public class PRankTrainer extends LTRTrainer {
-  final private PRank ranker;
+  final private PRank pRanker;
   private double maxScore;
   private final  List<Document> trainingDocList;
 
-  PRankTrainer(QuerySet training, QuerySet validation, Config configs) {
-    super(training, validation, configs.getNumIterations());
+  PRankTrainer(QuerySet training, QuerySet validation, Config config) {
+    super(training, validation, config);
     maxScore = 0.0;
-    ranker = new PRank(training.getFeatureLength(), QuerySet.findMaxLabel(trainingSet));
+    pRanker = new PRank(training.getFeatureLength(), QuerySet.findMaxLabel(trainingSet));
+    super.ranker = pRanker;
     trainingDocList = new ArrayList<>();
     for (Query query : trainingSet)
       trainingDocList.addAll(query.getDocList());
@@ -46,29 +53,27 @@ public class PRankTrainer extends LTRTrainer {
   public void train() {
     Collections.shuffle(trainingDocList);
     for (Document doc : trainingDocList)
-      ranker.updateWeights(doc);
+      pRanker.updateWeights(doc);
   }
 
   protected double calculateLoss(List<Query> queries) {
     double loss = 0d;
     for (Query query : queries) {
       List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(ranker.predict(doc), doc.getLabel())).sum() / docList.size();
+      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(pRanker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
     }
     return loss / queries.size();
   }
 
-  //Sort documents in a query based on current model.
-  public List<Document> sortP(Query query) {
-    List<Document> ranks = new ArrayList<>(query.getDocList());
-    ranks.sort(Comparator.comparingInt(ranker::predict).reversed());  //to put in order of highest to lowest
-    return ranks;
+  @Override
+  Ranker getRanker() {
+    return pRanker;
   }
 }
 
-class PRank {
-  double[] weights;
-  double[] thresholds;
+class PRank extends Ranker{
+  protected double[] weights;
+  protected double[] thresholds;
 
   PRank(int featureLength, int maxLabel) {
     if (featureLength > 0 && maxLabel > 0) {
@@ -89,9 +94,21 @@ class PRank {
     return thresholds;
   }
 
+  public void writeModel(Properties props, String file) {
+    try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
+      props.store(pw, "Saved model");
+      pw.println("model=" + Arrays.toString(weights)); //To ensure model gets written at the end.
+      //props.setProperty("model", obtainWeights().toString());
+      //props.store(pw, "Saved model");
+
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public void updateWeights(Document doc) {
-    double wx = predictRelScore(doc);
-    int output = predict(doc);
+    double wx = predictRelScore(doc.getFeatures());
+    int output = (int) predict(doc.getFeatures());
     int label = doc.getLabel();
     if (output == label)//if output == label, do not update weights.
       return;
@@ -116,8 +133,10 @@ class PRank {
     }
   }
 
-  protected int predict(Document doc) {
-    double wx = predictRelScore(doc);
+
+  @Override
+  public double predict(List<Double> features) {
+    double wx = predictRelScore(features);
     for (int i = 0; i < thresholds.length; i++) {
       double b = thresholds[i];
       if (wx < b)
@@ -126,11 +145,10 @@ class PRank {
     return thresholds.length;
   }
 
-  private double predictRelScore(Document doc) {
+  private double predictRelScore(List<Double> features){
     double wx = 0;
-    for (int i = 0; i < doc.getFeatures().size(); i++) {
-      double feature = doc.getFeatures().get(i);
-      wx += feature * weights[i];     //w*x
+    for (int i = 0; i < features.size(); i++){
+      wx += features.get(i) * weights[i];
     }
     return wx;
   }
