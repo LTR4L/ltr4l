@@ -35,7 +35,6 @@ public class ListNetMLP extends Ranker {
   protected double accErrorDer_exSum;
   protected double accErrorDer_ptSum;
   protected final Regularization regularization;
-  protected static final String DEFAULT_MODEL_FILE = "model.txt";
   protected final WeightInitializer weightInit;
 
   //CONSTRUCT NETWORK
@@ -109,11 +108,6 @@ public class ListNetMLP extends Ranker {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  @Override
-  public void writeModel(Properties prop){
-    writeModel(prop, DEFAULT_MODEL_FILE);
   }
 
   @Override

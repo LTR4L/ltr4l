@@ -60,14 +60,6 @@ public class OAPBPMTrainer extends LTRTrainer {
   Ranker getRanker() {
     return oapRanker;
   }
-
-  @Override
-  public List<Document> sortP(Query query) {
-    List<Document> ranks = query.getDocList();
-    ranks.sort((docA, docB) -> Double.compare(oapRanker.predict(docB.getFeatures()), oapRanker.predict(docA.getFeatures())));
-    //ranks.sort(Comparator.comparingInt(oapRanker::predict).reversed());
-    return ranks;
-  }
 }
 
 class OAPBPMRank extends PRank {

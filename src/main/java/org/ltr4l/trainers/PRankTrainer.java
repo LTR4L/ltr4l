@@ -69,20 +69,11 @@ public class PRankTrainer extends LTRTrainer {
   Ranker getRanker() {
     return pRanker;
   }
-
-  //Sort documents in a query based on current model.
-  public List<Document> sortP(Query query) {
-    List<Document> ranks = new ArrayList<>(query.getDocList());
-    ranks.sort((docA, docB) -> Double.compare(pRanker.predict(docB.getFeatures()), pRanker.predict(docA.getFeatures())));
-    //ranks.sort(Comparator.comparingInt(pRanker::predict).reversed());  //to put in order of highest to lowest
-    return ranks;
-  }
 }
 
 class PRank extends Ranker{
   protected double[] weights;
   protected double[] thresholds;
-  protected static final String DEFAULT_MODEL_FILE = "model.txt";
 
   PRank(int featureLength, int maxLabel) {
     if (featureLength > 0 && maxLabel > 0) {
@@ -113,10 +104,6 @@ class PRank extends Ranker{
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  public void writeModel(Properties prop){
-    writeModel(prop, DEFAULT_MODEL_FILE);
   }
 
   public void updateWeights(Document doc) {

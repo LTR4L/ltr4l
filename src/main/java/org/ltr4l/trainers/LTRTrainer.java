@@ -16,9 +16,11 @@
 
 package org.ltr4l.trainers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.ltr4l.nn.Ranker;
+import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
@@ -41,7 +43,6 @@ public abstract class LTRTrainer implements Trainer {
     validationSet = validation.getQueries();
     maxScore = 0d;
     this.report = Report.getReport();  // TODO: use default Report for now...
-    ranker = null;
   }
 
   abstract double calculateLoss(List<Query> queries);
@@ -74,6 +75,12 @@ public abstract class LTRTrainer implements Trainer {
 
   abstract Ranker getRanker();
 
-
+  @Override
+  public List<Document> sortP(Query query){
+    if (ranker == null) ranker = getRanker();
+    List<Document> ranks = new ArrayList<>(query.getDocList());
+    ranks.sort((docA, docB) -> Double.compare(ranker.predict(docB.getFeatures()), ranker.predict(docA.getFeatures()))); //reversed for high to low.
+    return ranks;
+  }
 
 }

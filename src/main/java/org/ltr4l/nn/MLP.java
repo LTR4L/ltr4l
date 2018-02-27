@@ -33,7 +33,6 @@ public class MLP extends Ranker {
   protected long iter;
   protected int numAccumulatedDer;
   protected final Regularization regularization;
-  protected static final String DEFAULT_MODEL_FILE = "model.txt";
   protected final WeightInitializer weightInit;
 
   //CONSTRUCT NETWORK

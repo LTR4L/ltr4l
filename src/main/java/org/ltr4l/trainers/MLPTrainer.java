@@ -57,7 +57,6 @@ abstract class MLPTrainer extends LTRTrainer {
       Regularization regularization = config.getReguFunction();
       String weightModel = config.getWeightInit();
       mlp = new MLP(featureLength, networkShape, optFact, regularization, weightModel);
-      ranker = mlp;
     }
   }
 
@@ -77,12 +76,11 @@ abstract class MLPTrainer extends LTRTrainer {
     return loss / queries.size();
   }
 
-  @Override
+/*  @Override
   public List<Document> sortP(Query query) {
     List<Document> ranks = new ArrayList<>(query.getDocList());
     ranks.sort((docA, docB) -> Double.compare(mlp.predict(docB.getFeatures()), mlp.predict(docA.getFeatures()))); //reversed for high to low.
-    //ranks.sort(Comparator.comparingDouble(doc -> mlp.predict(doc)).reversed());
     return ranks;
-  }
+  }*/
 
 }

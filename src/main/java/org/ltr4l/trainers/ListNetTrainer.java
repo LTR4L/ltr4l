@@ -53,7 +53,6 @@ public class ListNetTrainer extends LTRTrainer {
       Regularization regularization = config.getReguFunction();
       String weightModel = config.getWeightInit();
       lmlp = new ListNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
-      super.ranker = lmlp;
     }
   }
 
@@ -88,12 +87,5 @@ public class ListNetTrainer extends LTRTrainer {
     return lmlp;
   }
 
-  @Override
-  public List<Document> sortP(Query query) {
-    List<Document> ranks = new ArrayList<>(query.getDocList());
-    ranks.sort((docA, docB) -> Double.compare(ranker.predict(docB.getFeatures()), ranker.predict(docA.getFeatures())));
-    //ranks.sort(Comparator.comparingDouble(lmlp::predict).reversed());
-    return ranks;
-  }
 }
 

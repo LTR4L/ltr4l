@@ -44,7 +44,8 @@ public class RankNetTrainer extends MLPTrainer {
     Regularization regularization = config.getReguFunction();
     String weightModel = config.getWeightInit();
     rmlp = new RankNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
-    mlp = rmlp;
+    super.mlp = rmlp;
+
 
     trainingPairs = new ArrayList<>();
     for (int i = 0; i < trainingSet.size(); i++) {

@@ -33,7 +33,6 @@ public class SortNetMLP extends Ranker {
   private long iter;
   private int numAccumulatedDer;
   private final Regularization regularization;
-  protected static final String DEFAULT_MODEL_FILE = "model.txt";
   private final WeightInitializer weightInit;
 
   //Construct Network
@@ -137,11 +136,6 @@ public class SortNetMLP extends Ranker {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  @Override
-  public void writeModel(Properties prop){
-    writeModel(prop, DEFAULT_MODEL_FILE);
   }
 
   // if > 0, doc1 is predicted to be more relevant than doc2
