@@ -17,10 +17,10 @@
 package org.ltr4l.trainers;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
+import org.ltr4l.nn.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
@@ -28,16 +28,14 @@ import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 
 public class OAPBPMTrainer extends LTRTrainer {
-  final private OAPBPMRank ranker;
+  final private OAPBPMRank oapRanker;
   private double maxScore;
   private final  List<Document> trainingDocList;
-  private final Config configs;
 
   OAPBPMTrainer(QuerySet training, QuerySet validation, Config config) {
-    super(training, validation, config.getNumIterations());
-    this.configs = config;
+    super(training, validation, config);
     maxScore = 0d;
-    ranker = new OAPBPMRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet), config.getPNum(), config.getBernNum());
+    oapRanker = new OAPBPMRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet), config.getPNum(), config.getBernNum());
     trainingDocList = new ArrayList<>();
     for (Query query : trainingSet)
       trainingDocList.addAll(query.getDocList());
@@ -46,28 +44,34 @@ public class OAPBPMTrainer extends LTRTrainer {
   @Override
   public void train() {
     for (Document doc : trainingDocList)
-      ranker.updateWeights(doc);
+      oapRanker.updateWeights(doc);
   }
 
   protected double calculateLoss(List<Query> queries) {
     double loss = 0d;
     for (Query query : queries) {
       List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(ranker.predict(doc), doc.getLabel())).sum() / docList.size();
+      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(oapRanker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
     }
     return loss / queries.size();
   }
 
   @Override
+  Ranker getRanker() {
+    return oapRanker;
+  }
+
+  @Override
   public List<Document> sortP(Query query) {
     List<Document> ranks = query.getDocList();
-    ranks.sort(Comparator.comparingInt(ranker::predict).reversed());
+    ranks.sort((docA, docB) -> Double.compare(oapRanker.predict(docB.getFeatures()), oapRanker.predict(docA.getFeatures())));
+    //ranks.sort(Comparator.comparingInt(oapRanker::predict).reversed());
     return ranks;
   }
 
   @Override
   public void logWeights(){
-    ranker.writeModel(configs.getProps());
+    oapRanker.writeModel(config.getProps());
   }
 }
 
@@ -88,7 +92,7 @@ class OAPBPMRank extends PRank {
     for (PRank prank : pRanks) {
       //Will or will not present document to the perceptron.
       if (bernoulli() == 1) {
-        int prediction = prank.predict(doc);
+        double prediction = prank.predict(doc.getFeatures());
         int label = doc.getLabel();
         if (label != prediction) { //if the prediction is wrong, update that perceptron's weights
           prank.updateWeights(doc);

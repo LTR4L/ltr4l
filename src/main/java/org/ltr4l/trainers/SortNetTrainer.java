@@ -20,10 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.ltr4l.nn.Activation;
-import org.ltr4l.nn.NetworkShape;
-import org.ltr4l.nn.Optimizer;
-import org.ltr4l.nn.SortNetMLP;
+import org.ltr4l.nn.*;
 
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
@@ -39,14 +36,12 @@ public class SortNetTrainer extends LTRTrainer {
   protected double lrRate;
   protected double rgRate;
   protected double[][] targets;
-  protected final Config config;
   //protected List<Document[][]> trainingPairs;
   //protected List<Document[][]> validationPairs;
 
 
   SortNetTrainer(QuerySet training, QuerySet validation, Config config) {
-    super(training, validation, config.getNumIterations());
-    this.config = config;
+    super(training, validation, config);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
@@ -78,6 +73,11 @@ public class SortNetTrainer extends LTRTrainer {
   @Override
   public void logWeights(){
     smlp.writeModel(config.getProps());
+  }
+
+  @Override
+  Ranker getRanker() {
+    return smlp;
   }
 
   //The following implementation is used for speed up.

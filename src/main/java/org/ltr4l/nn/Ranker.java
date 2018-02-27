@@ -2,6 +2,7 @@ package org.ltr4l.nn;
 
 import org.ltr4l.query.Document;
 
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -21,12 +22,11 @@ import java.util.Properties;
  */
 public abstract class Ranker {
   protected static final String DEFAULT_MODEL_FILE = "model.txt";
-
-  abstract void writeModel(Properties prop, String file);
-  protected void writeModel(Properties prop){
+  public abstract void writeModel(Properties prop, String file);
+  public void writeModel(Properties prop){
     writeModel(prop, DEFAULT_MODEL_FILE);
   }
 
-  abstract double predict(Document document);
+  public abstract double predict(List<Double> features);
 
 }

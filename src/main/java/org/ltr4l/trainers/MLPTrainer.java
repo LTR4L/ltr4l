@@ -23,6 +23,7 @@ import java.util.List;
 import org.ltr4l.nn.MLP;
 import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
+import org.ltr4l.nn.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
@@ -36,7 +37,7 @@ abstract class MLPTrainer extends LTRTrainer {
   protected double maxScore;
   protected double lrRate;
   protected double rgRate;
-  protected Config config;
+  //protected Config config;
 
   MLPTrainer(QuerySet training, QuerySet validation, Config config) {
     this(training, validation, config, false);
@@ -45,8 +46,7 @@ abstract class MLPTrainer extends LTRTrainer {
   //This constructor exists solely for the purpose of child classes
   //It gives child classes the ability to assign an extended MLP.
   MLPTrainer(QuerySet training, QuerySet validation, Config config, boolean hasOtherMLP) {
-    super(training, validation, config.getNumIterations());
-    this.config = config;
+    super(training, validation, config);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
@@ -57,7 +57,13 @@ abstract class MLPTrainer extends LTRTrainer {
       Regularization regularization = config.getReguFunction();
       String weightModel = config.getWeightInit();
       mlp = new MLP(featureLength, networkShape, optFact, regularization, weightModel);
+      ranker = mlp;
     }
+  }
+
+  @Override
+  protected Ranker getRanker(){
+    return mlp;
   }
 
   protected double calculateLoss(List<Query> queries) {
@@ -66,7 +72,7 @@ abstract class MLPTrainer extends LTRTrainer {
     double loss = 0d;
     for (Query query : queries) {
       List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(mlp.predict(doc), doc.getLabel())).sum() / docList.size();
+      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(mlp.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
     }
     return loss / queries.size();
   }
@@ -79,7 +85,8 @@ abstract class MLPTrainer extends LTRTrainer {
   @Override
   public List<Document> sortP(Query query) {
     List<Document> ranks = new ArrayList<>(query.getDocList());
-    ranks.sort(Comparator.comparingDouble(mlp::predict).reversed());
+    ranks.sort((docA, docB) -> Double.compare(mlp.predict(docB.getFeatures()), mlp.predict(docA.getFeatures()))); //reversed for high to low.
+    //ranks.sort(Comparator.comparingDouble(doc -> mlp.predict(doc)).reversed());
     return ranks;
   }
 

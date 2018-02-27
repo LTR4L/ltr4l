@@ -20,10 +20,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import org.ltr4l.nn.Activation;
-import org.ltr4l.nn.ListNetMLP;
-import org.ltr4l.nn.NetworkShape;
-import org.ltr4l.nn.Optimizer;
+import org.ltr4l.nn.*;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
@@ -36,7 +33,6 @@ public class ListNetTrainer extends LTRTrainer {
   private double lrRate;
   private double rgRate;
   private ListNetMLP lmlp;
-  private final Config config;
 
   ListNetTrainer(QuerySet training, QuerySet validation, Config config) {
     this(training, validation, config, false);
@@ -45,8 +41,7 @@ public class ListNetTrainer extends LTRTrainer {
   //This constructor exists solely for the purpose of child classes
   //It gives child classes the ability to assign an extended MLP.
   ListNetTrainer(QuerySet training, QuerySet validation, Config config, boolean hasOtherMLP) {
-    super(training, validation, config.getNumIterations());
-    this.config = config;
+    super(training, validation, config);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
@@ -58,6 +53,7 @@ public class ListNetTrainer extends LTRTrainer {
       Regularization regularization = config.getReguFunction();
       String weightModel = config.getWeightInit();
       lmlp = new ListNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
+      super.ranker = lmlp;
     }
   }
 
@@ -93,9 +89,15 @@ public class ListNetTrainer extends LTRTrainer {
   }
 
   @Override
+  Ranker getRanker() {
+    return lmlp;
+  }
+
+  @Override
   public List<Document> sortP(Query query) {
     List<Document> ranks = new ArrayList<>(query.getDocList());
-    ranks.sort(Comparator.comparingDouble(lmlp::predict).reversed());
+    ranks.sort((docA, docB) -> Double.compare(ranker.predict(docB.getFeatures()), ranker.predict(docA.getFeatures())));
+    //ranks.sort(Comparator.comparingDouble(lmlp::predict).reversed());
     return ranks;
   }
 }

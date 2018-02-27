@@ -28,7 +28,7 @@ import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
-public class ListNetMLP {
+public class ListNetMLP extends Ranker {
 
   protected List<List<LNode>> network;
   protected long iter;
@@ -98,6 +98,7 @@ public class ListNetMLP {
         .collect(Collectors.toList());
   }
 
+  @Override
   public void writeModel(Properties props, String file) {
     try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
       props.store(pw, "Saved model");
@@ -110,12 +111,18 @@ public class ListNetMLP {
     }
   }
 
+  @Override
   public void writeModel(Properties prop){
     writeModel(prop, DEFAULT_MODEL_FILE);
   }
 
+  @Override
+  public double predict(List<Double> features){
+    return forwardProp(features);
+  }
+
   public double predict(Document doc) {
-    return forwardProp(doc);
+    return predict(doc.getFeatures());
   }
 
   //Feed forward propagation

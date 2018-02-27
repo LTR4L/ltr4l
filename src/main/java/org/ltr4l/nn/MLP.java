@@ -28,7 +28,7 @@ import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
-public class MLP {
+public class MLP extends Ranker {
   protected List<List<Node>> network;
   protected long iter;
   protected int numAccumulatedDer;
@@ -95,6 +95,7 @@ public class MLP {
         .collect(Collectors.toList());
   }
 
+  @Override
   public void writeModel(Properties props, String file) {
     try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
       props.store(pw, "Saved model");
@@ -107,12 +108,9 @@ public class MLP {
     }
   }
 
-  public void writeModel(Properties prop){
-    writeModel(prop, DEFAULT_MODEL_FILE);
-  }
-
-  public double predict(Document doc) {
-    return forwardProp(doc);
+  @Override
+  public double predict(List<Double> features){
+    return forwardProp(features);
   }
 
   //Feed forward propagation
@@ -139,7 +137,6 @@ public class MLP {
   public double forwardProp(Document doc) {
     List<Double> features = doc.getFeatures();
     return forwardProp(features);
-
   }
 
   //This is for one output node.
