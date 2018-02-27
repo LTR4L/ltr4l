@@ -20,26 +20,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Document {
-  private int Label;
+  private int label;
   private List<Double> features;
 
-  Document() {
+  public Document() {
     features = new ArrayList<>();
   }
 
   public int getLabel() {
-    return Label;
+    return label;
   }
 
-  protected void setLabel(int newLabel) {
-    Label = newLabel;
+  public void setLabel(int newLabel) {
+    label = newLabel;
   }
 
   public List<Double> getFeatures() {
     return features;
   }
 
-  protected void addFeature(double feature) {
+  public void addFeature(double feature) {
     features.add(feature);
   }
 }
