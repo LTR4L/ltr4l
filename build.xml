@@ -28,7 +28,10 @@
 
     <target name="test" depends="compile" description="run all tests">
         <mkdir dir="${test.result.dir}"/>
-        <junit printsummary="on">
+        <junit printsummary="on"
+               haltonfailure="no"
+               errorProperty="tests.failed"
+               failureProperty="tests.failed">
             <classpath path="${cls.dir}"/>
             <classpath>
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
@@ -39,6 +42,7 @@
                 <fileset dir="${src.dir}/test/java" includes="**/*Test.java"/>
             </batchtest>
         </junit>
+        <fail if="tests.failed">***** Tests failed! *****</fail>
     </target>
 
 

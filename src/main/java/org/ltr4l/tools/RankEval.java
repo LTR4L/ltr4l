@@ -25,7 +25,14 @@ import org.ltr4l.trainers.Trainer;
 
 public class RankEval {
 
-  private static double dcg(List<Document> docsRanks, int position) {
+  /**
+   * Calculate Discounted Cumulative Gain. DCG is an evaluation measure that can leverage the relevance judgement
+   * in terms of multiple ordered categories, and has an explicit position discount factor in its definition.
+   * @param docsRanks
+   * @param position the k-position of DCG@k
+   * @return the score of DCG
+   */
+  public static double dcg(List<Document> docsRanks, int position) {
     double sum = 0;
     if (position > -1) {
       final int pos = Math.min(position, docsRanks.size());
@@ -36,7 +43,14 @@ public class RankEval {
     return sum * Math.log(2);  //Change of base
   }
 
-  private static double ndcg(List<Document> docsRanks, int position) {
+  /**
+   * Calculate Normalized Discounted Cumulative Gain. This is calculated by normalizing {@link #dcg(java.util.List, int)}
+   * @k with its maximum possible value.
+   * @param docsRanks
+   * @param position the k-position of NDCG@k
+   * @return the score of NDCG
+   */
+  public static double ndcg(List<Document> docsRanks, int position) {
     //Accept docs in predicted ranking order
     double dcg = dcg(docsRanks, position);
     //System.out.println(dcg);
