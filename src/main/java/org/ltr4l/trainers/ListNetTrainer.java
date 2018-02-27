@@ -58,11 +58,6 @@ public class ListNetTrainer extends LTRTrainer {
   }
 
   @Override
-  public void logWeights(){
-    lmlp.writeModel(config.getProps());
-  }
-
-  @Override
   public void train() {
     for (Query query : trainingSet) {
       for (Document doc : query.getDocList()) {

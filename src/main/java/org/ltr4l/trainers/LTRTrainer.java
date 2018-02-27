@@ -74,6 +74,6 @@ public abstract class LTRTrainer implements Trainer {
 
   abstract Ranker getRanker();
 
-  protected abstract void logWeights();
+
 
 }

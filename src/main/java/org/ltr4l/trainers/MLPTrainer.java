@@ -78,11 +78,6 @@ abstract class MLPTrainer extends LTRTrainer {
   }
 
   @Override
-  protected void logWeights(){
-    mlp.writeModel(config.getProps());
-  }
-
-  @Override
   public List<Document> sortP(Query query) {
     List<Document> ranks = new ArrayList<>(query.getDocList());
     ranks.sort((docA, docB) -> Double.compare(mlp.predict(docB.getFeatures()), mlp.predict(docA.getFeatures()))); //reversed for high to low.

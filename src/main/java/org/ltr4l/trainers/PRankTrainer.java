@@ -50,11 +50,6 @@ public class PRankTrainer extends LTRTrainer {
   }
 
   @Override
-  protected void logWeights(){
-    pRanker.writeModel(config.getProps());
-  }
-
-  @Override
   public void train() {
     Collections.shuffle(trainingDocList);
     for (Document doc : trainingDocList)

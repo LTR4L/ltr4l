@@ -71,11 +71,6 @@ public class SortNetTrainer extends LTRTrainer {
   }
 
   @Override
-  public void logWeights(){
-    smlp.writeModel(config.getProps());
-  }
-
-  @Override
   Ranker getRanker() {
     return smlp;
   }

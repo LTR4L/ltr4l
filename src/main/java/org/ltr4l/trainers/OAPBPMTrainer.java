@@ -68,11 +68,6 @@ public class OAPBPMTrainer extends LTRTrainer {
     //ranks.sort(Comparator.comparingInt(oapRanker::predict).reversed());
     return ranks;
   }
-
-  @Override
-  public void logWeights(){
-    oapRanker.writeModel(config.getProps());
-  }
 }
 
 class OAPBPMRank extends PRank {
