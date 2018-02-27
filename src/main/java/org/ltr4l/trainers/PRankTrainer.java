@@ -102,10 +102,6 @@ class PRank {
     return thresholds;
   }
 
-  public double[] getBestWeights() {
-    return weights;
-  }
-
   public void writeModel(Properties props, String file) {
     try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
       props.store(pw, "Saved model");
