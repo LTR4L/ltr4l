@@ -98,6 +98,7 @@ class PRank extends Ranker{
     try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
       props.store(pw, "Saved model");
       pw.println("model=" + Arrays.toString(weights)); //To ensure model gets written at the end.
+      pw.println("thresholds=" + Arrays.toString(thresholds));
       //props.setProperty("model", obtainWeights().toString());
       //props.store(pw, "Saved model");
 
