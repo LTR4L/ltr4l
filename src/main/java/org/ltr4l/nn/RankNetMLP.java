@@ -26,13 +26,19 @@ public class RankNetMLP extends MLP {
     super(inputDim, networkShape, optFact, regularization, weightModel);
   }
 
+  /**
+   * Backpropagation is very similar to MLP, however the derivative used in backpropagation is calculated first, and then
+   * passed to the method. This is so that all RankNet based classes can use the same implementation for backpropagation.
+   * @param lambda
+   */
   public void backProp(double lambda) {
     Node outputNode = network.get(network.size() - 1).get(0);
 
     //First, get the derivative ∂C/∂O and set it to output derivative of the final node.
     outputNode.setOutputDer(lambda);
 
-    for (int layerIdx = network.size() - 1; layerIdx >= 1; layerIdx--) { //When going through each layer, you modify the previous layer.
+    //When going through each layer, modify the previous layer.
+    for (int layerIdx = network.size() - 1; layerIdx >= 1; layerIdx--) {
       List<Node> layer = network.get(layerIdx);
 
       for (Node node : layer) {

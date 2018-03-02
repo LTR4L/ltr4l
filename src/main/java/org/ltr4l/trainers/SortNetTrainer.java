@@ -30,6 +30,11 @@ import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
+/**
+ * The implementation of MLPTrainer which uses the SortNet algorithm.
+ * This network trains an MLP network.
+ *
+ */
 public class SortNetTrainer extends LTRTrainer {
   protected SortNetMLP smlp;
   protected double maxScore;

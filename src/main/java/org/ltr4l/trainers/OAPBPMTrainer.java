@@ -27,6 +27,11 @@ import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 
+/**
+ * The implementation of LTRTrainer which uses the
+ * OAP-BPM algorithm.
+ *
+ */
 public class OAPBPMTrainer extends LTRTrainer {
   final private OAPBPMRank oapRanker;
   private double maxScore;

@@ -30,6 +30,11 @@ import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Regularization;
 
+/**
+ * The implementation of MLPTrainer which uses the
+ * RankNet algorithm.
+ *
+ */
 public class RankNetTrainer extends MLPTrainer {
   protected RankNetMLP rmlp;
   protected List<Document[][]> trainingPairs;

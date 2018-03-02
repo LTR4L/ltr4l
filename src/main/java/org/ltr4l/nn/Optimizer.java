@@ -16,6 +16,10 @@
 
 package org.ltr4l.nn;
 
+/**
+ * The variants of gradient descent which optimize the parameter update.
+ * Note that the standard gradient descent is of the form w = w - η(dw).
+ */
 public interface Optimizer {
 
   public static final Type DEFAULT = Type.sgd;

@@ -34,9 +34,13 @@ import java.util.List;
 
 import org.ltr4l.tools.Config;
 
+/**
+ * The implementation of LTRTrainer which uses the
+ * PRank(Perceptron Ranking) algorithm.
+ *
+ */
 public class PRankTrainer extends LTRTrainer {
   final private PRank pRanker;
-  private double maxScore;
   private final  List<Document> trainingDocList;
 
   PRankTrainer(QuerySet training, QuerySet validation, Config config) {

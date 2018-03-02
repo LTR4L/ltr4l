@@ -16,6 +16,11 @@
 
 package org.ltr4l.nn;
 
+/**
+ * Activation's output is used by a node to determine the node's output.
+ * The total input of the node is the input of the function.
+ * The derivative of Activation is used for backpropagation.
+ */
 public interface Activation {
   double output(double input);
 

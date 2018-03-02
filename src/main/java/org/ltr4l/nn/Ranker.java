@@ -1,11 +1,4 @@
-package org.ltr4l.nn;
-
-import org.ltr4l.query.Document;
-
-import java.util.List;
-import java.util.Properties;
-
-/**
+/*
  * Copyright 2018 org.LTR4L
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,13 +13,25 @@ import java.util.Properties;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.ltr4l.nn;
+
+import java.util.List;
+import java.util.Properties;
+
+/**
+ * Ranker classes use a model to make predictions for a document.
+ * Models (weights, thresholds, etc...) held by Ranker classes
+ * can be trained by trainers.
+ *
+ * Rankers are the model holders.
+ */
 public abstract class Ranker {
   protected static final String DEFAULT_MODEL_FILE = "model.txt";
+
   public abstract void writeModel(Properties prop, String file);
   public void writeModel(Properties prop){
     writeModel(prop, DEFAULT_MODEL_FILE);
   }
-
   public abstract double predict(List<Double> features);
 
 }
