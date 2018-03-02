@@ -5,6 +5,7 @@
     <property name="lib.dir" value="lib"/>
     <property name="test.result.dir" value="test-result"/>
     <property name="conf.dir" value="confs"/>
+    <property name="doc.dir" value="javadocs"/>
 
     <property name="PRODUCT_NAME" value="LTR4L"/>
     <property name="PRODUCT_VERSION" value="0.1-dev"/>
@@ -45,7 +46,6 @@
         <fail if="tests.failed">***** Tests failed! *****</fail>
     </target>
 
-
     <target name="jar" depends="compile" description="make jar file">
         <jar destfile="${product.jar}" basedir="${cls.dir}">
             <manifest>
@@ -80,4 +80,8 @@
         <ivy:retrieve sync="true" type="jar" />
     </target>
 
+    <target name="javadoc" description="generate documentation">
+        <javadoc sourcepath="${src.dir}/main/java" destdir="${doc.dir}" locale="en_US"/>
+    </target>
+    
 </project>
