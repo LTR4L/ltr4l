@@ -29,6 +29,11 @@ import org.ltr4l.tools.Regularization;
 
 import java.util.List;
 
+/**
+ * The implementation of MLPTrainer which uses the
+ * Neural Network Ranking (NNRank) algorithm.
+ *
+ */
 public class NNRankTrainer extends MLPTrainer {
   private final int outputNodeNumber;
 

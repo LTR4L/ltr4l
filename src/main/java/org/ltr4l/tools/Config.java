@@ -27,6 +27,9 @@ import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
 import org.ltr4l.nn.WeightInitializer;
 
+/**
+ * This class is responsible for parsing the file for the required parameters for training and holding the parameters.
+ */
 public class Config {
 
   private final int numIterations;

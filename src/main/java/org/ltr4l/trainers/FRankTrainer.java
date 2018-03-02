@@ -24,6 +24,12 @@ import org.ltr4l.query.QuerySet;
 
 import java.util.HashMap;
 
+/**
+ * An extension of RankNetTrainer.
+ * FRank can be considered a "midway step" between RankNet
+ * and LambdaRank.
+ *
+ */
 public class FRankTrainer extends RankNetTrainer {
 
 

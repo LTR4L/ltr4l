@@ -20,6 +20,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * NetworkShape parses the "layer" settings in the config file, and holds the information about
+ * the number of nodes and their activation in a layer.
+ * The default values are also provided.
+ */
 public class NetworkShape {
 
   public static NetworkShape parseSetting(String layers){

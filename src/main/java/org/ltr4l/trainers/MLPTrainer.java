@@ -16,8 +16,6 @@
 
 package org.ltr4l.trainers;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import org.ltr4l.nn.MLP;
@@ -32,6 +30,11 @@ import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
+/**
+ * The basic implementation of LTRTrainer for classes which use Multi-Layer Perceptron rankers.
+ * As the training method can be different depending on the algorithm used,
+ * the method train() must be implemented by child classes.
+ */
 abstract class MLPTrainer extends LTRTrainer {
   protected MLP mlp;
   protected double maxScore;

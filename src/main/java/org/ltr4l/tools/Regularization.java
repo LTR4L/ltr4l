@@ -16,6 +16,9 @@
 
 package org.ltr4l.tools;
 
+/**
+ * Regularization is used for updating weights.
+ */
 public interface Regularization {
 
   public static Type DEFAULT = Type.L2;

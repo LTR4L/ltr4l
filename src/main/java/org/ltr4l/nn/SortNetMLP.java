@@ -273,6 +273,13 @@ public class SortNetMLP extends Ranker {
     iter++;
   }
 
+  /**
+   * Similar to Edge, however each source and destination contains two nodes.
+   * This is to preserve symmetry in the weights in the network.
+   * For example, LayerA = {node1, node2, ..., node1', node2'}, LayerB = {nodeA, nodeB, ..., nodeA', nodeB'}.
+   * node1:nodeA = node1':nodeA' and node1:nodeA' = node1':nodeA,
+   * where nodeX:nodeY = weight between node x and node y.
+   */
   protected static class SEdge {
     private SNode[] source;
     private SNode[] destination;
