@@ -138,6 +138,25 @@ public class MLP extends Ranker {
   }
 
   @Override
+  public void readModel(String model){
+    int dim = 3;
+    model = model.substring(dim, model.length() - dim);
+    List<Object> modelList = toList(model, dim);
+    List<List<List<Double>>> weights = modelList.stream().map(layer -> ((List<List<Double>>) layer)).collect(Collectors.toList());
+    for (int layerId = 0; layerId < network.size() - 1; layerId++){ //Do not process last layer
+      List<Node> layer = network.get(layerId);
+      for (int nodeId = 0; nodeId < layer.size(); nodeId++){
+        Node node = layer.get(nodeId);
+        List<Edge> outputEdges = node.getOutputEdges();
+        for (int edgeId = 0; edgeId < outputEdges.size(); edgeId ++){
+          Edge edge = outputEdges.get(edgeId);
+          edge.setWeight(weights.get(layerId).get(nodeId).get(edgeId));
+        }
+      }
+    }
+  }
+
+  @Override
   public double predict(List<Double> features){
     return forwardProp(features);
   }
