@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -109,6 +110,24 @@ class PRank extends Ranker{
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  //Weight and thresholds must be given as string, separated by "++"
+  @Override
+  public void readModel(String model){
+    final String regex = "";
+    String weights = model.split(regex)[0];
+    String thresholds = model.split(regex)[1];
+    assign(weights, this.weights);
+    assign(thresholds, this.thresholds);
+  }
+
+  private void assign(String model, double[] modelType){
+    int dim = 1;
+    model = model.substring(dim, model.length() - dim);
+    List<Object> modelList = toList(model, dim);
+    List<Double> modelD = modelList.stream().map(weight -> (Double) weight).collect(Collectors.toList());
+    for (int i = 0; i < modelType.length; i++) modelType[i] = modelD.get(i);
   }
 
   public void updateWeights(Document doc) {
