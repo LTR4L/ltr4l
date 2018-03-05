@@ -121,12 +121,8 @@
         <ivy:retrieve />
         <ivy:retrieve sync="true" type="jar" />
     </target>
-<<<<<<< HEAD
-=======
-
     <target name="javadoc" description="generate documentation">
         <javadoc sourcepath="${src.dir}/main/java" destdir="${doc.dir}" locale="en_US"/>
     </target>
     
->>>>>>> e8cccaa97c1f38b194977197aa1788f405870a88
 </project>
