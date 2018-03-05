@@ -41,24 +41,25 @@ public abstract class Ranker {
   protected abstract void readModel(String model);
 
   private static String makeRegex(String regex, int num){
-    String splitter = "";
+    StringBuilder splitter = new StringBuilder();
     for (int i = 0; i < num; i++){
-      splitter = splitter + regex;
+      splitter.append(regex);
     }
-    return splitter;
+    return splitter.toString();
   }
 
-  public static List<Object> toList(String line, int dim){
+  protected static List<Object> toList(String line, int dim){
+    assert(dim >= 1);
     List<Object> model = new ArrayList<>();
-    if (dim > 1){
+    if (dim == 1){
+      model.addAll(Arrays.stream(line.split(",")).map((Double::parseDouble)).collect(Collectors.toList()));
+    }
+    else { //dim > 1
       String splitter = makeRegex("]", dim - 1) + ", " + makeRegex("[", dim - 1);
       String[] elements = line.split(Pattern.quote(splitter));
       for (String elem : elements){
         model.add(new ArrayList<>(toList(elem, dim - 1)));
       }
-    }
-    if (dim == 1){
-      model.addAll(Arrays.stream(line.split(",")).map((Double::parseDouble)).collect(Collectors.toList()));
     }
     return model;
   }
