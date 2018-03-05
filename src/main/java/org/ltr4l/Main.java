@@ -26,7 +26,7 @@ import org.ltr4l.trainers.Trainer;
  * LTR Project
  * <p>
  * Please download test datasets from:
- * https://onedrive.live.com/?authkey=%21ACnoZZSZVfHPJd0&id=8FEADC23D838BDA8%21107&cid=8FEADC23D838BDA8
+ * https://onedrive.live.com/?authkey=%21ACnoZZSZVfHPJd0&amp;id=8FEADC23D838BDA8%21107&amp;cid=8FEADC23D838BDA8
  */
 public class Main {
   public static void main(String[] args) throws IOException {
