@@ -16,8 +16,6 @@
 
 package org.ltr4l.trainers;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import org.ltr4l.nn.*;
@@ -28,7 +26,11 @@ import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
-
+/**
+ * ListNetTrainer is an extension of LTRTrainer.
+ * Despite note extending MLPTrainer, this trainer
+ * trains an MLP network.
+ */
 public class ListNetTrainer extends LTRTrainer {
   private double lrRate;
   private double rgRate;

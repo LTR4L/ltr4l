@@ -28,6 +28,13 @@ import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
+/**
+ * Ranker which holds the model based on a Multi-Layer Perceptron network.
+ * The overall structure for ListNetMLP is the same as MLP.
+ * The main difference lies in the fact that edges keep track of two derivatives instead of one.
+ * Thus, the implementation of backpropagation and updateweights is different.
+ * TODO: Create a baseMLP class which will extend Ranker and be the parent of ListNetMLP and MLP.
+ */
 public class ListNetMLP extends Ranker {
 
   protected List<List<LNode>> network;
@@ -107,6 +114,25 @@ public class ListNetMLP extends Ranker {
 
     } catch (IOException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void readModel(String model){
+    int dim = 3;
+    model = model.substring(dim, model.length() - dim);
+    List<Object> modelList = toList(model, dim);
+    List<List<List<Double>>> weights = modelList.stream().map(layer -> ((List<List<Double>>) layer)).collect(Collectors.toList());
+    for (int layerId = 0; layerId < network.size() - 1; layerId++){ //Do not process last layer
+      List<LNode> layer = network.get(layerId);
+      for (int nodeId = 0; nodeId < layer.size(); nodeId++){
+        LNode node = layer.get(nodeId);
+        List<LEdge> outputEdges = node.getOutputEdges();
+        for (int edgeId = 0; edgeId < outputEdges.size(); edgeId ++){
+          LEdge edge = outputEdges.get(edgeId);
+          edge.setWeight(weights.get(layerId).get(nodeId).get(edgeId));
+        }
+      }
     }
   }
 
@@ -258,16 +284,10 @@ public class ListNetMLP extends Ranker {
     iter++;
   }
 
-  public List<List<List<Double>>> getWeights() {
-    //Note: went with collect as it is necessary to get a list of all weights anyway.
-    return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null).map(layer -> layer.stream()
-        .map(node -> node.getOutputEdges().stream()
-            .map(edge -> edge.getWeight())
-            .collect(Collectors.toList()))
-        .collect(Collectors.toList()))
-        .collect(Collectors.toList());
-  }
-
+  /**
+   * Difference between LEdge and Edge is the fact that two derivatives are held.
+   * See accErrorDerLabel and accErrorDerPredict.
+   */
   private static class LEdge {
     private LNode source;
     private LNode destination;

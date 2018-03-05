@@ -138,6 +138,25 @@ public class SortNetMLP extends Ranker {
     }
   }
 
+  @Override
+  public void readModel(String model){
+    int dim = 3;
+    model = model.substring(dim, model.length() - dim);
+    List<Object> modelList = toList(model, dim);
+    List<List<List<Double>>> weights = modelList.stream().map(layer -> ((List<List<Double>>) layer)).collect(Collectors.toList());
+    for (int layerId = 0; layerId < network.size() - 1; layerId++){ //Do not process last layer
+      List<SNode> layer = network.get(layerId);
+      for (int nodeId = 0; nodeId < layer.size(); nodeId++){
+        SNode node = layer.get(nodeId);
+        List<SEdge> outputEdges = node.getOutputEdges();
+        for (int edgeId = 0; edgeId < outputEdges.size(); edgeId ++){
+          SEdge edge = outputEdges.get(edgeId);
+          edge.setWeight(weights.get(layerId).get(nodeId).get(edgeId));
+        }
+      }
+    }
+  }
+
   // if > 0, doc1 is predicted to be more relevant than doc2
   // if < 0, doc1 is predicted to be less relevant than doc 2.
   public double predict(Document doc1, Document doc2) {
@@ -273,6 +292,13 @@ public class SortNetMLP extends Ranker {
     iter++;
   }
 
+  /**
+   * Similar to Edge, however each source and destination contains two nodes.
+   * This is to preserve symmetry in the weights in the network.
+   * For example, LayerA = {node1, node2, ..., node1', node2'}, LayerB = {nodeA, nodeB, ..., nodeA', nodeB'}.
+   * node1:nodeA = node1':nodeA' and node1:nodeA' = node1':nodeA,
+   * where nodeX:nodeY = weight between node x and node y.
+   */
   protected static class SEdge {
     private SNode[] source;
     private SNode[] destination;

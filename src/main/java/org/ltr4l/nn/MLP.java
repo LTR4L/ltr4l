@@ -28,6 +28,16 @@ import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
+/**
+ * MLP is a Ranker which uses a Multi-Layer Perceptron network.
+ * The network is a feed-forward network, and the links between
+ * nodes are represented by the Edge class.
+ * Nodes contain lists of edges (source and input), and edges contain
+ * information about source nodes and destination nodes.
+ *
+ * MLPRankers should have methods for forward propagation, backpropagation, and updating of weights.
+ *
+ */
 public class MLP extends Ranker {
   protected List<List<Node>> network;
   protected long iter;
@@ -35,7 +45,17 @@ public class MLP extends Ranker {
   protected final Regularization regularization;
   protected final WeightInitializer weightInit;
 
-  //CONSTRUCT NETWORK
+  /**
+   * The network is constructed within the constructor of MLP.
+   * Bias edges are created for each node, which will add some constant to the total input to the node.
+   * The weights held by these edges are initialized with constants (regardless of weight initialization strategy).
+   * @param inputDim       The number of nodes in the input layer; the dimension of the feature space.
+   * @param networkShape    Contains information about the number of hidden layers, the number of nodes in each layer,
+   *                        and the activation of the nodes in the layer.
+   * @param optFact         Contains information about which optimizer to use for weight updating.
+   * @param regularization  Contains information about what regularization to use for weight updating.
+   * @param weightModel     How to initialize weights (i.e. randomly, gaussian, etc...)
+   */
   public MLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
     //Network shape describes number of nodes and their activation. Example:
     //[
@@ -84,6 +104,16 @@ public class MLP extends Ranker {
     }
   }
 
+  /**
+   * Weights are held by the edges. Lists of edges are stored in nodes.
+   * Since the network is a 2 dimensional list of nodes (i.e. using network.get(i) gives you layer i),
+   * obtainWeights obtains the weights from the network, in order, and keeps information about the order.
+   * The dimensions of the list are:
+   * 1. layer number
+   * 2. node number within layer
+   * 3. outputEdge number within node
+   * @return List of weights.
+   */
   private List<List<List<Double>>> obtainWeights(){
     return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null)
         .map(layer -> layer.stream()
@@ -108,12 +138,34 @@ public class MLP extends Ranker {
   }
 
   @Override
+  public void readModel(String model){
+    int dim = 3;
+    model = model.substring(dim, model.length() - dim);
+    List<Object> modelList = toList(model, dim);
+    List<List<List<Double>>> weights = modelList.stream().map(layer -> ((List<List<Double>>) layer)).collect(Collectors.toList());
+    for (int layerId = 0; layerId < network.size() - 1; layerId++){ //Do not process last layer
+      List<Node> layer = network.get(layerId);
+      for (int nodeId = 0; nodeId < layer.size(); nodeId++){
+        Node node = layer.get(nodeId);
+        List<Edge> outputEdges = node.getOutputEdges();
+        for (int edgeId = 0; edgeId < outputEdges.size(); edgeId ++){
+          Edge edge = outputEdges.get(edgeId);
+          edge.setWeight(weights.get(layerId).get(nodeId).get(edgeId));
+        }
+      }
+    }
+  }
+
+  @Override
   public double predict(List<Double> features){
     return forwardProp(features);
   }
 
-  //Feed forward propagation
-  //This is for the case of the output layer with one node.
+  /**
+   * Input each feature into the input layer of the network, and propagate forward to the last layer.
+   * @param features
+   * @return
+   */
   public double forwardProp(List<Double> features) {
     //Feed document features into input layer.
     List<Node> layer = network.get(0); //First layer
@@ -247,6 +299,10 @@ public class MLP extends Ranker {
     iter++;
   }
 
+  /**
+   * Edge (link) in the network.
+   * Holds information about which nodes are connected, the weight between the nodes, and dw.
+   */
   protected static class Edge { //Serializable?
     private Node source;
     private Node destination;
@@ -303,6 +359,11 @@ public class MLP extends Ranker {
 
   }
 
+  /**
+   * Node in the network.
+   * Holds information regarding the edges (which nodes are connected), and based on that information
+   * the total input and output. Also contains information about Activation.
+   */
   protected static class Node {
     private List<Edge> inputEdges;
     private List<Edge> outputEdges;

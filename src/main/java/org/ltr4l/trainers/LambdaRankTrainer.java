@@ -27,6 +27,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * LambdaRankTrainer trains the RankNetTrainer's network
+ * through a different algorithm, which incorporates
+ * ΔNDCG.
+ * */
 public class LambdaRankTrainer extends RankNetTrainer {
 
   LambdaRankTrainer(QuerySet training, QuerySet validation, Config config) {
@@ -74,6 +79,12 @@ public class LambdaRankTrainer extends RankNetTrainer {
     rmlp.updateWeights(lrRate, rgRate);
   }
 
+  /**
+   * This method returns the ideal DCG given a list of documents.
+   * @param docList List of documents for which ideal DCG is desired.
+   * @param position position = k in DCG@k
+   * @return ideal DCG.
+   */
   private double idcg(List<Document> docList, int position) {
     List<Document> docsRanks = new ArrayList<>(docList);
     docsRanks.sort(Comparator.comparingInt(Document::getLabel).reversed());

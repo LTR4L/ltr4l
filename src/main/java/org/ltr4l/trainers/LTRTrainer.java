@@ -27,6 +27,12 @@ import org.ltr4l.tools.Config;
 import org.ltr4l.tools.RankEval;
 import org.ltr4l.tools.Report;
 
+/**
+ * Abstract class used for training the model held by Rankers.
+ * This class is also the parameter holder.
+ *
+ * train() must be implemented based on algorithm used.
+ */
 public abstract class LTRTrainer implements Trainer {
   protected int epochNum;
   protected List<Query> trainingSet;
@@ -75,6 +81,21 @@ public abstract class LTRTrainer implements Trainer {
 
   abstract Ranker getRanker();
 
+  /**
+   * Sorts the associated documents in a  query according to the ranker's model via predict method, from highest score to lowest.
+   * For example, if a query has the following associated document list:
+   * {(2)docA, (3)docB, (1)docC}
+   * where the numbers in the parentheses are predicted scores,
+   * sortP will return the following new list:
+   * {docB, docA, docC}
+   *
+   * A new list is made in order to preserve the order of the original document list.
+   *
+   * sortP is currently also used to calculate NDCG, and thus a new sorted list should be used to avoid calculation errors.
+   *
+   * @param query
+   * @return new sorted document list.
+   */
   @Override
   public List<Document> sortP(Query query){
     if (ranker == null) ranker = getRanker();
