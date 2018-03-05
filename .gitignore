@@ -8,3 +8,4 @@ test-result
 target
 LTR4L-*.jar
 *.csv
+jacoco-report

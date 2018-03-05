@@ -1,10 +1,15 @@
-<project xmlns:ivy="antlib:org.apache.ivy.ant" name="org.LTR4L-project" default="compile" basedir=".">
+<project name="org.LTR4L-project"
+         xmlns:ivy="antlib:org.apache.ivy.ant"
+         xmlns:jacoco="antlib:org.jacoco.ant"
+         default="compile" basedir=".">
 
     <property name="src.dir" value="src"/>
     <property name="cls.dir" value="classes"/>
     <property name="lib.dir" value="lib"/>
     <property name="test.result.dir" value="test-result"/>
     <property name="conf.dir" value="confs"/>
+    <property name="jacoco.report.dir" value="jacoco-report"/>
+    <property name="jacoco.version" value="0.8.0"/>
 
     <property name="PRODUCT_NAME" value="LTR4L"/>
     <property name="PRODUCT_VERSION" value="0.1-dev"/>
@@ -26,23 +31,60 @@
         </javac>
     </target>
 
-    <target name="test" depends="compile" description="run all tests">
+    <target name="jacoco-install" depends="jacoco-check" unless="jacocoant.exists">
+        <get src="https://github.com/jacoco/jacoco/releases/download/v${jacoco.version}/jacoco-${jacoco.version}.zip" dest="${lib.dir}"/>
+        <unzip src="${lib.dir}/jacoco-${jacoco.version}.zip" dest="${lib.dir}/jacoco-${jacoco.version}"/>
+        <move todir="${lib.dir}">
+            <fileset dir="${lib.dir}/jacoco-${jacoco.version}/lib">
+                <include name="*.jar"/>
+            </fileset>
+        </move>
+        <delete dir="${lib.dir}/jacoco-${jacoco.version}"/>
+        <delete file="${lib.dir}/jacoco-${jacoco.version}.zip"/>
+    </target>
+
+    <target name="jacoco-check">
+        <available property = "jacocoant.exists" file = "${lib.dir}/jacocoant.jar"/>
+    </target>
+
+    <target name="test" depends="compile,jacoco-install" description="run all tests">
         <mkdir dir="${test.result.dir}"/>
-        <junit printsummary="on"
-               haltonfailure="no"
-               errorProperty="tests.failed"
-               failureProperty="tests.failed">
-            <classpath path="${cls.dir}"/>
-            <classpath>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
-            </classpath>
-            <jvmarg value="-ea"/>
-            <formatter type="plain"/>
-            <batchtest fork="yes" todir="${test.result.dir}">
-                <fileset dir="${src.dir}/test/java" includes="**/*Test.java"/>
-            </batchtest>
-        </junit>
+        <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+            <classpath path="${lib.dir}/jacocoant.jar"/>
+        </taskdef>
+        <jacoco:coverage destfile="${jacoco.report.dir}/jacoco-report">
+            <junit fork="true" forkmode="once" printsummary="on"
+                   haltonfailure="no"
+                   errorProperty="tests.failed"
+                   failureProperty="tests.failed">
+                <classpath path="${cls.dir}"/>
+                <classpath>
+                    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+                </classpath>
+                <jvmarg value="-ea"/>
+                <formatter type="plain"/>
+                <batchtest fork="true" todir="${test.result.dir}">
+                    <fileset dir="${src.dir}/test/java" includes="**/*Test.java"/>
+                </batchtest>
+            </junit>
+        </jacoco:coverage>
         <fail if="tests.failed">***** Tests failed! *****</fail>
+
+        <jacoco:report>
+            <executiondata>
+                <file file="${jacoco.report.dir}/jacoco-report"/>
+            </executiondata>
+
+            <structure name="jacoco coverage report">
+                <classfiles>
+                    <fileset dir="${cls.dir}"/>
+                </classfiles>
+                <sourcefiles encoding="UTF-8">
+                    <fileset dir="${src.dir}/main/java"/>
+                </sourcefiles>
+            </structure>
+            <html destdir="${jacoco.report.dir}/coverage-report"/>
+        </jacoco:report>
     </target>
 
 
@@ -79,5 +121,4 @@
         <ivy:retrieve />
         <ivy:retrieve sync="true" type="jar" />
     </target>
-
 </project>
