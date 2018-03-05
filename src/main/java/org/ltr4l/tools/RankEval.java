@@ -45,7 +45,7 @@ public class RankEval {
 
   /**
    * Calculate Normalized Discounted Cumulative Gain. This is calculated by normalizing {@link #dcg(java.util.List, int)}
-   * @k with its maximum possible value.
+   * {@literal @}k with its maximum possible value.
    * @param docsRanks
    * @param position the k-position of NDCG@k
    * @return the score of NDCG
