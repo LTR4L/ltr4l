@@ -135,10 +135,9 @@ Note that this is the time required for all epochs to finish: i.e. for all train
 |Bias Initialization|Zero, Infinity|
 |Loss Function|Square Error|
 |Epochs|100|
-|Time Elapsed|8.734 s|
+|Time Elapsed|8.7 s|
 
 ![Alt Text](figures/PRankNDCG.jpg)
-
 ![Alt Text](figures/PRankError.jpg)
 
 #### OAP-BPM
@@ -147,14 +146,14 @@ Note: N is the number of PRanks used.
 |Parameter|Value|
 |:-:|:-:|
 |Algorithm|OAP-BPM|
-|Dataset|LETOR:MQ2007 Fold 1|
+|Dataset|LETOR:MQ2008 Fold 1|
 |Weights Initialization|Zero|
 |Bias Initialization|Zero, Infinity|
 |N|100|
-|Bernoulli|0.3|
+|Bernoulli|0.03|
 |Loss Function|Square Error|
 |Epochs|100|
-|Time Elapsed|59.974 s|
+|Time Elapsed|10.8 s|
 
 ![Alt Text](figures/oapNDCG.jpg)
 ![Alt Text](figures/oapError.jpg)
@@ -202,7 +201,7 @@ Also note the steady rise in NDCG and fall in loss despite the reduction of docu
 |Learning Rate|0.00001|
 |Regularization|L2|
 |Regularization Rate|0.01|
-|Time Elapsed| 122.318s|
+|Time Elapsed| 114.8s|
 
 ![Alt Text](figures/RankNetNDCG.jpg)
 ![Alt Text](figures/RankNetError.jpg)
@@ -225,7 +224,7 @@ performed on MQ2008:
 |Learning Rate|0.00001|
 |Regularization|L2|
 |Regularization Rate|0.01|
-|Time Elapsed| 38.262s|
+|Time Elapsed| 37.2s|
 
 ![Alt Text](figures/RankNetNDCG2008.jpg)
 ![Alt Text](figures/RankNetError2008.jpg)
@@ -250,7 +249,7 @@ Note: FRankNet is still work in progress.
 |Learning Rate|0.001|
 |Regularization|L2|
 |Regularization Rate|0.01|
-|Time Elapsed| 17.186s|
+|Time Elapsed| 16.0s|
 
 ![Alt Text](figures/FRankNetNDCG2008.jpg)
 ![Alt Text](figures/FRankNetError2008.jpg)
@@ -260,8 +259,25 @@ Note: FRankNet is still work in progress.
 
 Note: LambdaRank is still work in progress.
 
+|Parameter|Value|
+|:-:|:-:|
+|Algorithm|LambdaRank|
+|Dataset|LETOR:MQ2008 Fold 1|
+|Optimizer|Adam|
+|Weights Initialization|Xavier|
+|Bias Initialization|Constant (0.1)|
+|Layers|[46, 10, 1]|
+|Hidden Activation|Sigmoid|
+|Output Activation|Sigmoid|
+|Loss Function|Cross Entropy|
+|Epochs|100|
+|Learning Rate|0.001|
+|Regularization|L2|
+|Regularization Rate|0.01|
+|Time Elapsed| 42.1s|
 
-
+![Alt Text](figures/LambdaRankNDCG2008.jpg)
+![Alt Text](figures/LambdaRankError2008.jpg)
 
 
 #### SortNet
@@ -281,7 +297,7 @@ Note: LambdaRank is still work in progress.
 |Learning Rate|0.01|
 |Regularization|L2|
 |Regularization Rate|0.01|
-|Time Elapsed| 20.091s|
+|Time Elapsed| 20.8s|
 
 
 ![Alt Text](figures/SortNetNDCG2008.jpg)
@@ -304,7 +320,7 @@ Note: LambdaRank is still work in progress.
 |Learning Rate|0.001|
 |Regularization|L2|
 |Regularization Rate|0.01|
-|Time Elapsed| 65.3s|
+|Time Elapsed| 70.8s|
 
 
 ![Alt Text](figures/ListNetNDCG.jpg)
