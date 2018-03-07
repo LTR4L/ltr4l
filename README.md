@@ -310,8 +310,8 @@ Note: FRankNet is still work in progress.
 |Optimizer|Adam|
 |Weights Initialization|Xavier|
 |Bias Initialization|Constant (0.1)|
-|Layers|[46, 15, 1] (Doubled)|
-|Hidden Activation|Identity|
+|Layers|[46, 15, 1, 1]|
+|Hidden Activation|Identity, Sigmoid|
 |Output Activation|Sigmoid|
 |Loss Function|Cross Entropy|
 |Epochs|100|
