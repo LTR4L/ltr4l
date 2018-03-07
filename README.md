@@ -120,10 +120,20 @@ java -jar data/MQ2007/Fold1/train.txt data/MQ2007/Fold1/vali.txt confs/ranknet.c
 
 ## Experiments
 
-In this section, we provide some graphs of NDCG and Loss, as well as the parameters used and elapsed time.
+In this section, first we provide barcharts which show NDCG@10 for each algorithm, across different datasets.
+Then we provide some graphs of NDCG and Loss, as well as the parameters used and elapsed time.
 Note that elapsed time can vary quite a bit depending on the parameters (especially on the number of hidden layers, activation, etc...),
 and is only provided to give a general idea of the speed of the algorithm. Even with no change in parameters, the elapsed time can vary.
 Note that this is the time required for all epochs to finish: i.e. for all training and validation to complete.
+
+#### NDCG Comparisons
+Note that SortNet is missing from MQ2007 and OHSUMED, due to a bug.
+When it is fixed, the graphs will be updated.
+
+
+![Alt Text](figures/2008NDCG.jpg)
+![Alt Text](figures/ohsumedNDCG.jpg)
+
 
 #### PRank
 
