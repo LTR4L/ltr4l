@@ -130,8 +130,10 @@ Note that this is the time required for all epochs to finish: i.e. for all train
 Note that SortNet is missing from MQ2007 and OHSUMED, due to a bug.
 When it is fixed, the graphs will be updated.
 
+![Alt Text](figures/2007NDCG.jpg)
 
 ![Alt Text](figures/2008NDCG.jpg)
+
 ![Alt Text](figures/ohsumedNDCG.jpg)
 
 
