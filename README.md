@@ -120,10 +120,22 @@ java -jar data/MQ2007/Fold1/train.txt data/MQ2007/Fold1/vali.txt confs/ranknet.c
 
 ## Experiments
 
-In this section, we provide some graphs of NDCG and Loss, as well as the parameters used and elapsed time.
+In this section, first we provide barcharts which show NDCG@10 for each algorithm, across different datasets.
+Then we provide some graphs of NDCG and Loss, as well as the parameters used and elapsed time.
 Note that elapsed time can vary quite a bit depending on the parameters (especially on the number of hidden layers, activation, etc...),
 and is only provided to give a general idea of the speed of the algorithm. Even with no change in parameters, the elapsed time can vary.
 Note that this is the time required for all epochs to finish: i.e. for all training and validation to complete.
+
+#### NDCG Comparisons
+Note that SortNet is missing from MQ2007 and OHSUMED, due to a bug.
+When it is fixed, the graphs will be updated.
+
+![Alt Text](figures/2007NDCG.jpg)
+
+![Alt Text](figures/2008NDCG.jpg)
+
+![Alt Text](figures/ohsumedNDCG.jpg)
+
 
 #### PRank
 
@@ -257,8 +269,6 @@ Note: FRankNet is still work in progress.
 
 #### LambdaRank
 
-Note: LambdaRank is still work in progress.
-
 |Parameter|Value|
 |:-:|:-:|
 |Algorithm|LambdaRank|
@@ -312,8 +322,8 @@ Note: LambdaRank is still work in progress.
 |Optimizer|Adam|
 |Weights Initialization|Xavier|
 |Bias Initialization|Constant (0.1)|
-|Layers|[46, 15, 1] (Doubled)|
-|Hidden Activation|Identity|
+|Layers|[46, 15, 1, 1]|
+|Hidden Activation|Identity, Sigmoid|
 |Output Activation|Sigmoid|
 |Loss Function|Cross Entropy|
 |Epochs|100|
@@ -409,7 +419,7 @@ Strictly speaking, this method falls into the multi-threshold approach.
 Type: Feed-forward neural network  
 Approach: Pairwise*  
 Strengths: Relatively high accuracy. Has been widely adopted to much success.  
-Weaknesses: Very slow for training through all document paris.  
+Weaknesses: Very slow for training through all document pairs.  
 Network Input: A single document's features  
 Network Output: Relevance Score  
 Weights updated per document pair  
