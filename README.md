@@ -257,8 +257,6 @@ Note: FRankNet is still work in progress.
 
 #### LambdaRank
 
-Note: LambdaRank is still work in progress.
-
 |Parameter|Value|
 |:-:|:-:|
 |Algorithm|LambdaRank|
@@ -409,7 +407,7 @@ Strictly speaking, this method falls into the multi-threshold approach.
 Type: Feed-forward neural network  
 Approach: Pairwise*  
 Strengths: Relatively high accuracy. Has been widely adopted to much success.  
-Weaknesses: Very slow for training through all document paris.  
+Weaknesses: Very slow for training through all document pairs.  
 Network Input: A single document's features  
 Network Output: Relevance Score  
 Weights updated per document pair  
