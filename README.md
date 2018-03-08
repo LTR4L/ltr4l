@@ -4,7 +4,7 @@ Learning-to-Rank for Apache Lucene (compatibility with Apache Lucene is still a 
 
 The purpose of this document is to provide instructions on how to execute the program, some experimental results.
 A general overview is also provided at the end of the document for those who would like to review or learn more about the algorithms.
-The general overview is meant to provide a "big picture," interpretation, or explanation of each network.
+The general overview is meant to provide a "big picture," interpretation, or explanation of each algorithm, as well as pseudo code.
 For specific mathematical details and formulation, please see implementation or original articles.
 
 ## Table of Contents
@@ -339,6 +339,23 @@ Note: FRankNet is still work in progress.
 
 ## Overview of Algorithms
 
+At the end of the overview for each algorithm, pseudo code will be provided.
+In general, the flow of training and validation takes the following structure:
+
+```
+S = epoch number
+for s = 1 to S do:
+  train()     //updates weights accordingly
+  validate() //calculates NDCG and loss using all documents in the validation set
+  report()
+end for
+
+```
+
+We will focus on train(), and elaborate on other parts when necessary.
+We will also include initialization, and variables.
+Note that yi will refer to the label of document xi, unless otherwise stated.
+
 #### PRank
 Type: Single Perceptron  
 Approach: Pointwise  
@@ -370,6 +387,42 @@ represents a feature of the document (thus the number of nodes is equal to the n
 The activation for each node in the network is the identity function, and each node's output is multiplied by a weight,
 and that becomes one of the inputs of the output node.
 
+Pseudo-code is as follows:
+```
+S = epoch number
+T = Training set of document-label pairs {(x1, y1), (x2, y2),..., (xn, yn))}
+V = Validation set of document-label pairs {(x1, y1), (x2, y2),..., (xm, ym))}
+
+Initialization:
+weights vector: W = (0, 0, 0, ..., 0)
+threshold vector: b = (0, 0, ..., 0) [Note: length of b is # of categories - 1; i.e. last threshold is infinitely large ]
+Error function = Square Error
+
+for s=1 to S do:
+  shuffle(T) [arrange randomly]
+  for each document x(t) in T do:   
+    yt' = min(r, r is index of b {1, 2, ..., k}) {(W*x(t) - b[r])  < 0} //start of updateWeights(x)
+    if (yt' != yt) then:
+      τ[] = new integer array (length = b.length = k) 
+      for r = 1 to k - 1:
+        integer ytr
+        if (yt <= r) then: ytr = -1 else 1 //This is to count mismatched categories.
+        if (wx(t) - b[r]) * ytr <=0 then:
+          τ[r] = ytr
+        else:
+          τ[r] = 0
+      end for
+      τs = Στ[r] for all r
+      W = W + τs * X
+      b = b - τ
+    end if                                 //end of updateWeights(x)
+  end for
+  validate()
+  report()
+end for
+
+```
+
 #### OAP-BPM
 Type: PRank Network  
 Approach: Pointwise  
@@ -389,14 +442,31 @@ Then, OAP-BPM's weights are updated by PRank's weight / N.
 Please see below for an example of presentation of documents and update of weights below:  
 
 ```
-for i = 0 until i = N
-  pRank = pranks[i]
-  if (bernoulli(τ) == 1)
-    predictAndUpdate(prank)
-  if(prank.weightsChanged)
-    this.Weights += prank.Weights / N
+S = epoch number
+T = Training set of document-label pairs {(x1, y1), (x2, y2),..., (xn, yn))}
+V = Validation set of document-label pairs {(x1, y1), (x2, y2),..., (xm, ym))}
+N = number of PRank objects in pRank
 
+Initialization:
+weights vector: W = (0, 0, 0, ..., 0)
+threshold vector: b = (0, 0, ..., 0) [Note: length of b is # of categories - 1; i.e. last threshold is infinitely large ]
+Error function = Square Error
+
+for s = 1 until to S do:
+  shuffle(T)
+  for each document x(t) in T do:
+    for each pR in pRanks do:
+      if (bernoulli(τ) == 1) then:
+        pR.updateWeights()
+        this.weights = this.weights + pr.weights / N
+        this.b = this.b + pr.b / N
+      end if
+    end for
+    validate()
+    report()
+  end for
 end for
+
 ```
 
 #### NNRank
@@ -413,6 +483,43 @@ the number of ordinal categories (for example, if the categories are 1, 2, 3, an
 The key difference of NNRank (from other implemented MLP algorithms) is that the network directly tries to classify a given document,
 rather than output a relevance score.
 Strictly speaking, this method falls into the multi-threshold approach.
+
+```
+S = epoch number
+T = Training set of queries with associated document-label pairs {q1, q2, ..., qn} (each q has a list of documents w/ labels)
+V = Validation set of queries with associated document-label pairs {q1, q2, ..., qm}
+
+Initialization:
+Error function = square error
+network = constructNodes() [2 dimensional list of nodes]
+initializeWeights() [use specified random initialization strategy]
+
+for s = 1 until S do:
+  for all document x in T do:
+    output = predict(x's features)
+    label = x.label
+    if (output != label) then:
+      backProp(x)
+      updateWeights(x)
+    end if
+  end for
+  validate()
+  report()
+end for
+
+
+predict(features):
+  threshold = 0.5
+  forwardProp(features)
+  for nodeId = 0 until network.finalLayer.length do:
+    node = network.finalLayer[nodeId]
+    if (node.getOutput < threshold) then:
+      return nodeId - 1
+    end if
+  end for
+  return network.finalLayer.length - 1
+
+```
 
 
 #### RankNet
@@ -432,6 +539,37 @@ function is used to measure loss, and thus two documents are required for backpr
 (as loss is defined over two documents, the derivative of the loss must be taken with respect
 to document pairs). Therefore, RankNet is considered a pairwise approach, document pairs are
 used as instances during training.
+
+```
+S = epoch number
+T = Training set of queries with associated document-label pairs {q1, q2, ..., qn} (each q has a list of documents w/ labels)
+V = Validation set of queries with associated document-label pairs {q1, q2, ..., qm}
+TP = All pairs of documents (x1, x2) associated with each q in T, such that y1 > y2.
+VP = All pairs of documents (x1, x2) associated with each q in V, such that y1 > y2.
+
+Initialization:
+Error function = cross entropy
+network = constructNodes() //2 dimensional list of nodes
+initializeWeights() //use specified random initialization strategy
+
+for s = 1 until S do:
+  for all document pairs (x1, x2) in T do:
+    threshold = 0.5
+    s1 = forwardProp(x1)
+    s2 = forwardProp(x2)
+    delta = s1 - s2
+    if (delta < threshold) then:
+      sigma = Sigmoid.output(delta)
+      backProp(Sigma)
+      forwardProp(x1)
+      backProp(-Sigma)
+    end if
+  end for
+  validate()
+  report()
+end for
+
+```
 
 #### FRankNet
 
@@ -461,13 +599,47 @@ The output function is first calculated for every pair in the query and combined
 Then, the derivative of the cost function is taken with respect to the score of a document (not the difference of scores of a document pair) using the output.
 This derivative is called λi (for document i) and it is used for backpropagation. After this is done for every document in the query, the weights are updated.
 Thus, for N documents in a query, the total number of updates per query is:  
-1,  
-and the total number of times backpropagation occurs is:  
-N.
+`1`, and the total number of times backpropagation occurs is: `N`.
 
 The approach is pairwise because the cost function is defined for document pairs, and listwise because
 all of the document pairs (and thus all of the documents) in a query are used; thus a document list for the query
 is required.
+
+```
+S = epoch number
+T = Training set of queries with associated document-label pairs {q1, q2, ..., qn} (each q has a list of documents w/ labels)
+V = Validation set of queries with associated document-label pairs {q1, q2, ..., qm}
+TP = All pairs of documents (x1, x2) associated with each q in T, such that y1 > y2.
+VP = All pairs of documents (x1, x2) associated with each q in V, such that y1 > y2.
+
+Initialization:
+Error function = cross entropy
+network = constructNodes() //2 dimensional list of nodes
+initializeWeights() //use specified random initialization strategy
+
+for s = 1 until S do:
+  for all queries q in T do:
+    lambdas = new map
+    ranks = new map
+      for each doc x in q, do:
+        ranks.put(x, forwardProp(x)) //this is for speed up
+        lambdas.put(x, 0)
+      end for
+    for each document pair (x1, x2) in q do:
+      delta = ranks.get(x2) - ranks.get(x1)
+      lambda = Sigmoid.output(delta)
+      lambdas[x1] -= lambda
+      lambdas[x2] += lambda
+    end for
+    for each document x1 in q do:
+      forwardProp(x1)
+      backProp(lambdas[x1])
+    end for
+  updateWeights()
+  validate()
+  report()
+end for
+```
 
 
 #### LambdaRank
@@ -484,6 +656,43 @@ LambdaRank is a modification of FRankNet. The structure of the network remains u
 The main difference is when calculating the λi by looking at all pairs with document i (explained in FRankNet),
 the value is multiplied by |ΔNDCG| of swapping the two documents. Please refer to the original article for the reasoning behind
 the use of this term.
+
+```
+S = epoch number
+T = Training set of queries with associated document-label pairs {q1, q2, ..., qn} (each q has a list of documents w/ labels)
+V = Validation set of queries with associated document-label pairs {q1, q2, ..., qm}
+TP = All pairs of documents (x1, x2) associated with each q in T, such that y1 > y2.
+VP = All pairs of documents (x1, x2) associated with each q in V, such that y1 > y2.
+
+Initialization:
+Error function = cross entropy
+network = constructNodes() //2 dimensional list of nodes
+initializeWeights() //use specified random initialization strategy
+
+for s = 1 until S do:
+  for all queries q in T do:
+    lambdas = new map
+    ranks = new map
+      for each doc x in q, do:
+        ranks.put(x, forwardProp(x)) //this is for speed up
+        lambdas.put(x, 0)
+      end for
+    for each document pair (x1, x2) in q do:
+      calculate ΔNDCG
+      delta = ranks.get(x2) - ranks.get(x1)
+      lambda = Sigmoid.output(delta)
+      lambdas[x1] -= lambda * ΔNDCG
+      lambdas[x2] += lambda * ΔNDCG
+    end for
+    for each document x1 in q do:
+      forwardProp(x1)
+      backProp(lambdas[x1])
+    end for
+  updateWeights()
+  validate()
+  report()
+end for
+```
  
 #### SortNet
 Type: Comparative Neural Network  
@@ -491,7 +700,10 @@ Approach: Pairwise
 Strengths:   
 Weaknesses:  
 Network Input: Two document's features
-Network Output: Preference between the two documents (which document is more relevant)  
+Network Output: Preference between the two documents (which document is more relevant).  
+For example, for an input of {x1, x2}, the output will be {o1, o2}.  
+if o1 > o2, then o1 is more relevant than o2. If o2 > o1, then o2 is more relevant than o1.
+Thus, the targets (given two labels) will be either {1,0} or {0,1}
 Weights updated per document (/ pair)
 
 The structure of SortNet's neural network is different from the rest of the networks implemented thus far in this project.
@@ -501,6 +713,47 @@ the weights between ni and n1 are equal to ni' and n1', and the weights between 
 
 Note: As the output of the network is the preference between the two documents, there is no way to directly calculate the score of a document,
 nor is there a way to classify the document (for ordinal regression).
+
+```
+S = epoch number
+T = Training set of queries with associated document-label pairs {q1, q2, ..., qn} (each q has a list of documents w/ labels)
+V = Validation set of queries with associated document-label pairs {q1, q2, ..., qm}
+TP = All pairs of documents (x1, x2) associated with each q in T, such that y1 > y2.
+VP = All pairs of documents (x1, x2) associated with each q in V, such that y1 > y2.
+
+Initialization:
+Error function = square error
+network = constructNodes() //2 dimensional list of nodes; comparative neural network
+initializeWeights() //use specified random initialization strategy
+targets[][] = {{1,0},{0,1}}
+
+for s = 1 until S do:
+  for all queries q in T do:
+  threshold = 0.5
+    for all documents x1 in q do:     //This is a variation. It does not look at all pairs!
+      get a random document x2 in q such that x2 != x1
+      delta = y1 - y2
+      if (delta != 0) then:
+        prediction = predict(x1, x2)
+        if (prediction * delta < threshold) then:
+          if (delta > 0) then: backprop (targets[0], errorFunc)
+          else: backProp(targets[1], errorFunc)
+          updateWeights()
+        end if
+      end if
+    end for
+  validate()
+  report()
+  end for
+end for
+
+
+predict(features)
+  output = forwardProp(features)
+  return output[0] - output[1]
+
+
+```
 
 #### ListNet
 Type: Feed-forward neural network  
@@ -514,3 +767,29 @@ Weights updated per query
 ListNet can be considered a "listwise version" of RankNet. The main difference is that the cross entropy loss is calculated using a list
 of documents rather than a pair of documents, and the probability used for the cross entropy loss is top one probability (see original paper)
 rather than the probability of one document being more relevant than another.
+To see the key differences, please look at implementation of ListNetMLP.backProp and ListNetTrainer.calculateLoss().
+
+```
+S = epoch number
+T = Training set of queries with associated document-label pairs {q1, q2, ..., qn} (each q has a list of documents w/ labels)
+V = Validation set of queries with associated document-label pairs {q1, q2, ..., qm}
+
+Initialization:
+Error function = Entropy
+network = constructNodes() //2 dimensional list of nodes
+initializeWeights() //use specified random initialization strategy
+targets[][] = {{1,0},{0,1}}
+
+for s = 1 until S do:
+  for all queries q in T do:
+    for all documents x in q do:
+      forwardProp(x)
+      backProp(x)
+    end for
+    updateWeights()
+  end for
+  validate()
+  report()
+end for
+
+```
