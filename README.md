@@ -9,14 +9,15 @@ For specific mathematical details and formulation, please see implementation or 
 
 ## Table of Contents
 
-1. Execution Instructions
+1. Introduction to LTR
+2. Execution Instructions
     - Requirements
     - Data
     - How to Execute Program
     - Changing Parameters
     
-2. Experiments
-3. Overview of Algorithms
+3. Experiments
+4. Overview of Algorithms
     - PRank
     - OAP-BPM
     - NNRank
@@ -26,6 +27,23 @@ For specific mathematical details and formulation, please see implementation or 
     - SortNet
     - ListNet
     
+## Introduction
+Ranking models are an essential component of information retrieval systems.  
+
+Consider the pool of search results for a given search. It is largely impossible to have a pool of search results which will exactly match the set of results the user is looking for. Thus, by vastly increasing the number of search results, one can hope to include all of the desired results of the user. The problem with this, however, is that it becomes much harder for the user to find the desired results among the large pool of search results.  
+Ranking serves as means of mitigating this problem. If all of the user's desired results are pushed to the top of the list, then it does not take much effort for the user to find their desired results.  
+The ability for a "ranker" to rank the search results accurately is dependent on the ranking model. Learning to Rank is the application of machine learning to construct the ranking model.
+
+There are three different types of machine learning algorithms: supervised learning (labels, or the "correct answer," is provided for all data), unsupervised learning (no labels provided), and reinforcement learning (training through trial and error in a specific environment).
+
+In Learning to Rank, there are three different approaches: pointwise, pairwise, and listwise. In pointwise, training involves looking at the data or documents independently. Each document will have a relevance score, which is unrelated or unaffected by other documents. Because of this, the final rank of the document is not visible to the loss function. In addition, this method does not take into account the fact that documents may actually be related, or that documents are related to a certain query.
+
+The pairwise approach involves considering documents in pairs. Learning occurs by looking at which document is more relevant. For example, the model may make a prediction about which document in a pair is more relevant, and compare that to the labels of each document. Then, the model is adjusted. Depending on the algorithm, the model may output a score for a single document, however the loss function (and thus training) will usually require a pair of documents in this case.
+
+The listwise approach involves looking at lists of documents associated with a query. While the model may output a score for one document, the loss function requires a full list of documents in a query. Thus, during learning, information about all of the documents is necessary.
+
+This project currently only implements algorithms of the supervised learning variety, and thus we will focus on supervised learning in this document. The implemented algorithms include pointwise, pairwise, and listwise approaches.
+
 ## Execution Instructions
 
 #### Requirements
