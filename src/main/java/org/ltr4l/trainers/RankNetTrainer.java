@@ -29,6 +29,7 @@ import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Regularization;
+import org.ltr4l.tools.Error;
 
 /**
  * The implementation of MLPTrainer which uses the
@@ -68,6 +69,11 @@ public class RankNetTrainer extends MLPTrainer {
   }
 
   @Override
+  protected Error makeErrorFunc(){
+    return new Error.Entropy();
+  }
+
+  @Override
   public double calculateLoss(List<Query> queries) {
     List<Document[][]> docPairs;
     if (queries == trainingSet)
@@ -86,14 +92,13 @@ public class RankNetTrainer extends MLPTrainer {
       for (Document[] pair : query) {
         double s1 = rmlp.forwardProp(pair[0]);
         double s2 = rmlp.forwardProp(pair[1]);
-        //double output = Math.pow(1 + Math.exp(s2 - s1), -1);
-        //double output = new Activation.Sigmoid().output(s1 - s2);
-        //queryLoss += new Error.ENTROPY().error(output, 1d);
-        queryLoss += Math.log(1 + Math.exp(s2 - s1));
+        double output = Math.pow(1 + Math.exp(s2 - s1), -1); //double output = new Activation.Sigmoid().output(s1 - s2);
+        queryLoss += errorFunc.error(output, 1d);
+        //queryLoss += Math.log(1 + Math.exp(s2 - s1)); This is a derivation; equivalent to errorFunc.error.
       }
       loss += queryLoss / query.length;
     }
-    return loss / processedQueryNum; //(double) (docPairs.size() - nullQueryNum);
+    return loss / processedQueryNum;
   }
 
   @Override

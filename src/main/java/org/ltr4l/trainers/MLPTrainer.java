@@ -64,26 +64,23 @@ abstract class MLPTrainer extends LTRTrainer {
   }
 
   @Override
+  protected Error makeErrorFunc(){
+    return new Error.Square(); //Default square error
+  }
+
+  @Override
   protected Ranker getRanker(){
     return mlp;
   }
 
   protected double calculateLoss(List<Query> queries) {
-    // Note: appears to be just as fast use of nested loops without streams.
-    // However, I have not tested it thoroughly.
+    // Default square error.
     double loss = 0d;
     for (Query query : queries) {
       List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(mlp.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
+      loss += docList.stream().mapToDouble(doc -> errorFunc.error(mlp.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
     }
     return loss / queries.size();
   }
-
-/*  @Override
-  public List<Document> sortP(Query query) {
-    List<Document> ranks = new ArrayList<>(query.getDocList());
-    ranks.sort((docA, docB) -> Double.compare(mlp.predict(docB.getFeatures()), mlp.predict(docA.getFeatures()))); //reversed for high to low.
-    return ranks;
-  }*/
 
 }
