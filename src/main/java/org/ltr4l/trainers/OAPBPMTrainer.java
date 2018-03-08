@@ -33,7 +33,7 @@ import org.ltr4l.tools.Error;
  *
  */
 public class OAPBPMTrainer extends LTRTrainer {
-  final private OAPBPMRank oapRanker;
+  private final OAPBPMRank oapRanker;
   private double maxScore;
   private final  List<Document> trainingDocList;
 

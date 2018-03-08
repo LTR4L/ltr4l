@@ -38,8 +38,8 @@ import org.ltr4l.tools.Error;
  */
 public class RankNetTrainer extends MLPTrainer {
   protected RankNetMLP rmlp;
-  protected List<Document[][]> trainingPairs;
-  protected List<Document[][]> validationPairs;
+  protected final List<Document[][]> trainingPairs;
+  protected final List<Document[][]> validationPairs;
 
   RankNetTrainer(QuerySet training, QuerySet validation, Config config) {
     super(training, validation, config, true);

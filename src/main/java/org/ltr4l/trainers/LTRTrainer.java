@@ -35,14 +35,14 @@ import org.ltr4l.tools.Error;
  * train() must be implemented based on algorithm used.
  */
 public abstract class LTRTrainer implements Trainer {
-  protected int epochNum;
-  protected List<Query> trainingSet;
-  protected List<Query> validationSet;
-  double maxScore;
+  protected final int epochNum;
+  protected final List<Query> trainingSet;
+  protected final List<Query> validationSet;
+  protected double maxScore;
   protected final Report report;
   protected Ranker ranker;
-  protected Config config;
-  protected Error errorFunc;
+  protected final Config config;
+  protected final Error errorFunc;
 
   LTRTrainer(QuerySet training, QuerySet validation, Config config) {
     this.config = config;

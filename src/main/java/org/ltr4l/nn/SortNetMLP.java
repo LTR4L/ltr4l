@@ -29,7 +29,7 @@ import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
 public class SortNetMLP extends Ranker {
-  private List<List<SNode>> network;
+  private final List<List<SNode>> network;
   private long iter;
   private int numAccumulatedDer;
   private final Regularization regularization;

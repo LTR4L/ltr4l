@@ -40,7 +40,7 @@ public class SortNetTrainer extends LTRTrainer {
   protected double maxScore;
   protected double lrRate;
   protected double rgRate;
-  protected double[][] targets;
+  protected final double[][] targets;
   //protected List<Document[][]> trainingPairs;
   //protected List<Document[][]> validationPairs;
 

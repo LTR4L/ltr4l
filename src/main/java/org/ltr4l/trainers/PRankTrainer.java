@@ -41,7 +41,7 @@ import org.ltr4l.tools.Config;
  *
  */
 public class PRankTrainer extends LTRTrainer {
-  final private PRank pRanker;
+  private final PRank pRanker;
   private final  List<Document> trainingDocList;
 
   PRankTrainer(QuerySet training, QuerySet validation, Config config) {
