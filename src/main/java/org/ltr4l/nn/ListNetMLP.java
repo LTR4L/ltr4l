@@ -37,7 +37,7 @@ import org.ltr4l.tools.Regularization;
  */
 public class ListNetMLP extends Ranker {
 
-  protected List<List<LNode>> network;
+  protected final List<List<LNode>> network;
   protected long iter;
   protected double accErrorDer_exSum;
   protected double accErrorDer_ptSum;

@@ -26,6 +26,7 @@ import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.RankEval;
 import org.ltr4l.tools.Report;
+import org.ltr4l.tools.Error;
 
 /**
  * Abstract class used for training the model held by Rankers.
@@ -34,13 +35,14 @@ import org.ltr4l.tools.Report;
  * train() must be implemented based on algorithm used.
  */
 public abstract class LTRTrainer implements Trainer {
-  protected int epochNum;
-  protected List<Query> trainingSet;
-  protected List<Query> validationSet;
-  double maxScore;
+  protected final int epochNum;
+  protected final List<Query> trainingSet;
+  protected final List<Query> validationSet;
+  protected double maxScore;
   protected final Report report;
   protected Ranker ranker;
-  protected Config config;
+  protected final Config config;
+  protected final Error errorFunc;
 
   LTRTrainer(QuerySet training, QuerySet validation, Config config) {
     this.config = config;
@@ -49,9 +51,17 @@ public abstract class LTRTrainer implements Trainer {
     validationSet = validation.getQueries();
     maxScore = 0d;
     this.report = Report.getReport();  // TODO: use default Report for now...
+    this.errorFunc = makeErrorFunc();
   }
 
   abstract double calculateLoss(List<Query> queries);
+
+  /**
+   * This method is used to assign errorFunc.
+   * Child classes must specify which error they will use.
+   * @return Implementation of Error
+   */
+  protected abstract Error makeErrorFunc();
 
   @Override
   public double[] calculateLoss() {

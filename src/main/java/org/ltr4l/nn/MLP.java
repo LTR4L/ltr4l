@@ -39,7 +39,7 @@ import org.ltr4l.tools.Regularization;
  *
  */
 public class MLP extends Ranker {
-  protected List<List<Node>> network;
+  protected final List<List<Node>> network;
   protected long iter;
   protected int numAccumulatedDer;
   protected final Regularization regularization;

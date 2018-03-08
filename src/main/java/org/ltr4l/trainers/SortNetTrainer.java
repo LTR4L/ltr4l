@@ -40,7 +40,7 @@ public class SortNetTrainer extends LTRTrainer {
   protected double maxScore;
   protected double lrRate;
   protected double rgRate;
-  protected double[][] targets;
+  protected final double[][] targets;
   //protected List<Document[][]> trainingPairs;
   //protected List<Document[][]> validationPairs;
 
@@ -76,6 +76,11 @@ public class SortNetTrainer extends LTRTrainer {
   }
 
   @Override
+  protected Error makeErrorFunc(){
+    return new Error.Square();
+  }
+
+  @Override
   Ranker getRanker() {
     return smlp;
   }
@@ -100,9 +105,9 @@ public class SortNetTrainer extends LTRTrainer {
         double prediction = smlp.predict(doc1, doc2);
         if (delta * prediction < threshold) {
           if (delta > 0)
-            smlp.backProp(targets[0], new Error.Square());
+            smlp.backProp(targets[0], errorFunc);
           else
-            smlp.backProp(targets[1], new Error.Square());
+            smlp.backProp(targets[1], errorFunc);
 
           smlp.updateWeights(lrRate, rgRate);
         }
@@ -145,8 +150,8 @@ public class SortNetTrainer extends LTRTrainer {
       double queryLoss = 0d;
       for (Document[] pair : pairs) {
         double[] outputs = smlp.forwardProp(pair[0], pair[1]);
-        queryLoss += new Error.Square().error(outputs[0], targets[0][0]);
-        queryLoss += new Error.Square().error(outputs[1], targets[0][1]);
+        queryLoss += errorFunc.error(outputs[0], targets[0][0]);
+        queryLoss += errorFunc.error(outputs[1], targets[0][1]);
       }
       loss += queryLoss / (double) pairs.length;
     }

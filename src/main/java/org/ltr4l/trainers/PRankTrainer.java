@@ -41,7 +41,7 @@ import org.ltr4l.tools.Config;
  *
  */
 public class PRankTrainer extends LTRTrainer {
-  final private PRank pRanker;
+  private final PRank pRanker;
   private final  List<Document> trainingDocList;
 
   PRankTrainer(QuerySet training, QuerySet validation, Config config) {
@@ -61,11 +61,16 @@ public class PRankTrainer extends LTRTrainer {
       pRanker.updateWeights(doc);
   }
 
+  @Override
+  protected Error makeErrorFunc(){
+    return new Error.Square();
+  }
+
   protected double calculateLoss(List<Query> queries) {
     double loss = 0d;
     for (Query query : queries) {
       List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(pRanker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
+      loss += docList.stream().mapToDouble(doc -> errorFunc.error(pRanker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
     }
     return loss / queries.size();
   }

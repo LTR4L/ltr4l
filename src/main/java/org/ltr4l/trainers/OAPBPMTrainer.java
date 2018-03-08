@@ -33,7 +33,7 @@ import org.ltr4l.tools.Error;
  *
  */
 public class OAPBPMTrainer extends LTRTrainer {
-  final private OAPBPMRank oapRanker;
+  private final OAPBPMRank oapRanker;
   private double maxScore;
   private final  List<Document> trainingDocList;
 
@@ -52,11 +52,16 @@ public class OAPBPMTrainer extends LTRTrainer {
       oapRanker.updateWeights(doc);
   }
 
+  @Override
+  protected Error makeErrorFunc(){
+    return new Error.Square();
+  }
+
   protected double calculateLoss(List<Query> queries) {
     double loss = 0d;
     for (Query query : queries) {
       List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(oapRanker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
+      loss += docList.stream().mapToDouble(doc -> errorFunc.error(oapRanker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
     }
     return loss / queries.size();
   }
