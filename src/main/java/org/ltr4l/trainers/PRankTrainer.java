@@ -39,15 +39,12 @@ import org.ltr4l.tools.Config;
  * PRank(Perceptron Ranking) algorithm.
  *
  */
-public class PRankTrainer extends LTRTrainer {
-  private final PRank pRanker;
+public class PRankTrainer extends LTRTrainer<PRank> {
   private final  List<Document> trainingDocList;
 
   PRankTrainer(QuerySet training, QuerySet validation, Config config) {
     super(training, validation, config);
     maxScore = 0.0;
-    pRanker = new PRank(training.getFeatureLength(), QuerySet.findMaxLabel(trainingSet));
-    super.ranker = pRanker;
     trainingDocList = new ArrayList<>();
     for (Query query : trainingSet)
       trainingDocList.addAll(query.getDocList());
@@ -57,7 +54,7 @@ public class PRankTrainer extends LTRTrainer {
   public void train() {
     Collections.shuffle(trainingDocList);
     for (Document doc : trainingDocList)
-      pRanker.updateWeights(doc);
+      ranker.updateWeights(doc);
   }
 
   @Override
@@ -69,14 +66,14 @@ public class PRankTrainer extends LTRTrainer {
     double loss = 0d;
     for (Query query : queries) {
       List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> errorFunc.error(pRanker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
+      loss += docList.stream().mapToDouble(doc -> errorFunc.error(ranker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
     }
     return loss / queries.size();
   }
 
   @Override
-  Ranker getRanker() {
-    return pRanker;
+  protected PRank constructRanker() {
+    return new PRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet));
   }
 }
 

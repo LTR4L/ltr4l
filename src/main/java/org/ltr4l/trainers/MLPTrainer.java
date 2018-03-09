@@ -35,8 +35,7 @@ import org.ltr4l.tools.Regularization;
  * As the training method can be different depending on the algorithm used,
  * the method train() must be implemented by child classes.
  */
-abstract class MLPTrainer extends LTRTrainer {
-  protected MLP mlp;
+abstract class MLPTrainer<M extends MLP> extends LTRTrainer<M> {
   protected double maxScore;
   protected double lrRate;
   protected double rgRate;
@@ -53,14 +52,6 @@ abstract class MLPTrainer extends LTRTrainer {
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
-    if (!hasOtherMLP) {
-      int featureLength = trainingSet.get(0).getFeatureLength();
-      NetworkShape networkShape = config.getNetworkShape();
-      Optimizer.OptimizerFactory optFact = config.getOptFact();
-      Regularization regularization = config.getReguFunction();
-      String weightModel = config.getWeightInit();
-      mlp = new MLP(featureLength, networkShape, optFact, regularization, weightModel);
-    }
   }
 
   @Override
@@ -69,8 +60,13 @@ abstract class MLPTrainer extends LTRTrainer {
   }
 
   @Override
-  protected Ranker getRanker(){
-    return mlp;
+  protected MLP constructRanker(){
+    int featureLength = trainingSet.get(0).getFeatureLength();
+    NetworkShape networkShape = config.getNetworkShape();
+    Optimizer.OptimizerFactory optFact = config.getOptFact();
+    Regularization regularization = config.getReguFunction();
+    String weightModel = config.getWeightInit();
+    return new MLP(featureLength, networkShape, optFact, regularization, weightModel);
   }
 
   protected double calculateLoss(List<Query> queries) {
@@ -78,7 +74,7 @@ abstract class MLPTrainer extends LTRTrainer {
     double loss = 0d;
     for (Query query : queries) {
       List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> errorFunc.error(mlp.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
+      loss += docList.stream().mapToDouble(doc -> errorFunc.error(ranker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
     }
     return loss / queries.size();
   }

@@ -34,13 +34,13 @@ import org.ltr4l.tools.Error;
  *
  * train() must be implemented based on algorithm used.
  */
-public abstract class LTRTrainer implements Trainer {
+public abstract class LTRTrainer<R extends Ranker> implements Trainer {
   protected final int epochNum;
   protected final List<Query> trainingSet;
   protected final List<Query> validationSet;
   protected double maxScore;
   protected final Report report;
-  protected Ranker ranker;
+  protected final R ranker;
   protected final Config config;
   protected final Error errorFunc;
 
@@ -50,6 +50,7 @@ public abstract class LTRTrainer implements Trainer {
     trainingSet = training.getQueries();
     validationSet = validation.getQueries();
     maxScore = 0d;
+    ranker = constructRanker();
     this.report = Report.getReport();  // TODO: use default Report for now...
     this.errorFunc = makeErrorFunc();
   }
@@ -85,11 +86,10 @@ public abstract class LTRTrainer implements Trainer {
       validate(i);
     }
     report.close();
-    if (ranker == null) ranker = getRanker();
     ranker.writeModel(config.getProps());
   }
 
-  abstract Ranker getRanker();
+  abstract protected <R extends Ranker> R constructRanker();
 
   /**
    * Sorts the associated documents in a  query according to the ranker's model via predict method, from highest score to lowest.
@@ -108,7 +108,6 @@ public abstract class LTRTrainer implements Trainer {
    */
   @Override
   public List<Document> sortP(Query query){
-    if (ranker == null) ranker = getRanker();
     List<Document> ranks = new ArrayList<>(query.getDocList());
     ranks.sort((docA, docB) -> Double.compare(ranker.predict(docB.getFeatures()), ranker.predict(docA.getFeatures()))); //reversed for high to low.
     return ranks;
