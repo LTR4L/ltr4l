@@ -18,6 +18,7 @@ package org.ltr4l.trainers;
 
 import java.util.List;
 
+import org.ltr4l.Ranker;
 import org.ltr4l.nn.*;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
