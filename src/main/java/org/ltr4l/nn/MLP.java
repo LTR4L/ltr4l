@@ -19,12 +19,10 @@ package org.ltr4l.nn;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
@@ -39,11 +37,7 @@ import org.ltr4l.tools.Regularization;
  * MLPRankers should have methods for forward propagation, backpropagation, and updating of weights.
  *
  */
-public class MLP extends Ranker {
-  protected final List<List<Node>> network;
-  protected long iter;
-  protected int numAccumulatedDer;
-  protected final Regularization regularization;
+public class MLP extends AbstractMLP<MLP.Node, MLP.Edge> {
 
   /**
    * The network is constructed within the constructor of MLP.
@@ -57,146 +51,21 @@ public class MLP extends Ranker {
    * @param weightModel     How to initialize weights (i.e. randomly, gaussian, etc...)
    */
   public MLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
-    //Network shape describes number of nodes and their activation. Example:
-    //[
-    //[12, Sigmoid ]
-    //[4 , Softmax ]
-    //[1 , Identity]
-    //]
-    iter = 1;
-    numAccumulatedDer = 0;
-    this.regularization = regularization;
-    addOutputs(networkShape);
-    network = new ArrayList<>();
-
-    WeightInitializer weightInit = WeightInitializer.get(weightModel, inputDim, networkShape);
-
-    //Start with constructing the input layer
-    List<Node> currentLayer = new ArrayList<>();
-    for (int i = 0; i < inputDim; i++) {
-      currentLayer.add(new Node(new Activation.Identity()));
-    }
-    network.add(currentLayer);
-
-    //Construct hidden layers
-    final double bias = weightInit.getInitialBias();
-    for (int layerNum = 0; layerNum < networkShape.size(); layerNum++) {
-      currentLayer = new ArrayList<>();
-      network.add(currentLayer);
-      int nodeNum = networkShape.getLayerSetting(layerNum).getNum();
-      Activation activation = networkShape.getLayerSetting(layerNum).getActivation();
-
-      for (int i = 0; i < nodeNum; i++) {
-        Node currentNode = new Node(activation);
-        Optimizer opt = optFact.getOptimizer();
-        currentNode.addInputEdge(new Edge(null, currentNode, opt, bias)); //add bias edge
-        currentLayer.add(currentNode);
-
-        for (Node previousNode : network.get(layerNum)) {    //Note network.get(layerNum) is previous layer!
-          Edge edge = new Edge(previousNode, currentNode, optFact.getOptimizer(), weightInit.getNextRandomInitialWeight());
-          currentNode.addInputEdge(edge);
-          previousNode.addOutputEdge(edge);
-        }
-      }
-    }
+    super(inputDim, networkShape, optFact, regularization, weightModel);
   }
 
   protected void addOutputs(NetworkShape ns){
-    return; //Default is do not add outputs... make abstract?
-  }
-
-  public List<Node> getLayer(int i){
-    return network.get(i);
-  }
-
-  public Node getNode(int i, int j){
-    return getLayer(i).get(j);
-  }
-
-  /**
-   * Weights are held by the edges. Lists of edges are stored in nodes.
-   * Since the network is a 2 dimensional list of nodes (i.e. using network.get(i) gives you layer i),
-   * obtainWeights obtains the weights from the network, in order, and keeps information about the order.
-   * The dimensions of the list are:
-   * 1. layer number
-   * 2. node number within layer
-   * 3. outputEdge number within node
-   * @return List of weights.
-   */
-  private List<List<List<Double>>> obtainWeights(){
-    return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null)
-        .map(layer -> layer.stream()
-            .map(node -> node.getOutputEdges().stream()
-                .map(edge -> edge.getWeight())
-                .collect(Collectors.toList()))
-            .collect(Collectors.toList()))
-        .collect(Collectors.toList());
+    return; //Default is do not specify... make abstract?
   }
 
   @Override
-  public void writeModel(Properties props, String file) {
-    try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
-      props.store(pw, "Saved model");
-      pw.println("model=" + obtainWeights()); //To ensure model gets written at the end.
-      //props.setProperty("model", obtainWeights().toString());
-      //props.store(pw, "Saved model");
-
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+  protected Node constructNode(Activation activation) {
+    return new Node(activation);
   }
 
   @Override
-  public void readModel(String model){
-    int dim = 3;
-    model = model.substring(dim, model.length() - dim);
-    List<Object> modelList = toList(model, dim);
-    List<List<List<Double>>> weights = modelList.stream().map(layer -> ((List<List<Double>>) layer)).collect(Collectors.toList());
-    for (int layerId = 0; layerId < network.size() - 1; layerId++){ //Do not process last layer
-      List<Node> layer = network.get(layerId);
-      for (int nodeId = 0; nodeId < layer.size(); nodeId++){
-        Node node = layer.get(nodeId);
-        List<Edge> outputEdges = node.getOutputEdges();
-        for (int edgeId = 0; edgeId < outputEdges.size(); edgeId ++){
-          Edge edge = outputEdges.get(edgeId);
-          edge.setWeight(weights.get(layerId).get(nodeId).get(edgeId));
-        }
-      }
-    }
-  }
-
-  @Override
-  public double predict(List<Double> features){
-    return forwardProp(features);
-  }
-
-  /**
-   * Input each feature into the input layer of the network, and propagate forward to the last layer.
-   * @param features
-   * @return
-   */
-  public double forwardProp(List<Double> features) {
-    //Feed document features into input layer.
-    List<Node> layer = network.get(0); //First layer
-    for (int i = 0; i < layer.size(); i++) {
-      Node node = layer.get(i);
-      node.setOutput(features.get(i));
-    }
-
-    //Go through the rest of the layers and update the output.
-    for (int layerId = 1; layerId < network.size(); layerId++) {
-      layer = network.get(layerId);
-      for (Node node : layer) {
-        node.updateOutput();
-      }
-    }
-    return layer.get(0).getOutput(); //After the loop, layer = lastLayer
-  }
-
-  //Overloaded to accept Document object as well.
-  public double forwardProp(Document doc) {
-    List<Double> features = doc.getFeatures();
-    return forwardProp(features);
+  protected Edge constructEdge(Node source, Node destination, Optimizer opt, double weight) {
+    return new Edge(source, destination, opt, weight);
   }
 
   //This is for one output node.
@@ -309,50 +178,21 @@ public class MLP extends Ranker {
    * Edge (link) in the network.
    * Holds information about which nodes are connected, the weight between the nodes, and dw.
    */
-  protected static class Edge { //Serializable?
-    private final Node source;
-    private final Node destination;
-    private final Optimizer optimizer;
-    private double weight;
+  protected static class Edge extends AbstractEdge<Node> { //Serializable?
     private double accErrorDer;
     private boolean isDead;
 
     Edge(Node source, Node destination, Optimizer optimizer, double weight) {
-      this.source = source;
-      this.destination = destination;
-      this.optimizer = optimizer;
-      this.weight = weight;
+      super(source, destination, optimizer, weight);
       accErrorDer = 0.0;
       isDead = false;
     }
-
     public boolean isDead() {
       return isDead;
     }
 
     public void setDead(boolean bool) {
       isDead = bool;
-    }
-
-
-    public double getWeight() {
-      return weight;
-    }
-
-    public void setWeight(double weight) {
-      this.weight = weight;
-    }
-
-    public Node getSource() {
-      return source;
-    }
-
-    public Node getDestination() {
-      return destination;
-    }
-
-    public Optimizer getOptimizer() {
-      return optimizer;
     }
 
     public void setAccErrorDer(double accErrorDer) {
@@ -366,93 +206,11 @@ public class MLP extends Ranker {
   }
 
   /**
-   * Node in the network.
-   * Holds information regarding the edges (which nodes are connected), and based on that information
-   * the total input and output. Also contains information about Activation.
+   * Defines what type of AbstractEdge the node will hold.
    */
-  protected static class Node {
-    private List<Edge> inputEdges;
-    private List<Edge> outputEdges;
-    private double totalInput;
-    private double inputDer;
-    private double output;
-    private double outputDer;
-    private final Activation activation;
-
-    protected Node(Activation activation) {
-      this.activation = activation;
-      inputEdges = new ArrayList<>();
-      outputEdges = new ArrayList<>();
-      totalInput = 0d;
-      inputDer = 0d;
-      output = 0d;
-      outputDer = 0d;
-    }
-
-    protected void addInputEdge(Edge edge) {
-      inputEdges.add(edge);
-    }
-
-    protected void addOutputEdge(Edge edge) {
-      outputEdges.add(edge);
-    }
-
-    protected void updateOutput() {
-      totalInput = inputEdges.get(0).getWeight(); //The first edge is the bias.
-
-      for (int i = 1; i < inputEdges.size(); i++) {
-        Edge edge = inputEdges.get(i);
-        totalInput += edge.getSource().getOutput() * edge.getWeight();
-      }
-      output = activation.output(totalInput);
-    }
-
-    public void setOutput(double output) { //This will be used for input layer only.
-      this.output = output;
-    }
-
-    public double getOutput() {
-      return output;
-    }
-
-    public void setOutputDer(double outputDer) {
-      this.outputDer = outputDer;
-    }
-
-    public double getOutputDer() {
-      return outputDer;
-    }
-
-    public double getInputDer() {
-      return inputDer;
-    }
-
-    public void setInputDer(double inputDer) {
-      this.inputDer = inputDer;
-    }
-
-    public Activation getActivation() {
-      return activation;
-    }
-
-    public double getTotalInput() {
-      return totalInput;
-    }
-
-    public List<Edge> getInputEdges() {
-      return inputEdges;
-    }
-
-    public Edge getInputEdge(int i){
-      return inputEdges.get(i);
-    }
-
-    public List<Edge> getOutputEdges() {
-      return outputEdges;
-    }
-
-    public Edge getOutputEdge(int i){
-      return outputEdges.get(i);
+  protected static class Node extends AbstractNode<Edge> {
+    Node(Activation activation){
+      super(activation);
     }
   }
 }
