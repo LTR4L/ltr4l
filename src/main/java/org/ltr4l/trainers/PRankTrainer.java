@@ -72,7 +72,7 @@ public class PRankTrainer extends LTRTrainer<PRank> {
   }
 
   @Override
-  protected PRank getRanker() {
+  protected PRank constructRanker() {
     return new PRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet));
   }
 }

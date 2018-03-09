@@ -50,7 +50,7 @@ public abstract class LTRTrainer<R extends Ranker> implements Trainer {
     trainingSet = training.getQueries();
     validationSet = validation.getQueries();
     maxScore = 0d;
-    ranker = getRanker();
+    ranker = constructRanker();
     this.report = Report.getReport();  // TODO: use default Report for now...
     this.errorFunc = makeErrorFunc();
   }
@@ -89,7 +89,7 @@ public abstract class LTRTrainer<R extends Ranker> implements Trainer {
     ranker.writeModel(config.getProps());
   }
 
-  abstract protected <R extends Ranker> R getRanker();
+  abstract protected <R extends Ranker> R constructRanker();
 
   /**
    * Sorts the associated documents in a  query according to the ranker's model via predict method, from highest score to lowest.

@@ -74,7 +74,7 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP> {
   }
 
   @Override
-  protected SortNetMLP getRanker() {
+  protected SortNetMLP constructRanker() {
     int featureLength = trainingSet.get(0).getFeatureLength();
     NetworkShape networkShape = config.getNetworkShape();
     networkShape.add(1, new Activation.Sigmoid());

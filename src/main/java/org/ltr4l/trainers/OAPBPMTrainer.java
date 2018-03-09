@@ -65,7 +65,7 @@ public class OAPBPMTrainer extends LTRTrainer<OAPBPMRank> {
   }
 
   @Override
-  protected Ranker getRanker() {
+  protected Ranker constructRanker() {
     return new OAPBPMRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet), config.getPNum(), config.getBernNum());
   }
 }

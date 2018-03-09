@@ -45,7 +45,7 @@ public class NNRankTrainer extends MLPTrainer<MLP> {
   }
 
   @Override
-  protected MLP getRanker(){
+  protected MLP constructRanker(){
     int featureLength = trainingSet.get(0).getFeatureLength();
     //Add an output layer with number of nodes equal to number of classes/relevance categories.
     NetworkShape networkShape = config.getNetworkShape();

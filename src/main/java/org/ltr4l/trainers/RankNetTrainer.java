@@ -60,7 +60,7 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   }
 
   @Override
-  protected RankNetMLP getRanker(){
+  protected RankNetMLP constructRanker(){
     int featureLength = trainingSet.get(0).getFeatureLength();
     NetworkShape networkShape = config.getNetworkShape();
     networkShape.add(1, new Activation.Identity());

@@ -60,7 +60,7 @@ abstract class MLPTrainer<M extends MLP> extends LTRTrainer<M> {
   }
 
   @Override
-  protected MLP getRanker(){
+  protected MLP constructRanker(){
     int featureLength = trainingSet.get(0).getFeatureLength();
     NetworkShape networkShape = config.getNetworkShape();
     Optimizer.OptimizerFactory optFact = config.getOptFact();

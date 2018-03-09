@@ -44,7 +44,7 @@ public class ListNetTrainer extends LTRTrainer<ListNetMLP> {
   }
 
   @Override
-  protected ListNetMLP getRanker() {
+  protected ListNetMLP constructRanker() {
     int featureLength = trainingSet.get(0).getFeatureLength();
     NetworkShape networkShape = config.getNetworkShape();
     networkShape.add(1, new Activation.Identity());
