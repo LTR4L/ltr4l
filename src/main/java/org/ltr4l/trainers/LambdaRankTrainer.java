@@ -57,7 +57,7 @@ public class LambdaRankTrainer extends RankNetTrainer {
 
       for (int i = 0; i < sorted.size(); i++) {
         Document doc = sorted.get(i);
-        ranks.put(doc, rmlp.forwardProp(doc));
+        ranks.put(doc, ranker.forwardProp(doc));
         lambdas.put(doc, 0d);
         pws.put(doc, Math.pow(2, doc.getLabel()) - 1);
         logs.put(doc, 1 / Math.log(i + 2));
@@ -72,11 +72,11 @@ public class LambdaRankTrainer extends RankNetTrainer {
       }
 
       for (Document doc : query.getDocList()) {
-        rmlp.forwardProp(doc);
-        rmlp.backProp(lambdas.get(doc));
+        ranker.forwardProp(doc);
+        ranker.backProp(lambdas.get(doc));
       }
     }
-    rmlp.updateWeights(lrRate, rgRate);
+    ranker.updateWeights(lrRate, rgRate);
   }
 
   /**

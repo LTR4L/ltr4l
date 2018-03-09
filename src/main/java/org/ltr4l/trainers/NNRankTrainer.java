@@ -34,7 +34,7 @@ import java.util.List;
  * Neural Network Ranking (NNRank) algorithm.
  *
  */
-public class NNRankTrainer extends MLPTrainer {
+public class NNRankTrainer extends MLPTrainer<MLP> {
   private final int outputNodeNumber;
 
   //Last layer of the network has a number of nodes equal to the number of categories.
@@ -42,6 +42,10 @@ public class NNRankTrainer extends MLPTrainer {
   NNRankTrainer(QuerySet training, QuerySet validation, Config config) {
     super(training, validation, config, true);
     outputNodeNumber = QuerySet.findMaxLabel(trainingSet) + 1;
+  }
+
+  @Override
+  protected MLP getRanker(){
     int featureLength = trainingSet.get(0).getFeatureLength();
     //Add an output layer with number of nodes equal to number of classes/relevance categories.
     NetworkShape networkShape = config.getNetworkShape();
@@ -49,9 +53,7 @@ public class NNRankTrainer extends MLPTrainer {
     Optimizer.OptimizerFactory optFact = config.getOptFact();
     Regularization regularization = config.getReguFunction();
     String weightModel = config.getWeightInit();
-
-    //As the structure of the output layer has changed, predict needs to be overridden.
-    mlp = new MLP(featureLength, networkShape, optFact, regularization, weightModel) {
+    return new MLP(featureLength, networkShape, optFact, regularization, weightModel) {
       @Override
       public double predict(List<Double> features) {
         double threshold = 0.5;
@@ -64,6 +66,7 @@ public class NNRankTrainer extends MLPTrainer {
         return network.get(network.size() - 1).size() - 1;
       }
     };
+
   }
 
   private double[] targetLabel(int label) {
@@ -77,11 +80,11 @@ public class NNRankTrainer extends MLPTrainer {
   public void train() {
     for (Query query : trainingSet) {
       for (Document doc : query.getDocList()) {
-        int output = (int) mlp.predict(doc.getFeatures());
+        int output = (int) ranker.predict(doc.getFeatures());
         int label = doc.getLabel();
         if (output != label) {
-          mlp.backProp(targetLabel(label), errorFunc);
-          mlp.updateWeights(lrRate, rgRate);
+          ranker.backProp(targetLabel(label), errorFunc);
+          ranker.updateWeights(lrRate, rgRate);
         }
       }
     }

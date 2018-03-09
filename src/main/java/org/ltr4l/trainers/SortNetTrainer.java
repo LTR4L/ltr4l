@@ -36,8 +36,7 @@ import org.ltr4l.tools.Regularization;
  * This network trains an MLP network.
  *
  */
-public class SortNetTrainer extends LTRTrainer {
-  protected SortNetMLP smlp;
+public class SortNetTrainer extends LTRTrainer<SortNetMLP> {
   protected double maxScore;
   protected double lrRate;
   protected double rgRate;
@@ -52,13 +51,6 @@ public class SortNetTrainer extends LTRTrainer {
     rgRate = config.getReguRate();
     maxScore = 0;
     targets = new double[][]{{1, 0}, {0, 1}};
-    int featureLength = trainingSet.get(0).getFeatureLength();
-    NetworkShape networkShape = config.getNetworkShape();
-    networkShape.add(1, new Activation.Sigmoid());
-    Optimizer.OptimizerFactory optFact = config.getOptFact();
-    Regularization regularization = config.getReguFunction();
-    String weightModel = config.getWeightInit();
-    smlp = new SortNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
 
 /*        trainingPairs = new ArrayList<>();
         for (int i = 0; i < trainingSet.size(); i++){
@@ -82,8 +74,14 @@ public class SortNetTrainer extends LTRTrainer {
   }
 
   @Override
-  Ranker getRanker() {
-    return smlp;
+  protected SortNetMLP getRanker() {
+    int featureLength = trainingSet.get(0).getFeatureLength();
+    NetworkShape networkShape = config.getNetworkShape();
+    networkShape.add(1, new Activation.Sigmoid());
+    Optimizer.OptimizerFactory optFact = config.getOptFact();
+    Regularization regularization = config.getReguFunction();
+    String weightModel = config.getWeightInit();
+    return new SortNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
   }
 
   //The following implementation is used for speed up.
@@ -103,14 +101,14 @@ public class SortNetTrainer extends LTRTrainer {
         double delta = doc1.getLabel() - doc2.getLabel();
         if (delta == 0) //if the label is the same, skip.
           continue;
-        double prediction = smlp.predict(doc1, doc2);
+        double prediction = ranker.predict(doc1, doc2);
         if (delta * prediction < threshold) {
           if (delta > 0)
-            smlp.backProp(targets[0], errorFunc);
+            ranker.backProp(targets[0], errorFunc);
           else
-            smlp.backProp(targets[1], errorFunc);
+            ranker.backProp(targets[1], errorFunc);
 
-          smlp.updateWeights(lrRate, rgRate);
+          ranker.updateWeights(lrRate, rgRate);
         }
       }
     }
@@ -150,7 +148,7 @@ public class SortNetTrainer extends LTRTrainer {
         continue;
       double queryLoss = 0d;
       for (Document[] pair : pairs) {
-        double[] outputs = smlp.forwardProp(pair[0], pair[1]);
+        double[] outputs = ranker.forwardProp(pair[0], pair[1]);
         queryLoss += errorFunc.error(outputs[0], targets[0][0]);
         queryLoss += errorFunc.error(outputs[1], targets[0][1]);
       }
@@ -163,7 +161,7 @@ public class SortNetTrainer extends LTRTrainer {
   public List<Document> sortP(Query query) {
     List<Document> ranks = new ArrayList<>(query.getDocList());
     //Reverse order to go from highest to lowest instead of lowest to highest.
-    ranks.sort((docA, docB) -> Double.compare(0, smlp.predict(docA, docB)));
+    ranks.sort((docA, docB) -> Double.compare(0, ranker.predict(docA, docB)));
 /*        ranks.sort(new Comparator<Document>() {
             @Override
             public int compare(Document o1, Document o2) {

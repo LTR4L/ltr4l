@@ -51,7 +51,7 @@ public class FRankTrainer extends RankNetTrainer {
       HashMap<Document, Double> ranks = new HashMap<>();   //Create map for documents ranks.
       for (Document doc : query.getDocList()) {
         lambdas.put(doc, 0d);
-        ranks.put(doc, rmlp.forwardProp(doc));
+        ranks.put(doc, ranker.forwardProp(doc));
       }
 
       for (Document[] pair : trainingPairs.get(iq)) {
@@ -62,11 +62,11 @@ public class FRankTrainer extends RankNetTrainer {
       }
 
       for (Document doc : query.getDocList()) {
-        rmlp.forwardProp(doc);
-        rmlp.backProp(lambdas.get(doc));
+        ranker.forwardProp(doc);
+        ranker.backProp(lambdas.get(doc));
       }
     }
-    rmlp.updateWeights(lrRate, rgRate);
+    ranker.updateWeights(lrRate, rgRate);
   }
 
 }
