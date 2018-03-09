@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.ltr4l.Ranker;
 import org.ltr4l.nn.*;
 
 import org.ltr4l.query.Document;
