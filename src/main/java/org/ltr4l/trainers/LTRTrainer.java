@@ -40,7 +40,7 @@ public abstract class LTRTrainer<R extends Ranker> implements Trainer {
   protected final List<Query> validationSet;
   protected double maxScore;
   protected final Report report;
-  protected R ranker;
+  protected final R ranker;
   protected final Config config;
   protected final Error errorFunc;
 
