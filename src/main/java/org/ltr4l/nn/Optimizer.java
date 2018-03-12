@@ -154,6 +154,30 @@ public interface Optimizer {
     }
   }
 
+  class RMSProp implements Optimizer{
+    private double cache;
+    private static final double eps = 1e-6;   //Note: different values possible
+    private static final double decay = 0.99; //Note: different values possible
+
+    RMSProp(){
+      cache = 0;
+    }
+
+    @Override
+    public double optimize(double dw, double rate, long iter) {
+      cache = decay * cache + (1 - decay) * dw * dw;
+      return - (rate * dw)/Math.sqrt(cache + eps);
+    }
+  }
+
+  class RMSFactory implements OptimizerFactory {
+
+    @Override
+    public Optimizer getOptimizer() {
+      return new RMSProp();
+    }
+  }
+
   public static Optimizer.OptimizerFactory getFactory(Type type) {
     switch (type) {
       case adam:
@@ -166,12 +190,14 @@ public interface Optimizer {
         return new Optimizer.NesterovFactory();
       case adagrad:
         return new Optimizer.AdagradFactory();
+      case rmsprop:
+        return new Optimizer.RMSFactory();
       default:
         return new Optimizer.SGDFactory();
     }
   }
 
   public enum Type {
-    adam, sgd, momentum, nesterov, adagrad;
+    adam, sgd, momentum, nesterov, adagrad, rmsprop;
   }
 }
