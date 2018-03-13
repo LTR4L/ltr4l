@@ -50,10 +50,10 @@ public interface Optimizer {
     public double optimize(double dw, double rate, long iter) {
       m = beta1 * m + (1 - beta1) * dw;
       r = beta2 * r + (1 - beta2) * dw * dw;
-      double mH = m / (1 - Math.pow(beta1,iter));
+      double mH = m / (1 - Math.pow(beta1, iter));
       double rH = r / (1 - Math.pow(beta2, iter)); //Note: should always be positive for 0 <= beta2 < 1
 
-      return -rate * mH / (Math.sqrt(Math.sqrt(rH)) + eps);
+      return -rate * mH / (Math.sqrt(rH) + eps);
     }
   }
 

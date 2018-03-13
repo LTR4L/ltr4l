@@ -35,11 +35,11 @@ public class OptimizerTest {
   public void testOptimizeByAdam() throws Exception {
     Optimizer opt = Optimizer.getFactory(Optimizer.Type.adam).getOptimizer();
 
-    Assert.assertEquals(-0.0199999, opt.optimize(0.1, 0.2, 1), 0.001);
-    Assert.assertEquals(-0.0340523, opt.optimize(0.2, 0.2, 2), 0.001);
-    Assert.assertEquals(-0.0473565, opt.optimize(0.3, 0.2, 3), 0.001);
-    Assert.assertEquals(-0.0601400, opt.optimize(0.4, 0.2, 4), 0.001);
-    Assert.assertEquals(-0.0724769, opt.optimize(0.5, 0.2, 5), 0.001);
+    Assert.assertEquals(-0.2, opt.optimize(0.1, 0.2, 1), 0.001);
+    Assert.assertEquals(-0.193, opt.optimize(0.2, 0.2, 2), 0.001);
+    Assert.assertEquals(-0.192, opt.optimize(0.3, 0.2, 3), 0.001);
+    Assert.assertEquals(-0.192, opt.optimize(0.4, 0.2, 4), 0.001);
+    Assert.assertEquals(-0.193, opt.optimize(0.5, 0.2, 5), 0.001);
   }
 
   @Test
