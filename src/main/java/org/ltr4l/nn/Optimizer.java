@@ -141,7 +141,7 @@ public interface Optimizer {
 
     @Override
     public double optimize(double dw, double rate, long iter) {
-      cache = dw * dw;
+      cache = cache + (dw * dw);
       return - rate * dw / (Math.sqrt(cache) + eps);
     }
   }
