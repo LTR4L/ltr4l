@@ -178,6 +178,35 @@ public interface Optimizer {
     }
   }
 
+  class Adamax implements Optimizer { //Recommended rate is 0.002
+    private final double beta1;
+    private final double beta2;
+    private double m;
+    private double r; //r used instead of v for consistency with implementation of Adam.
+
+    Adamax(){
+      beta1 = 0.9;
+      beta2 = 0.999;
+      m = 0.0;
+      r = 0.0;
+    }
+
+    @Override
+    public double optimize(double dw, double rate, long iter) {
+      m = (beta1 * m) + (1 - beta1) * dw;
+      r = Math.max(beta2 * r, Math.abs(dw));
+      return rate * m / r;
+    }
+  }
+
+  class AdamaxFactory implements OptimizerFactory {
+
+    @Override
+    public Optimizer getOptimizer() {
+      return new Adamax();
+    }
+  }
+
   public static Optimizer.OptimizerFactory getFactory(Type type) {
     switch (type) {
       case adam:
@@ -192,12 +221,14 @@ public interface Optimizer {
         return new Optimizer.AdagradFactory();
       case rmsprop:
         return new Optimizer.RMSFactory();
+      case adamax:
+        return new Optimizer.AdamaxFactory();
       default:
         return new Optimizer.SGDFactory();
     }
   }
 
   public enum Type {
-    adam, sgd, momentum, nesterov, adagrad, rmsprop;
+    adam, sgd, momentum, nesterov, adagrad, rmsprop, adamax;
   }
 }
