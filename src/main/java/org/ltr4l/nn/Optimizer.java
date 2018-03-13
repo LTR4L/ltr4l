@@ -168,7 +168,7 @@ public interface Optimizer {
     @Override
     public double optimize(double dw, double rate, long iter) {
       cache = decay * cache + (1 - decay) * dw * dw;
-      return - (rate * dw)/Math.sqrt(cache + eps);
+      return - (rate * dw)/(Math.sqrt(cache) + eps);
     }
   }
 
@@ -197,7 +197,7 @@ public interface Optimizer {
     public double optimize(double dw, double rate, long iter) {
       m = (beta1 * m) + (1 - beta1) * dw;
       r = Math.max(beta2 * r, Math.abs(dw));
-      return rate * m / r;
+      return -rate * m / r;
     }
   }
 
