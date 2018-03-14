@@ -47,13 +47,9 @@ public class SortNetMLP extends Ranker {
     iter = 1;
     numAccumulatedDer = 0;
     this.regularization = regularization;
-    int nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
     network = new ArrayList<>();
 
-    for (int i = 1; i < networkShape.size(); i++) {
-      nWeights += networkShape.getLayerSetting(i - 1).getNum() * networkShape.getLayerSetting(i).getNum();
-    }
-    WeightInitializer weightInit = WeightInitializer.get(weightModel, nWeights);
+    WeightInitializer weightInit = WeightInitializer.get(weightModel, inputDim, networkShape);
 
     //Construct the initial layer:
     List<SNode> inputLayer = new ArrayList<>();
