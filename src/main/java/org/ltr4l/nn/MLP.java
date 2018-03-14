@@ -44,7 +44,6 @@ public class MLP extends Ranker {
   protected long iter;
   protected int numAccumulatedDer;
   protected final Regularization regularization;
-  protected final WeightInitializer weightInit;
 
   /**
    * The network is constructed within the constructor of MLP.
@@ -73,7 +72,7 @@ public class MLP extends Ranker {
     for (int i = 1; i < networkShape.size(); i++) {
       nWeights += networkShape.getLayerSetting(i - 1).getNum() * networkShape.getLayerSetting(i).getNum();
     }
-    weightInit = WeightInitializer.get(weightModel, nWeights);
+    WeightInitializer weightInit = WeightInitializer.get(weightModel, nWeights);
 
     //Start with constructing the input layer
     List<Node> currentLayer = new ArrayList<>();

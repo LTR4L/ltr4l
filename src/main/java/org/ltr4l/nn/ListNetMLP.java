@@ -43,7 +43,6 @@ public class ListNetMLP extends Ranker {
   protected double accErrorDer_exSum;
   protected double accErrorDer_ptSum;
   protected final Regularization regularization;
-  protected final WeightInitializer weightInit;
 
   //CONSTRUCT NETWORK
   public ListNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
@@ -63,7 +62,7 @@ public class ListNetMLP extends Ranker {
     for (int i = 1; i < networkShape.size(); i++) {
       nWeights += networkShape.getLayerSetting(i - 1).getNum() * networkShape.getLayerSetting(i).getNum();
     }
-    weightInit = WeightInitializer.get(weightModel, nWeights);
+    WeightInitializer weightInit = WeightInitializer.get(weightModel, nWeights);
 
     //Start with constructing the input layer
     List<LNode> currentLayer = new ArrayList<>();
