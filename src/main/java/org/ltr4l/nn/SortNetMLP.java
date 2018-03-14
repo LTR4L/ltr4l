@@ -34,7 +34,6 @@ public class SortNetMLP extends Ranker {
   private long iter;
   private int numAccumulatedDer;
   private final Regularization regularization;
-  private final WeightInitializer weightInit;
 
   //Construct Network
   public SortNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
@@ -54,7 +53,7 @@ public class SortNetMLP extends Ranker {
     for (int i = 1; i < networkShape.size(); i++) {
       nWeights += networkShape.getLayerSetting(i - 1).getNum() * networkShape.getLayerSetting(i).getNum();
     }
-    weightInit = WeightInitializer.get(weightModel, nWeights);
+    WeightInitializer weightInit = WeightInitializer.get(weightModel, nWeights);
 
     //Construct the initial layer:
     List<SNode> inputLayer = new ArrayList<>();
