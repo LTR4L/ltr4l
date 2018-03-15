@@ -127,13 +127,23 @@ For example, to add another layer of 3 ReLu nodes and the output layer to Sigmoi
 layers:10,Sigmoid 3,Relu 1,Sigmoid
 ```
 
-You can also change the training data and validation data by changing the path of the first and second argument while executing the program:
+You can also change the gradient descent optimization algorithm used during training.
+The following optimization algorithms have been implemented (specification in the config file is case-insensitive):  
+SGD  
+Adam  
+Momentum  
+Nesterov  
+Adagrad  
+RMSProp  
+Adamax  
+Nadam  
+AMSGrad  
+
+The training data and validation data used can be changed by changing the path of the first and second argument while executing the program:
 
 ```
 java -jar data/MQ2007/Fold1/train.txt data/MQ2007/Fold1/vali.txt confs/ranknet.config
 ```
-
-
 
 
 ## Experiments
@@ -302,7 +312,7 @@ Note: FRankNet is still work in progress.
 |Learning Rate|0.001|
 |Regularization|L2|
 |Regularization Rate|0.01|
-|Time Elapsed| 42.1s|
+|Time Elapsed| 32.6s|
 
 ![Alt Text](figures/LambdaRankNDCG2008.jpg)
 ![Alt Text](figures/LambdaRankError2008.jpg)
@@ -336,23 +346,23 @@ Note: FRankNet is still work in progress.
 |Parameter|Value|
 |:-:|:-:|
 |Algorithm|ListNet|
-|Dataset|LETOR:MQ2007 Fold 1|
+|Dataset|LETOR:MQ2008 Fold 1|
 |Optimizer|Adam|
 |Weights Initialization|Xavier|
 |Bias Initialization|Constant (0.1)|
-|Layers|[46, 15, 1, 1]|
-|Hidden Activation|Identity, Sigmoid|
+|Layers|[46, 15, 1]|
+|Hidden Activation|Identity|
 |Output Activation|Sigmoid|
 |Loss Function|Cross Entropy|
 |Epochs|100|
 |Learning Rate|0.001|
 |Regularization|L2|
 |Regularization Rate|0.01|
-|Time Elapsed| 70.8s|
+|Time Elapsed| 35.7s|
 
 
-![Alt Text](figures/ListNetNDCG.jpg)
-![Alt Text](figures/ListNetError.jpg)
+![Alt Text](figures/ListNetNDCG2008.jpg)
+![Alt Text](figures/ListNetError2008.jpg)
 
 
 ## Overview of Algorithms
