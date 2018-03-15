@@ -127,13 +127,23 @@ For example, to add another layer of 3 ReLu nodes and the output layer to Sigmoi
 layers:10,Sigmoid 3,Relu 1,Sigmoid
 ```
 
-You can also change the training data and validation data by changing the path of the first and second argument while executing the program:
+You can also change the gradient descent optimization algorithm used during training.
+The following optimization algorithms have been implemented (specification in the config file is case-insensitive):  
+SGD  
+Adam  
+Momentum  
+Nesterov  
+Adagrad  
+RMSProp  
+Adamax  
+Nadam  
+AMSGrad  
+
+The training data and validation data used can be changed by changing the path of the first and second argument while executing the program:
 
 ```
 java -jar data/MQ2007/Fold1/train.txt data/MQ2007/Fold1/vali.txt confs/ranknet.config
 ```
-
-
 
 
 ## Experiments
