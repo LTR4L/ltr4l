@@ -312,7 +312,7 @@ Note: FRankNet is still work in progress.
 |Learning Rate|0.001|
 |Regularization|L2|
 |Regularization Rate|0.01|
-|Time Elapsed| 42.1s|
+|Time Elapsed| 32.6s|
 
 ![Alt Text](figures/LambdaRankNDCG2008.jpg)
 ![Alt Text](figures/LambdaRankError2008.jpg)
@@ -346,23 +346,23 @@ Note: FRankNet is still work in progress.
 |Parameter|Value|
 |:-:|:-:|
 |Algorithm|ListNet|
-|Dataset|LETOR:MQ2007 Fold 1|
+|Dataset|LETOR:MQ2008 Fold 1|
 |Optimizer|Adam|
 |Weights Initialization|Xavier|
 |Bias Initialization|Constant (0.1)|
-|Layers|[46, 15, 1, 1]|
-|Hidden Activation|Identity, Sigmoid|
+|Layers|[46, 15, 1]|
+|Hidden Activation|Identity|
 |Output Activation|Sigmoid|
 |Loss Function|Cross Entropy|
 |Epochs|100|
 |Learning Rate|0.001|
 |Regularization|L2|
 |Regularization Rate|0.01|
-|Time Elapsed| 70.8s|
+|Time Elapsed| 35.7s|
 
 
-![Alt Text](figures/ListNetNDCG.jpg)
-![Alt Text](figures/ListNetError.jpg)
+![Alt Text](figures/ListNetNDCG2008.jpg)
+![Alt Text](figures/ListNetError2008.jpg)
 
 
 ## Overview of Algorithms
