@@ -50,8 +50,10 @@ public interface Optimizer {
     public double optimize(double dw, double rate, long iter) {
       m = beta1 * m + (1 - beta1) * dw;
       r = beta2 * m + (1 - beta2) * dw * dw;
+      double mH = m / (1 - Math.pow(beta1,iter));
+      double rH = r / (1 - Math.pow(beta2, iter)); //Note: should always be positive for 0 <= beta2 < 1
 
-      return -rate * m / (Math.sqrt(Math.abs(r)) + eps);
+      return -rate * mH / (Math.sqrt(Math.sqrt(rH)) + eps);
     }
   }
 
@@ -141,7 +143,7 @@ public interface Optimizer {
 
     @Override
     public double optimize(double dw, double rate, long iter) {
-      cache = dw * dw;
+      cache = cache + (dw * dw);
       return - rate * dw / (Math.sqrt(cache) + eps);
     }
   }
@@ -151,6 +153,129 @@ public interface Optimizer {
     @Override
     public Optimizer getOptimizer() {
       return new Adagrad();
+    }
+  }
+
+  class RMSProp implements Optimizer{
+    private double cache;
+    private static final double eps = 1e-6;   //Note: different values possible
+    private static final double decay = 0.99; //Note: different values possible
+
+    RMSProp(){
+      cache = 0;
+    }
+
+    @Override
+    public double optimize(double dw, double rate, long iter) {
+      cache = decay * cache + (1 - decay) * dw * dw;
+      return - (rate * dw)/Math.sqrt(cache + eps);
+    }
+  }
+
+  class RMSFactory implements OptimizerFactory {
+
+    @Override
+    public Optimizer getOptimizer() {
+      return new RMSProp();
+    }
+  }
+
+  class Adamax implements Optimizer { //Recommended rate is 0.002
+    private final double beta1;
+    private final double beta2;
+    private double m;
+    private double r; //r used instead of v for consistency with implementation of Adam.
+
+    Adamax(){
+      beta1 = 0.9;
+      beta2 = 0.999;
+      m = 0.0;
+      r = 0.0;
+    }
+
+    @Override
+    public double optimize(double dw, double rate, long iter) {
+      m = (beta1 * m) + (1 - beta1) * dw;
+      r = Math.max(beta2 * r, Math.abs(dw));
+      return rate * m / r;
+    }
+  }
+
+  class AdamaxFactory implements OptimizerFactory {
+
+    @Override
+    public Optimizer getOptimizer() {
+      return new Adamax();
+    }
+  }
+
+  class Nadam implements Optimizer {
+    private final double beta1;
+    private final double beta2;
+    private double m;
+    private double r;
+    private double eps;
+
+    Nadam(){
+      beta1 = 0.9;
+      beta2 = 0.999;
+      m = 0.0;
+      r = 0.0;
+      eps = 1e-8;
+    }
+
+    @Override
+    public double optimize(double dw, double rate, long iter) {
+      m = (beta1 * m) + (1 - beta1) * dw;
+      r = (beta2 * r) + (1 - beta2) * dw * dw;
+      double mH = m / (1 - Math.pow(beta1, iter));
+      double rH = r / (1 - Math.pow(beta2, iter));
+
+      return - rate * (beta1 * mH + ((1 - beta1) * dw / (1 - Math.pow(beta1, iter)))) / (Math.sqrt(rH) + eps);
+    }
+  }
+
+  class NadamFactory implements OptimizerFactory {
+
+    @Override
+    public Optimizer getOptimizer() {
+      return new Nadam();
+    }
+  }
+
+  class AMSGrad implements Optimizer {
+    private final double beta1;
+    private final double beta2;
+    private final double eps;
+    private double m;
+    private double r;
+    private double rH;
+
+    AMSGrad(){
+      beta1 = 0.9;
+      beta2 = 0.99;
+      eps = 1e-8;
+      m = 0.0;
+      r = 0.0;
+      rH = 0.0;
+    }
+
+
+    @Override
+    public double optimize(double dw, double rate, long iter) {
+      m = beta1 * m + (1 - beta1) * dw;
+      r = beta2 * r + (1 - beta2) * dw * dw;
+      rH = Math.max(rH, r);
+
+      return - rate * m / (Math.sqrt(rH) + eps);
+    }
+  }
+
+  class AMSGradFactory implements OptimizerFactory {
+
+    @Override
+    public Optimizer getOptimizer() {
+      return new AMSGrad();
     }
   }
 
@@ -166,12 +291,20 @@ public interface Optimizer {
         return new Optimizer.NesterovFactory();
       case adagrad:
         return new Optimizer.AdagradFactory();
+      case rmsprop:
+        return new Optimizer.RMSFactory();
+      case adamax:
+        return new Optimizer.AdamaxFactory();
+      case nadam:
+        return new Optimizer.NadamFactory();
+      case amsgrad:
+        return new Optimizer.AMSGradFactory();
       default:
         return new Optimizer.SGDFactory();
     }
   }
 
   public enum Type {
-    adam, sgd, momentum, nesterov, adagrad;
+    adam, sgd, momentum, nesterov, adagrad, rmsprop, adamax, nadam, amsgrad;
   }
 }
