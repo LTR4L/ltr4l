@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
@@ -37,12 +38,11 @@ import org.ltr4l.tools.Regularization;
  */
 public class ListNetMLP extends Ranker {
 
-  protected List<List<LNode>> network;
+  protected final List<List<LNode>> network;
   protected long iter;
   protected double accErrorDer_exSum;
   protected double accErrorDer_ptSum;
   protected final Regularization regularization;
-  protected final WeightInitializer weightInit;
 
   //CONSTRUCT NETWORK
   public ListNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
@@ -56,13 +56,9 @@ public class ListNetMLP extends Ranker {
     accErrorDer_exSum = 0;
     accErrorDer_ptSum = 0;
     this.regularization = regularization;
-    int nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
     network = new ArrayList<>();
 
-    for (int i = 1; i < networkShape.size(); i++) {
-      nWeights += networkShape.getLayerSetting(i - 1).getNum() * networkShape.getLayerSetting(i).getNum();
-    }
-    weightInit = WeightInitializer.get(weightModel, nWeights);
+    WeightInitializer weightInit = WeightInitializer.get(weightModel, inputDim, networkShape);
 
     //Start with constructing the input layer
     List<LNode> currentLayer = new ArrayList<>();

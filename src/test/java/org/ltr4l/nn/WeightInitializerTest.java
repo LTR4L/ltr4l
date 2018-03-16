@@ -35,6 +35,13 @@ public class WeightInitializerTest {
   }
 
   @Test
+  public void testGetNumWeights() throws Exception {
+    Assert.assertEquals(40, WeightInitializer.getNumWeights(10, NetworkShape.parseSetting("4,Identity")));
+    Assert.assertEquals(32, WeightInitializer.getNumWeights(3, NetworkShape.parseSetting("4,Identity 5,Sigmoid")));
+    Assert.assertEquals(82, WeightInitializer.getNumWeights(3, NetworkShape.parseSetting("4,Identity 5,Sigmoid 10,ReLU")));
+  }
+
+  @Test
   public void testGetInitialBias() throws Exception {
     WeightInitializer weightInit1 = WeightInitializer.get(WeightInitializer.Type.zero.name(), 100);
     Assert.assertEquals(0, weightInit1.getInitialBias(), 0.001);

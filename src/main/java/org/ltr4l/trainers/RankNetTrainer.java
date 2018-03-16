@@ -29,27 +29,19 @@ import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Regularization;
+import org.ltr4l.tools.Error;
 
 /**
  * The implementation of MLPTrainer which uses the
  * RankNet algorithm.
  *
  */
-public class RankNetTrainer extends MLPTrainer {
-  protected RankNetMLP rmlp;
-  protected List<Document[][]> trainingPairs;
-  protected List<Document[][]> validationPairs;
+public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
+  protected final List<Document[][]> trainingPairs;
+  protected final List<Document[][]> validationPairs;
 
   RankNetTrainer(QuerySet training, QuerySet validation, Config config) {
     super(training, validation, config, true);
-    int featureLength = trainingSet.get(0).getFeatureLength();
-    NetworkShape networkShape = config.getNetworkShape();
-    networkShape.add(1, new Activation.Identity());
-    Optimizer.OptimizerFactory optFact = config.getOptFact();
-    Regularization regularization = config.getReguFunction();
-    String weightModel = config.getWeightInit();
-    rmlp = new RankNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
-    super.mlp = rmlp;
 
 
     trainingPairs = new ArrayList<>();
@@ -65,6 +57,22 @@ public class RankNetTrainer extends MLPTrainer {
       Document[][] documentPairs = query.orderDocPairs();
       validationPairs.add(documentPairs);
     }
+  }
+
+  @Override
+  protected RankNetMLP constructRanker(){
+    int featureLength = trainingSet.get(0).getFeatureLength();
+    NetworkShape networkShape = config.getNetworkShape();
+    networkShape.add(1, new Activation.Identity());
+    Optimizer.OptimizerFactory optFact = config.getOptFact();
+    Regularization regularization = config.getReguFunction();
+    String weightModel = config.getWeightInit();
+    return new RankNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
+  }
+
+  @Override
+  protected Error makeErrorFunc(){
+    return new Error.Entropy();
   }
 
   @Override
@@ -84,16 +92,15 @@ public class RankNetTrainer extends MLPTrainer {
       processedQueryNum++;
       double queryLoss = 0d;
       for (Document[] pair : query) {
-        double s1 = rmlp.forwardProp(pair[0]);
-        double s2 = rmlp.forwardProp(pair[1]);
-        //double output = Math.pow(1 + Math.exp(s2 - s1), -1);
-        //double output = new Activation.Sigmoid().output(s1 - s2);
-        //queryLoss += new Error.ENTROPY().error(output, 1d);
-        queryLoss += Math.log(1 + Math.exp(s2 - s1));
+        double s1 = ranker.forwardProp(pair[0]);
+        double s2 = ranker.forwardProp(pair[1]);
+        double output = Math.pow(1 + Math.exp(s2 - s1), -1); //double output = new Activation.Sigmoid().output(s1 - s2);
+        queryLoss += errorFunc.error(output, 1d);
+        //queryLoss += Math.log(1 + Math.exp(s2 - s1)); This is a derivation; equivalent to errorFunc.error.
       }
       loss += queryLoss / query.length;
     }
-    return loss / processedQueryNum; //(double) (docPairs.size() - nullQueryNum);
+    return loss / processedQueryNum;
   }
 
   @Override
@@ -112,16 +119,16 @@ public class RankNetTrainer extends MLPTrainer {
         Document docA = docPair[0];
         Document docB = docPair[1];
 
-        double si = rmlp.forwardProp(docA);
-        double sj = rmlp.forwardProp(docB);
+        double si = ranker.forwardProp(docA);
+        double sj = ranker.forwardProp(docB);
         double delta = si - sj;
 
         if (delta < threshold) {
           double sigma = new Activation.Sigmoid().output(-delta);
-          rmlp.backProp(sigma);
-          rmlp.forwardProp(docA);
-          rmlp.backProp(-sigma);
-          rmlp.updateWeights(lrRate, rgRate);
+          ranker.backProp(sigma);
+          ranker.forwardProp(docA);
+          ranker.backProp(-sigma);
+          ranker.updateWeights(lrRate, rgRate);
         }
       }
     }

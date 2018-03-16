@@ -18,6 +18,7 @@ package org.ltr4l.trainers;
 
 import java.util.List;
 
+import org.ltr4l.Ranker;
 import org.ltr4l.nn.*;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
@@ -31,41 +32,41 @@ import org.ltr4l.tools.Regularization;
  * Despite note extending MLPTrainer, this trainer
  * trains an MLP network.
  */
-public class ListNetTrainer extends LTRTrainer {
+public class ListNetTrainer extends LTRTrainer<ListNetMLP> {
   private double lrRate;
   private double rgRate;
-  private ListNetMLP lmlp;
 
   ListNetTrainer(QuerySet training, QuerySet validation, Config config) {
-    this(training, validation, config, false);
-  }
-
-  //This constructor exists solely for the purpose of child classes
-  //It gives child classes the ability to assign an extended MLP.
-  ListNetTrainer(QuerySet training, QuerySet validation, Config config, boolean hasOtherMLP) {
     super(training, validation, config);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
-    if (!hasOtherMLP) {
-      int featureLength = trainingSet.get(0).getFeatureLength();
-      NetworkShape networkShape = config.getNetworkShape();
-      networkShape.add(1, new Activation.Identity());
-      Optimizer.OptimizerFactory optFact = config.getOptFact();
-      Regularization regularization = config.getReguFunction();
-      String weightModel = config.getWeightInit();
-      lmlp = new ListNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
-    }
+  }
+
+  @Override
+  protected ListNetMLP constructRanker() {
+    int featureLength = trainingSet.get(0).getFeatureLength();
+    NetworkShape networkShape = config.getNetworkShape();
+    networkShape.add(1, new Activation.Identity());
+    Optimizer.OptimizerFactory optFact = config.getOptFact();
+    Regularization regularization = config.getReguFunction();
+    String weightModel = config.getWeightInit();
+    return new ListNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
+  }
+
+  @Override
+  protected Error makeErrorFunc(){
+    return new Error.Entropy();
   }
 
   @Override
   public void train() {
     for (Query query : trainingSet) {
       for (Document doc : query.getDocList()) {
-        lmlp.forwardProp(doc);
-        lmlp.backProp(doc.getLabel());
+        ranker.forwardProp(doc);
+        ranker.backProp(doc.getLabel());
       }
-      lmlp.updateWeights(lrRate, rgRate);
+      ranker.updateWeights(lrRate, rgRate);
     }
   }
 
@@ -74,9 +75,9 @@ public class ListNetTrainer extends LTRTrainer {
     double loss = 0;
     for (Query query : querySet) {
       double targetSum = query.getDocList().stream().mapToDouble(i -> Math.exp(i.getLabel())).sum();
-      double outputSum = query.getDocList().stream().mapToDouble(i -> Math.exp(lmlp.forwardProp(i))).sum();
-      double qLoss = query.getDocList().stream().mapToDouble(i -> new Error.Entropy().error( //-Py(log(Pfx))
-          Math.exp(lmlp.forwardProp(i)) / outputSum, //output: exp(f(x)) / sum(f(x))
+      double outputSum = query.getDocList().stream().mapToDouble(i -> Math.exp(ranker.forwardProp(i))).sum();
+      double qLoss = query.getDocList().stream().mapToDouble(i -> errorFunc.error( //-Py(log(Pfx))
+          Math.exp(ranker.forwardProp(i)) / outputSum, //output: exp(f(x)) / sum(f(x))
           i.getLabel() / targetSum))                 //target: y / sum(exp(y))
           .sum(); //sum over all documents                // Should it be exp(y)/sum(exp(y))?
       loss += qLoss;
@@ -84,10 +85,7 @@ public class ListNetTrainer extends LTRTrainer {
     return loss / querySet.size();
   }
 
-  @Override
-  Ranker getRanker() {
-    return lmlp;
-  }
+
 
 }
 

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
@@ -39,11 +40,10 @@ import org.ltr4l.tools.Regularization;
  *
  */
 public class MLP extends Ranker {
-  protected List<List<Node>> network;
+  protected final List<List<Node>> network;
   protected long iter;
   protected int numAccumulatedDer;
   protected final Regularization regularization;
-  protected final WeightInitializer weightInit;
 
   /**
    * The network is constructed within the constructor of MLP.
@@ -66,13 +66,9 @@ public class MLP extends Ranker {
     iter = 1;
     numAccumulatedDer = 0;
     this.regularization = regularization;
-    int nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
     network = new ArrayList<>();
 
-    for (int i = 1; i < networkShape.size(); i++) {
-      nWeights += networkShape.getLayerSetting(i - 1).getNum() * networkShape.getLayerSetting(i).getNum();
-    }
-    weightInit = WeightInitializer.get(weightModel, nWeights);
+    WeightInitializer weightInit = WeightInitializer.get(weightModel, inputDim, networkShape);
 
     //Start with constructing the input layer
     List<Node> currentLayer = new ArrayList<>();

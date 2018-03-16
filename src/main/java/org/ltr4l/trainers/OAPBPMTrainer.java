@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.ltr4l.nn.Ranker;
+import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
@@ -32,15 +32,13 @@ import org.ltr4l.tools.Error;
  * OAP-BPM algorithm.
  *
  */
-public class OAPBPMTrainer extends LTRTrainer {
-  final private OAPBPMRank oapRanker;
+public class OAPBPMTrainer extends LTRTrainer<OAPBPMRank> {
   private double maxScore;
   private final  List<Document> trainingDocList;
 
   OAPBPMTrainer(QuerySet training, QuerySet validation, Config config) {
     super(training, validation, config);
     maxScore = 0d;
-    oapRanker = new OAPBPMRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet), config.getPNum(), config.getBernNum());
     trainingDocList = new ArrayList<>();
     for (Query query : trainingSet)
       trainingDocList.addAll(query.getDocList());
@@ -49,21 +47,26 @@ public class OAPBPMTrainer extends LTRTrainer {
   @Override
   public void train() {
     for (Document doc : trainingDocList)
-      oapRanker.updateWeights(doc);
+      ranker.updateWeights(doc);
+  }
+
+  @Override
+  protected Error makeErrorFunc(){
+    return new Error.Square();
   }
 
   protected double calculateLoss(List<Query> queries) {
     double loss = 0d;
     for (Query query : queries) {
       List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> new Error.Square().error(oapRanker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
+      loss += docList.stream().mapToDouble(doc -> errorFunc.error(ranker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
     }
     return loss / queries.size();
   }
 
   @Override
-  Ranker getRanker() {
-    return oapRanker;
+  protected Ranker constructRanker() {
+    return new OAPBPMRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet), config.getPNum(), config.getBernNum());
   }
 }
 

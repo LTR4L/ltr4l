@@ -25,8 +25,20 @@ public class WeightInitializer {
   private final int num;
   private final Random r;
 
-  public static WeightInitializer get(String type, int num){
+  static WeightInitializer get(String type, int num){
     return new WeightInitializer(Type.valueOf(type), num);
+  }
+
+  public static WeightInitializer get(String weightModel, int inputDim, NetworkShape networkShape){
+    return get(weightModel, getNumWeights(inputDim, networkShape));
+  }
+
+  public static int getNumWeights(int inputDim, NetworkShape networkShape){
+    int nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
+    for (int i = 1; i < networkShape.size(); i++) {
+      nWeights += networkShape.getLayerSetting(i - 1).getNum() * networkShape.getLayerSetting(i).getNum();
+    }
+    return nWeights;
   }
 
   private WeightInitializer(Type type, int num){

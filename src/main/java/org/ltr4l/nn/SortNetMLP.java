@@ -24,16 +24,16 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
 public class SortNetMLP extends Ranker {
-  private List<List<SNode>> network;
+  private final List<List<SNode>> network;
   private long iter;
   private int numAccumulatedDer;
   private final Regularization regularization;
-  private final WeightInitializer weightInit;
 
   //Construct Network
   public SortNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
@@ -47,13 +47,9 @@ public class SortNetMLP extends Ranker {
     iter = 1;
     numAccumulatedDer = 0;
     this.regularization = regularization;
-    int nWeights = inputDim * networkShape.getLayerSetting(0).getNum();  //Number of weights used for Xavier initialization.
     network = new ArrayList<>();
 
-    for (int i = 1; i < networkShape.size(); i++) {
-      nWeights += networkShape.getLayerSetting(i - 1).getNum() * networkShape.getLayerSetting(i).getNum();
-    }
-    weightInit = WeightInitializer.get(weightModel, nWeights);
+    WeightInitializer weightInit = WeightInitializer.get(weightModel, inputDim, networkShape);
 
     //Construct the initial layer:
     List<SNode> inputLayer = new ArrayList<>();
