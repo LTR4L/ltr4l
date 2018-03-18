@@ -362,8 +362,8 @@ public class SortNetMLP extends Ranker {
     protected SNode(int group, Activation activation) {
       this.activation = activation;
       this.group = group;
-      inputEdges = null;
-      outputEdges = null;
+      inputEdges = new ArrayList<>();
+      outputEdges = new ArrayList<>();
       output = 0d;
       outputDer = 0d;
       totalInput = 0d;
@@ -419,14 +419,10 @@ public class SortNetMLP extends Ranker {
     }
 
     public void addInputEdge(SEdge edge) {
-      if (inputEdges == null)
-        inputEdges = new ArrayList<>();
       inputEdges.add(edge);
     }
 
     public void addOutputEdge(SEdge edge) {
-      if (outputEdges == null)
-        outputEdges = new ArrayList<>();
       outputEdges.add(edge);
     }
 

@@ -359,8 +359,8 @@ public class ListNetMLP extends Ranker {
 
     LNode(Activation activation) {
       this.activation = activation;
-      inputEdges = null;
-      outputEdges = null;
+      inputEdges = new ArrayList<>();
+      outputEdges = new ArrayList<>();
       totalInput = 0d;
       inputDer = 0d;
       output = 0d;
@@ -368,14 +368,10 @@ public class ListNetMLP extends Ranker {
     }
 
     public void addInputEdge(LEdge edge) {
-      if (inputEdges == null)
-        inputEdges = new ArrayList<>();
       inputEdges.add(edge);
     }
 
     public void addOutputEdge(LEdge edge) {
-      if (outputEdges == null)
-        outputEdges = new ArrayList<>();
       outputEdges.add(edge);
     }
 
