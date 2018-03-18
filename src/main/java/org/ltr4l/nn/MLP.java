@@ -300,9 +300,9 @@ public class MLP extends Ranker {
    * Holds information about which nodes are connected, the weight between the nodes, and dw.
    */
   protected static class Edge { //Serializable?
-    private Node source;
-    private Node destination;
-    private Optimizer optimizer;
+    private final Node source;
+    private final Node destination;
+    private final Optimizer optimizer;
     private double weight;
     private double accErrorDer;
     private boolean isDead;
