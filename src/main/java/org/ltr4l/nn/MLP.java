@@ -371,8 +371,8 @@ public class MLP extends Ranker {
 
     protected Node(Activation activation) {
       this.activation = activation;
-      inputEdges = null;
-      outputEdges = null;
+      inputEdges = new ArrayList<>();
+      outputEdges = new ArrayList<>();
       totalInput = 0d;
       inputDer = 0d;
       output = 0d;
@@ -380,14 +380,10 @@ public class MLP extends Ranker {
     }
 
     protected void addInputEdge(Edge edge) {
-      if (inputEdges == null)
-        inputEdges = new ArrayList<>();
       inputEdges.add(edge);
     }
 
     protected void addOutputEdge(Edge edge) {
-      if (outputEdges == null)
-        outputEdges = new ArrayList<>();
       outputEdges.add(edge);
     }
 
