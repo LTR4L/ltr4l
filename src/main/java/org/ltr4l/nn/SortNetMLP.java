@@ -296,9 +296,9 @@ public class SortNetMLP extends Ranker {
    * where nodeX:nodeY = weight between node x and node y.
    */
   protected static class SEdge {
-    private SNode[] source;
-    private SNode[] destination;
-    private Optimizer optimizer;
+    private final SNode[] source;
+    private final SNode[] destination;
+    private final Optimizer optimizer;
     private double weight;
     private double accErrorDer;
     private boolean isDead;

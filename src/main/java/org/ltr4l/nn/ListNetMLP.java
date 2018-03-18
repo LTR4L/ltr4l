@@ -285,10 +285,10 @@ public class ListNetMLP extends Ranker {
    * See accErrorDerLabel and accErrorDerPredict.
    */
   private static class LEdge {
-    private LNode source;
-    private LNode destination;
+    private final LNode source;
+    private final LNode destination;
     private double weight;
-    private Optimizer optimizer;
+    private final Optimizer optimizer;
     private double accErrorDerLabel;   //Σexp(y)∂f/∂w
     private double accErrorDerPredict; //Σexp(f(x))∂f/∂w
     boolean isDead;
