@@ -91,6 +91,14 @@ public class ListNetMLP extends Ranker {
     network.get(network.size() - 1).get(0).setOutputDer(1); //Set the last node's output derivative to 1
   }
 
+  public List<LNode> getLayer(int i){
+    return network.get(i);
+  }
+
+  public LNode getNode(int i, int j){
+    return getLayer(i).get(j);
+  }
+
   private List<List<List<Double>>> obtainWeights(){
     return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null).map(layer -> layer.stream()
         .map(node -> node.getOutputEdges().stream()
@@ -284,7 +292,7 @@ public class ListNetMLP extends Ranker {
    * Difference between LEdge and Edge is the fact that two derivatives are held.
    * See accErrorDerLabel and accErrorDerPredict.
    */
-  private static class LEdge {
+  static class LEdge {
     private final LNode source;
     private final LNode destination;
     private double weight;
@@ -348,7 +356,7 @@ public class ListNetMLP extends Ranker {
     }
   }
 
-  private static class LNode {
+  static class LNode {
     private List<LEdge> inputEdges;
     private List<LEdge> outputEdges;
     private double totalInput;
@@ -421,9 +429,16 @@ public class ListNetMLP extends Ranker {
       return inputEdges;
     }
 
+    public LEdge getInputEdge(int i){
+      return inputEdges.get(i);
+    }
+
     public List<LEdge> getOutputEdges() {
       return outputEdges;
     }
 
+    public LEdge getOutputEdge(int i){
+      return outputEdges.get(i);
+    }
   }
 }
