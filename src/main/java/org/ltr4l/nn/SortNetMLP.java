@@ -354,10 +354,10 @@ public class SortNetMLP extends Ranker {
     private double outputDer;
     private double totalInput;
     private double inputDer;
-    private int group;
+    private final int group;
     private List<SEdge> inputEdges;
     private List<SEdge> outputEdges;
-    private Activation activation;
+    private final Activation activation;
 
     protected SNode(int group, Activation activation) {
       this.activation = activation;
