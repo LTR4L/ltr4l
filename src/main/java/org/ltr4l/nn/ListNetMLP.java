@@ -363,7 +363,7 @@ public class ListNetMLP extends Ranker {
     private double inputDer;
     private double output;
     private double outputDer;
-    private Activation activation;
+    private final Activation activation;
 
     LNode(Activation activation) {
       this.activation = activation;
