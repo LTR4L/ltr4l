@@ -100,6 +100,14 @@ public class MLP extends Ranker {
     }
   }
 
+  public List<Node> getLayer(int i){
+    return network.get(i);
+  }
+
+  public Node getNode(int i, int j){
+    return getLayer(i).get(j);
+  }
+
   /**
    * Weights are held by the edges. Lists of edges are stored in nodes.
    * Since the network is a 2 dimensional list of nodes (i.e. using network.get(i) gives you layer i),
@@ -433,8 +441,16 @@ public class MLP extends Ranker {
       return inputEdges;
     }
 
+    public Edge getInputEdge(int i){
+      return inputEdges.get(i);
+    }
+
     public List<Edge> getOutputEdges() {
       return outputEdges;
+    }
+
+    public Edge getOutputEdge(int i){
+      return outputEdges.get(i);
     }
   }
 }
