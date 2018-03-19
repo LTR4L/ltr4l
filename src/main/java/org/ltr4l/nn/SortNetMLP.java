@@ -240,7 +240,7 @@ public class SortNetMLP extends Ranker {
           node.setOutputDer(0);
           double oder = 0;
           for (SEdge outEdge : node.getOutputEdges()) {
-            //And finally, ∂C/∂w = ∂C/∂I * ∂I/∂w
+            //∂C/∂Oi = ∂Ik/∂Oi * ∂C/∂Ik
             oder += outEdge.getWeight() * outEdge.getDestination()[node.getGroup()].getInputDer();
             node.setOutputDer(oder);
           }
