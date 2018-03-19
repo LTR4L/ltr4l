@@ -229,7 +229,7 @@ public class ListNetMLP extends Ranker {
           //node.setOutputDer(0);
           double oder = 0;
           for (LEdge outEdge : node.getOutputEdges()) {
-            //And finally, ∂C/∂w = ∂C/∂I * ∂I/∂w
+            //∂C/∂Oi = ∂Ik/∂Oi * ∂C/∂Ik
             oder += outEdge.getWeight() * outEdge.getDestination().getInputDer();
             node.setOutputDer(oder);
           }
