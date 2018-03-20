@@ -78,10 +78,9 @@ public class SortNetMLP extends Ranker {
         currentLayer.add(sNode0);
         layerPrime.add(sNode1);
         SNode[] sNodePair = {sNode0, sNode1};
-        Optimizer opt = optFact.getOptimizer();
 
         //Add bias
-        SEdge biasEdge = new SEdge(null, sNodePair, opt, bias);
+        SEdge biasEdge = new SEdge(null, sNodePair, optFact.getOptimizer(), bias);
         sNode0.addInputEdge(biasEdge);
         sNode1.addInputEdge(biasEdge);
 
@@ -92,7 +91,7 @@ public class SortNetMLP extends Ranker {
           SNode prevSNode1 = prevLayer.get(nodeId + prevLayer.size() / 2);
           double weight = weightInit.getNextRandomInitialWeight();
           SNode[] prevNodePair = {prevSNode0, prevSNode1};
-          SEdge sEdge = new SEdge(prevNodePair, sNodePair, opt, weight);
+          SEdge sEdge = new SEdge(prevNodePair, sNodePair, optFact.getOptimizer(), weight);
 
           prevSNode0.addOutputEdge(sEdge);
           prevSNode1.addOutputEdge(sEdge);
@@ -102,7 +101,7 @@ public class SortNetMLP extends Ranker {
           //Get another weight, and set up an edge for reversed pair.
           weight = weightInit.getNextRandomInitialWeight();
           prevNodePair = new SNode[]{prevSNode1, prevSNode0};
-          sEdge = new SEdge(prevNodePair, sNodePair, opt, weight);
+          sEdge = new SEdge(prevNodePair, sNodePair, optFact.getOptimizer(), weight);
           prevSNode1.addOutputEdge(sEdge);
           prevSNode0.addOutputEdge(sEdge);
           sNode0.addInputEdge(sEdge);
