@@ -234,15 +234,12 @@ public class MLP extends Ranker {
       if (layerIdx != 1) {
         List<Node> previousLayer = network.get(layerIdx - 1);
         for (Node node : previousLayer) {
-          //double oder = node.getOutputDer();
-          //node.setOutputDer(0);
-          node.setOutputDer(0);
           double oder = 0;
           for (Edge outEdge : node.getOutputEdges()) {
             //∂C/∂Oi = ∂Ik/∂Oi * ∂C/∂Ik
             oder += outEdge.getWeight() * outEdge.getDestination().getInputDer();
-            node.setOutputDer(oder);
           }
+          node.setOutputDer(oder);
         }
       }
     }
