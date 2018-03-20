@@ -66,6 +66,7 @@ public class MLP extends Ranker {
     iter = 1;
     numAccumulatedDer = 0;
     this.regularization = regularization;
+    addOutputs(networkShape);
     network = new ArrayList<>();
 
     WeightInitializer weightInit = WeightInitializer.get(weightModel, inputDim, networkShape);
@@ -100,8 +101,8 @@ public class MLP extends Ranker {
     }
   }
 
-  protected NetworkShape addOutputs(NetworkShape ns){
-    return ns; //No outputs needed... make abstract and require override?
+  protected void addOutputs(NetworkShape ns){
+    return; //Default is do not add outputs... make abstract?
   }
 
   public List<Node> getLayer(int i){

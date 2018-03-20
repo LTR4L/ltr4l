@@ -27,9 +27,8 @@ public class RankNetMLP extends MLP {
   }
 
   @Override
-  protected NetworkShape addOutputs(NetworkShape ns) {
+  protected void addOutputs(NetworkShape ns) {
     ns.add(1, new Activation.Identity());
-    return ns;
   }
 
   /**
