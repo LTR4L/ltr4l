@@ -36,8 +36,6 @@ import java.util.stream.Collectors;
  *
  * MLPRankers should have methods for forward propagation, backpropagation, and updating of weights.
  *
- * This is the default implementation of AbstractMLP.
- *
  */
 public abstract class AbstractMLP <N extends Node, E extends AbstractEdge> extends Ranker implements MLPInterface {
   protected final List<List<N>> network;

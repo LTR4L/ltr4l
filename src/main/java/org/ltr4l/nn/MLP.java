@@ -22,13 +22,6 @@ import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
 /**
- * MLP is a Ranker which uses a Multi-Layer Perceptron network.
- * The network is a feed-forward network, and the links between
- * nodes are represented by the Edge class.
- * Nodes contain lists of edges (source and input), and edges contain
- * information about source nodes and destination nodes.
- *
- * MLPRankers should have methods for forward propagation, backpropagation, and updating of weights.
  *
  * This is the default implementation of AbstractMLP.
  *
