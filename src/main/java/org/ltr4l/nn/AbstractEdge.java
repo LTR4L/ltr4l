@@ -20,7 +20,7 @@ package org.ltr4l.nn;
  * Edge (link) in the network.
  * Holds information about which nodes are connected, the weight between the nodes, and dw.
  */
-abstract class AbstractEdge<N extends Node> { //Serializable?
+public abstract class AbstractEdge<N extends Node> { //Serializable?
   protected final N source;
   protected final N destination;
   protected final Optimizer optimizer;
