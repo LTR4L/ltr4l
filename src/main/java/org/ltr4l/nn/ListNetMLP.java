@@ -16,15 +16,8 @@
 
 package org.ltr4l.nn;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
-import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
@@ -216,9 +209,9 @@ public class ListNetMLP extends AbstractMLP<ListNetMLP.LNode, ListNetMLP.LEdge> 
   }
 
   /**
-   * Node which holds LEdges.
+   * MNode which holds LEdges.
    */
-  static class LNode extends AbstractNode<LEdge> {
+  static class LNode extends Node<LEdge> {
 
     LNode(Activation activation) {
       super(activation);

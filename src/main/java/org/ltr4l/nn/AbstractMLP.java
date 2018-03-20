@@ -29,7 +29,17 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-public abstract class AbstractMLP <N extends AbstractNode, E extends AbstractEdge> extends Ranker implements MLPInterface {
+/**
+ * MLP is a Ranker which uses a Multi-Layer Perceptron network.
+ * The MLP Network contains nodes (of type Node) and edges (of type abstract edge) which
+ * connect nodes and
+ *
+ * MLPRankers should have methods for forward propagation, backpropagation, and updating of weights.
+ *
+ * This is the default implementation of AbstractMLP.
+ *
+ */
+public abstract class AbstractMLP <N extends Node, E extends AbstractEdge> extends Ranker implements MLPInterface {
   protected final List<List<N>> network;
   protected long iter;
   protected int numAccumulatedDer;

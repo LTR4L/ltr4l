@@ -36,7 +36,7 @@ public class ListNetMLPTest {
 
     Assert.assertTrue(mlp.regularization instanceof Regularization.L1);
 
-    // ListNetMLP always adds an output Node with Activation.Identity
+    // ListNetMLP always adds an output MNode with Activation.Identity
     Assert.assertEquals(3, mlp.network.size());
     Assert.assertEquals(1, mlp.getLayer(2).size());
     ListNetMLP.LNode outputNode = mlp.getNode(2, 0);
@@ -95,7 +95,7 @@ public class ListNetMLPTest {
 
     Assert.assertTrue(mlp.regularization instanceof Regularization.L2);
 
-    // ListNetMLP always adds an output Node with Activation.Identity
+    // ListNetMLP always adds an output MNode with Activation.Identity
     Assert.assertEquals(3, mlp.network.size());
     Assert.assertEquals(1, mlp.getLayer(2).size());
     ListNetMLP.LNode outputNode = mlp.getNode(2, 0);
@@ -188,7 +188,7 @@ public class ListNetMLPTest {
 
     Assert.assertTrue(mlp.regularization instanceof Regularization.L1);
 
-    // ListNetMLP always adds an output Node with Activation.Identity
+    // ListNetMLP always adds an output MNode with Activation.Identity
     Assert.assertEquals(4, mlp.network.size());
     Assert.assertEquals(1, mlp.getLayer(3).size());
     ListNetMLP.LNode outputNode = mlp.getNode(3, 0);

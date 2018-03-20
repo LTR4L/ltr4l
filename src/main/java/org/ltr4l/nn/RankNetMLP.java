@@ -37,16 +37,16 @@ public class RankNetMLP extends MLP {
    * @param lambda
    */
   public void backProp(double lambda) {
-    Node outputNode = network.get(network.size() - 1).get(0);
+    MNode outputNode = network.get(network.size() - 1).get(0);
 
     //First, get the derivative ∂C/∂O and set it to output derivative of the final node.
     outputNode.setOutputDer(lambda);
 
     //When going through each layer, modify the previous layer.
     for (int layerIdx = network.size() - 1; layerIdx >= 1; layerIdx--) {
-      List<Node> layer = network.get(layerIdx);
+      List<MNode> layer = network.get(layerIdx);
 
-      for (Node node : layer) {
+      for (MNode node : layer) {
         // Second, find ∂C/∂I by (∂C/∂O)(∂O/∂I)
         // I = total Input; O = output = Activation(I)
         double totalInput = node.getTotalInput();
@@ -73,8 +73,8 @@ public class RankNetMLP extends MLP {
         }
       }
       if (layerIdx != 1) {
-        List<Node> previousLayer = network.get(layerIdx - 1);
-        for (Node node : previousLayer) {
+        List<MNode> previousLayer = network.get(layerIdx - 1);
+        for (MNode node : previousLayer) {
           double oder = 0;
           for (Edge outEdge : node.getOutputEdges()) {
             //∂C/∂Oi = ∂Ik/∂Oi * ∂C/∂Ik
@@ -91,8 +91,8 @@ public class RankNetMLP extends MLP {
   public void updateWeights(double lrRate, double rgRate) {
     //Update all weights in all edges.
     for (int layerId = 1; layerId < network.size(); layerId++) {  //All Layers
-      List<Node> layer = network.get(layerId);
-      for (Node node : layer) {                     //All Nodes
+      List<MNode> layer = network.get(layerId);
+      for (MNode node : layer) {                     //All Nodes
         for (Edge edge : node.getInputEdges()) { //All edges for each node.
           if (!edge.isDead()) {
             double rgDer = 0;

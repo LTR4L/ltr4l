@@ -20,11 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Node in the network.
+ * MNode in the network.
  * Holds information regarding the edges (which nodes are connected), and based on that information
  * the total input and output. Also contains information about Activation.
  */
-public class AbstractNode<E extends AbstractEdge> {
+public class Node<E extends AbstractEdge> {
   protected final List<E> inputEdges;
   protected final List<E> outputEdges;
   protected double totalInput;
@@ -33,7 +33,7 @@ public class AbstractNode<E extends AbstractEdge> {
   protected double outputDer;
   protected final Activation activation;
 
-  protected AbstractNode(Activation activation) {
+  protected Node(Activation activation) {
     this.activation = activation;
     inputEdges = new ArrayList<>();
     outputEdges = new ArrayList<>();

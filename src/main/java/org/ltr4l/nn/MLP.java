@@ -16,14 +16,8 @@
 
 package org.ltr4l.nn;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
-import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
@@ -39,19 +33,8 @@ import org.ltr4l.tools.Regularization;
  * This is the default implementation of AbstractMLP.
  *
  */
-public class MLP extends AbstractMLP<MLP.Node, MLP.Edge> {
+public class MLP extends AbstractMLP<MLP.MNode, MLP.Edge> {
 
-  /**
-   * The network is constructed within the constructor of MLP.
-   * Bias edges are created for each node, which will add some constant to the total input to the node.
-   * The weights held by these edges are initialized with constants (regardless of weight initialization strategy).
-   * @param inputDim       The number of nodes in the input layer; the dimension of the feature space.
-   * @param networkShape    Contains information about the number of hidden layers, the number of nodes in each layer,
-   *                        and the activation of the nodes in the layer.
-   * @param optFact         Contains information about which optimizer to use for weight updating.
-   * @param regularization  Contains information about what regularization to use for weight updating.
-   * @param weightModel     How to initialize weights (i.e. randomly, gaussian, etc...)
-   */
   public MLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
     super(inputDim, networkShape, optFact, regularization, weightModel);
   }
@@ -61,27 +44,27 @@ public class MLP extends AbstractMLP<MLP.Node, MLP.Edge> {
   }
 
   @Override
-  protected Node constructNode(Activation activation) {
-    return new Node(activation);
+  protected MNode constructNode(Activation activation) {
+    return new MNode(activation);
   }
 
   @Override
-  protected Edge constructEdge(Node source, Node destination, Optimizer opt, double weight) {
+  protected Edge constructEdge(MNode source, MNode destination, Optimizer opt, double weight) {
     return new Edge(source, destination, opt, weight);
   }
 
   //This is for one output node.
   public void backProp(double target, Error errorFunc) {
-    Node outputNode = network.get(network.size() - 1).get(0);
+    MNode outputNode = network.get(network.size() - 1).get(0);
     double output = outputNode.getOutput();
     //First, get the derivative ∂C/∂O and set it to output derivative of the final node.
     double der = errorFunc.der(output, target);
     outputNode.setOutputDer(der);
 
     for (int layerIdx = network.size() - 1; layerIdx >= 1; layerIdx--) { //When going through each layer, you modify the previous layer.
-      List<Node> layer = network.get(layerIdx);
+      List<MNode> layer = network.get(layerIdx);
 
-      for (Node node : layer) {
+      for (MNode node : layer) {
         // Second, find ∂C/∂I by (∂C/∂O)(∂O/∂I)
         // I = total Input; O = output = Activation(I)
         double totalInput = node.getTotalInput();
@@ -108,8 +91,8 @@ public class MLP extends AbstractMLP<MLP.Node, MLP.Edge> {
         }
       }
       if (layerIdx != 1) {
-        List<Node> previousLayer = network.get(layerIdx - 1);
-        for (Node node : previousLayer) {
+        List<MNode> previousLayer = network.get(layerIdx - 1);
+        for (MNode node : previousLayer) {
           double oder = 0;
           for (Edge outEdge : node.getOutputEdges()) {
             //∂C/∂Oi = ∂Ik/∂Oi * ∂C/∂Ik
@@ -126,9 +109,9 @@ public class MLP extends AbstractMLP<MLP.Node, MLP.Edge> {
   public void backProp(double[] targets, Error errorFunc) {
     //First, feed derivative into each node in output layer
     //Skip the first node, as the derivative will be set through backprop method.
-    List<Node> outputLayer = network.get(network.size() - 1);
+    List<MNode> outputLayer = network.get(network.size() - 1);
     for (int i = 1; i < outputLayer.size(); i++) {
-      Node outputNode = outputLayer.get(i);
+      MNode outputNode = outputLayer.get(i);
       double output = outputNode.getOutput();
       double der = errorFunc.der(output, targets[i]);
       outputNode.setOutputDer(der);
@@ -142,8 +125,8 @@ public class MLP extends AbstractMLP<MLP.Node, MLP.Edge> {
   public void updateWeights(double lrRate, double rgRate) {
     //Update all weights in all edges.
     for (int layerId = 1; layerId < network.size(); layerId++) {  //All Layers
-      List<Node> layer = network.get(layerId);
-      for (Node node : layer) {                     //All Nodes
+      List<MNode> layer = network.get(layerId);
+      for (MNode node : layer) {                     //All Nodes
         for (Edge edge : node.getInputEdges()) { //All edges for each node.
           if (!edge.isDead()) {
             double rgDer = 0;
@@ -179,10 +162,10 @@ public class MLP extends AbstractMLP<MLP.Node, MLP.Edge> {
   /**
    * Edge which holds Nodes.
    */
-  protected static class Edge extends AbstractEdge<Node> { //Serializable?
+  protected static class Edge extends AbstractEdge<MNode> { //Serializable?
     private double accErrorDer;
 
-    Edge(Node source, Node destination, Optimizer optimizer, double weight) {
+    Edge(MNode source, MNode destination, Optimizer optimizer, double weight) {
       super(source, destination, optimizer, weight);
       accErrorDer = 0.0;
     }
@@ -200,8 +183,8 @@ public class MLP extends AbstractMLP<MLP.Node, MLP.Edge> {
   /**
    * Defines what type of AbstractEdge the node will hold for convenience.
    */
-  protected static class Node extends AbstractNode<Edge> {
-    Node(Activation activation){
+  protected static class MNode extends Node<Edge> {
+    MNode(Activation activation){
       super(activation);
     }
   }

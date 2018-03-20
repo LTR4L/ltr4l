@@ -24,7 +24,6 @@ import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
-import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
 import java.util.List;
@@ -60,7 +59,7 @@ public class NNRankTrainer extends MLPTrainer<MLP> {
         double threshold = 0.5;
         forwardProp(features);
         for (int nodeId = 0; nodeId < network.get(network.size() - 1).size(); nodeId++) {
-          Node node = network.get(network.size() - 1).get(nodeId);
+          MNode node = network.get(network.size() - 1).get(nodeId);
           if (node.getOutput() < threshold)
             return nodeId - 1;
         }
