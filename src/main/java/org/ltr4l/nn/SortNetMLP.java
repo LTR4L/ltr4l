@@ -30,10 +30,10 @@ import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
 public class SortNetMLP extends Ranker {
-  private final List<List<SNode>> network;
+  final List<List<SNode>> network;
   private long iter;
   private int numAccumulatedDer;
-  private final Regularization regularization;
+  final Regularization regularization;
 
   //Construct Network
   public SortNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
@@ -110,6 +110,14 @@ public class SortNetMLP extends Ranker {
       }
       currentLayer.addAll(layerPrime);
     }
+  }
+
+  public List<SNode> getLayer(int i){
+    return network.get(i);
+  }
+
+  public SNode getNode(int i, int j){
+    return getLayer(i).get(j);
   }
 
   private List<List<List<Double>>> obtainWeights(){
@@ -411,8 +419,16 @@ public class SortNetMLP extends Ranker {
       return inputEdges;
     }
 
+    public SEdge getInputEdge(int i){
+      return inputEdges.get(i);
+    }
+
     public List<SEdge> getOutputEdges() {
       return outputEdges;
+    }
+
+    public SEdge getOutputEdge(int i){
+      return outputEdges.get(i);
     }
 
     public void addInputEdge(SEdge edge) {
