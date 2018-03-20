@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 /**
  * MLP is a Ranker which uses a Multi-Layer Perceptron network.
  * The MLP Network contains nodes (of type Node) and edges (of type abstract edge) which
- * connect nodes and
+ * connect nodes and hold weights.
  *
  * MLPRankers should have methods for forward propagation, backpropagation, and updating of weights.
  *
