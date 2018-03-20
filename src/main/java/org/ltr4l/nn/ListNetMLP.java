@@ -233,14 +233,12 @@ public class ListNetMLP extends Ranker {
       if (layerIdx != 1) {
         List<LNode> previousLayer = network.get(layerIdx - 1);
         for (LNode node : previousLayer) {
-          //double oder = node.getOutputDer();
-          //node.setOutputDer(0);
           double oder = 0;
           for (LEdge outEdge : node.getOutputEdges()) {
             //∂C/∂Oi = ∂Ik/∂Oi * ∂C/∂Ik
             oder += outEdge.getWeight() * outEdge.getDestination().getInputDer();
-            node.setOutputDer(oder);
           }
+          node.setOutputDer(oder);
         }
       }
     }
