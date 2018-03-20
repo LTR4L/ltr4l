@@ -191,13 +191,11 @@ public class ListNetMLP extends AbstractMLP<ListNetMLP.LNode, ListNetMLP.LEdge> 
   static class LEdge extends AbstractEdge<LNode> {
     private double accErrorDerLabel;   //Σexp(y)∂f/∂w
     private double accErrorDerPredict; //Σexp(f(x))∂f/∂w
-    boolean isDead;
 
     LEdge(LNode source, LNode destination, Optimizer optimizer, double weight) {
       super(source, destination, optimizer, weight);
       accErrorDerLabel = 0.0;
       accErrorDerPredict = 0.0;
-      isDead = false;
     }
 
     protected double getAccErrorDerLabel() {
@@ -214,14 +212,6 @@ public class ListNetMLP extends AbstractMLP<ListNetMLP.LNode, ListNetMLP.LEdge> 
 
     protected void setAccErrorDerPredict(double errDer) {
       accErrorDerPredict = errDer;
-    }
-
-    public boolean isDead() {
-      return isDead;
-    }
-
-    public void setDead(boolean isDead) {
-      this.isDead = isDead;
     }
   }
 

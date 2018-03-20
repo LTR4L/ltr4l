@@ -36,6 +36,8 @@ import org.ltr4l.tools.Regularization;
  *
  * MLPRankers should have methods for forward propagation, backpropagation, and updating of weights.
  *
+ * This is the default implementation of AbstractMLP.
+ *
  */
 public class MLP extends AbstractMLP<MLP.Node, MLP.Edge> {
 
@@ -175,24 +177,14 @@ public class MLP extends AbstractMLP<MLP.Node, MLP.Edge> {
   }
 
   /**
-   * Edge (link) in the network.
-   * Holds information about which nodes are connected, the weight between the nodes, and dw.
+   * Edge which holds Nodes.
    */
   protected static class Edge extends AbstractEdge<Node> { //Serializable?
     private double accErrorDer;
-    private boolean isDead;
 
     Edge(Node source, Node destination, Optimizer optimizer, double weight) {
       super(source, destination, optimizer, weight);
       accErrorDer = 0.0;
-      isDead = false;
-    }
-    public boolean isDead() {
-      return isDead;
-    }
-
-    public void setDead(boolean bool) {
-      isDead = bool;
     }
 
     public void setAccErrorDer(double accErrorDer) {
@@ -206,7 +198,7 @@ public class MLP extends AbstractMLP<MLP.Node, MLP.Edge> {
   }
 
   /**
-   * Defines what type of AbstractEdge the node will hold.
+   * Defines what type of AbstractEdge the node will hold for convenience.
    */
   protected static class Node extends AbstractNode<Edge> {
     Node(Activation activation){

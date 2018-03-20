@@ -25,12 +25,14 @@ abstract class AbstractEdge<N extends AbstractNode> { //Serializable?
   protected final N destination;
   protected final Optimizer optimizer;
   protected double weight;
+  protected boolean isDead;
 
   AbstractEdge(N source, N destination, Optimizer optimizer, double weight) {
     this.source = source;
     this.destination = destination;
     this.optimizer = optimizer;
     this.weight = weight;
+    this.isDead = false;
   }
 
   public double getWeight() {
@@ -53,4 +55,7 @@ abstract class AbstractEdge<N extends AbstractNode> { //Serializable?
     return optimizer;
   }
 
+  public boolean isDead() { return isDead; }
+
+  public void setDead(boolean dead) { isDead = dead; }
 }
