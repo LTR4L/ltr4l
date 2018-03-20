@@ -77,7 +77,6 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP> {
   protected SortNetMLP constructRanker() {
     int featureLength = trainingSet.get(0).getFeatureLength();
     NetworkShape networkShape = config.getNetworkShape();
-    networkShape.add(1, new Activation.Sigmoid());
     Optimizer.OptimizerFactory optFact = config.getOptFact();
     Regularization regularization = config.getReguFunction();
     String weightModel = config.getWeightInit();

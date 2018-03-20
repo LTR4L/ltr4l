@@ -47,6 +47,7 @@ public class SortNetMLP extends Ranker {
     iter = 1;
     numAccumulatedDer = 0;
     this.regularization = regularization;
+    networkShape.add(1, new Activation.Sigmoid()); //Will get doubled.
     network = new ArrayList<>();
 
     WeightInitializer weightInit = WeightInitializer.get(weightModel, inputDim, networkShape);

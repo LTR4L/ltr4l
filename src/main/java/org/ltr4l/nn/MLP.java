@@ -100,6 +100,10 @@ public class MLP extends Ranker {
     }
   }
 
+  protected NetworkShape addOutputs(NetworkShape ns){
+    return ns; //No outputs needed... make abstract and require override?
+  }
+
   public List<Node> getLayer(int i){
     return network.get(i);
   }
