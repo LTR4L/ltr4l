@@ -26,6 +26,12 @@ public class RankNetMLP extends MLP {
     super(inputDim, networkShape, optFact, regularization, weightModel);
   }
 
+  @Override
+  protected NetworkShape addOutputs(NetworkShape ns) {
+    ns.add(1, new Activation.Identity());
+    return ns;
+  }
+
   /**
    * Backpropagation is very similar to MLP, however the derivative used in backpropagation is calculated first, and then
    * passed to the method. This is so that all RankNet based classes can use the same implementation for backpropagation.

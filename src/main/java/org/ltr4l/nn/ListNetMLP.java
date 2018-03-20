@@ -56,6 +56,7 @@ public class ListNetMLP extends Ranker {
     accErrorDer_exSum = 0;
     accErrorDer_ptSum = 0;
     this.regularization = regularization;
+    networkShape.add(1, new Activation.Identity());
     network = new ArrayList<>();
 
     WeightInitializer weightInit = WeightInitializer.get(weightModel, inputDim, networkShape);

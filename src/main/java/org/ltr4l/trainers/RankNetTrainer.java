@@ -63,7 +63,6 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   protected RankNetMLP constructRanker(){
     int featureLength = trainingSet.get(0).getFeatureLength();
     NetworkShape networkShape = config.getNetworkShape();
-    networkShape.add(1, new Activation.Identity());
     Optimizer.OptimizerFactory optFact = config.getOptFact();
     Regularization regularization = config.getReguFunction();
     String weightModel = config.getWeightInit();
