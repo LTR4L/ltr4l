@@ -57,26 +57,30 @@ public class ListNetMLPTest {
 
     ListNetMLP.LEdge outputEdge0 = inputNode.getOutputEdge(0);
     ListNetMLP.LEdge inputEdge0 = hiddenNode.getInputEdge(0);
-    Assert.assertFalse(outputEdge0 == inputEdge0);
-    ListNetMLP.LEdge inputEdge1 = hiddenNode.getInputEdge(1);
-    Assert.assertTrue(outputEdge0 == inputEdge1);
     ListNetMLP.LEdge outputEdge1 = hiddenNode.getOutputEdge(0);
     ListNetMLP.LEdge inputEdge2 = outputNode.getInputEdge(0);
-    ListNetMLP.LEdge inputEdge3 = outputNode.getInputEdge(1);
-    Assert.assertTrue(outputEdge1 == inputEdge3);
-
-    Assert.assertTrue(outputEdge0.getSource() == inputNode);
-    Assert.assertTrue(outputEdge0.getDestination() == hiddenNode);
-    Assert.assertNull(inputEdge0.getSource());
-    Assert.assertTrue(inputEdge0.getDestination() == hiddenNode);
-    Assert.assertTrue(outputEdge1.getSource() == hiddenNode);
-    Assert.assertTrue(outputEdge1.getDestination() == outputNode);
-    Assert.assertNull(inputEdge2.getSource());
+    assertBetweenNodes(inputNode, 0, hiddenNode, 1);
+    assertBetweenNodes(hiddenNode, 0, outputNode, 1);
+    assertBiasEdge(inputEdge0, hiddenNode);
+    assertBiasEdge(inputEdge2, outputNode);
 
     Assert.assertTrue(outputEdge0.getOptimizer() instanceof Optimizer.SGD);
     Assert.assertTrue(inputEdge0.getOptimizer() instanceof Optimizer.SGD);
     Assert.assertTrue(outputEdge1.getOptimizer() instanceof Optimizer.SGD);
     Assert.assertTrue(inputEdge2.getOptimizer() instanceof Optimizer.SGD);
+  }
+
+  private void assertBetweenNodes(ListNetMLP.LNode sn, int i, ListNetMLP.LNode dn, int j) throws Exception {
+    ListNetMLP.LEdge oe = sn.getOutputEdge(i);
+    ListNetMLP.LEdge ie = dn.getInputEdge(j);
+    Assert.assertTrue(oe == ie);
+    Assert.assertTrue(sn == oe.getSource());
+    Assert.assertTrue(dn == oe.getDestination());
+  }
+
+  private void assertBiasEdge(ListNetMLP.LEdge edge, ListNetMLP.LNode dn) throws Exception {
+    Assert.assertNull(edge.getSource());
+    Assert.assertTrue(dn == edge.getDestination());
   }
 
   @Test
@@ -121,47 +125,24 @@ public class ListNetMLPTest {
     Assert.assertEquals(1, hiddenNode1.getOutputEdges().size());
     Assert.assertEquals(3, outputNode.getInputEdges().size());
 
-    ListNetMLP.LEdge outputEdge00 = inputNode0.getOutputEdge(0);
-    ListNetMLP.LEdge outputEdge01 = inputNode0.getOutputEdge(1);
-    ListNetMLP.LEdge outputEdge10 = inputNode1.getOutputEdge(0);
-    ListNetMLP.LEdge outputEdge11 = inputNode1.getOutputEdge(1);
     ListNetMLP.LEdge inputEdge00 = hiddenNode0.getInputEdge(0);
     ListNetMLP.LEdge inputEdge01 = hiddenNode0.getInputEdge(1);
     ListNetMLP.LEdge inputEdge02 = hiddenNode0.getInputEdge(2);
     ListNetMLP.LEdge inputEdge10 = hiddenNode1.getInputEdge(0);
     ListNetMLP.LEdge inputEdge11 = hiddenNode1.getInputEdge(1);
     ListNetMLP.LEdge inputEdge12 = hiddenNode1.getInputEdge(2);
-    ListNetMLP.LEdge outputEdge20 = hiddenNode0.getOutputEdge(0);
-    ListNetMLP.LEdge outputEdge30 = hiddenNode1.getOutputEdge(0);
     ListNetMLP.LEdge inputEdge20 = outputNode.getInputEdge(0);
     ListNetMLP.LEdge inputEdge21 = outputNode.getInputEdge(1);
     ListNetMLP.LEdge inputEdge22 = outputNode.getInputEdge(2);
-    Assert.assertTrue(outputEdge00 == inputEdge01);
-    Assert.assertTrue(outputEdge01 == inputEdge11);
-    Assert.assertTrue(outputEdge10 == inputEdge02);
-    Assert.assertTrue(outputEdge11 == inputEdge12);
-    Assert.assertTrue(outputEdge20 == inputEdge21);
-    Assert.assertTrue(outputEdge30 == inputEdge22);
-
-    Assert.assertTrue(outputEdge00.getSource() == inputNode0);
-    Assert.assertTrue(outputEdge00.getDestination() == hiddenNode0);
-    Assert.assertTrue(outputEdge01.getSource() == inputNode0);
-    Assert.assertTrue(outputEdge01.getDestination() == hiddenNode1);
-    Assert.assertTrue(outputEdge10.getSource() == inputNode1);
-    Assert.assertTrue(outputEdge10.getDestination() == hiddenNode0);
-    Assert.assertTrue(outputEdge11.getSource() == inputNode1);
-    Assert.assertTrue(outputEdge11.getDestination() == hiddenNode1);
-    Assert.assertTrue(outputEdge20.getSource() == hiddenNode0);
-    Assert.assertTrue(outputEdge20.getDestination() == outputNode);
-    Assert.assertTrue(outputEdge30.getSource() == hiddenNode1);
-    Assert.assertTrue(outputEdge30.getDestination() == outputNode);
-
-    Assert.assertNull(inputEdge00.getSource());
-    Assert.assertNull(inputEdge10.getSource());
-    Assert.assertNull(inputEdge20.getSource());
-    Assert.assertTrue(inputEdge00.getDestination() == hiddenNode0);
-    Assert.assertTrue(inputEdge10.getDestination() == hiddenNode1);
-    Assert.assertTrue(inputEdge20.getDestination() == outputNode);
+    assertBetweenNodes(inputNode0, 0, hiddenNode0, 1);
+    assertBetweenNodes(inputNode0, 1, hiddenNode1, 1);
+    assertBetweenNodes(inputNode1, 0, hiddenNode0, 2);
+    assertBetweenNodes(inputNode1, 1, hiddenNode1, 2);
+    assertBetweenNodes(hiddenNode0, 0, outputNode, 1);
+    assertBetweenNodes(hiddenNode1, 0, outputNode, 2);
+    assertBiasEdge(inputEdge00, hiddenNode0);
+    assertBiasEdge(inputEdge10, hiddenNode1);
+    assertBiasEdge(inputEdge20, outputNode);
 
     Assert.assertTrue(inputEdge00.getOptimizer() instanceof Optimizer.SGD);
     Assert.assertTrue(inputEdge01.getOptimizer() instanceof Optimizer.SGD);
@@ -221,22 +202,12 @@ public class ListNetMLPTest {
     ListNetMLP.LEdge outputEdge2 = hiddenNode1.getOutputEdge(0);
     ListNetMLP.LEdge inputEdge20 = outputNode.getInputEdge(0);
     ListNetMLP.LEdge inputEdge21 = outputNode.getInputEdge(1);
-    Assert.assertTrue(outputEdge0 == inputEdge01);
-    Assert.assertTrue(outputEdge1 == inputEdge11);
-    Assert.assertTrue(outputEdge2 == inputEdge21);
-
-    Assert.assertTrue(outputEdge0.getSource() == inputNode);
-    Assert.assertTrue(outputEdge0.getDestination() == hiddenNode0);
-    Assert.assertNull(inputEdge00.getSource());
-    Assert.assertTrue(inputEdge00.getDestination() == hiddenNode0);
-    Assert.assertNull(inputEdge10.getSource());
-    Assert.assertTrue(inputEdge10.getDestination() == hiddenNode1);
-    Assert.assertTrue(inputEdge11.getSource() == hiddenNode0);
-    Assert.assertTrue(inputEdge11.getDestination() == hiddenNode1);
-    Assert.assertNull(inputEdge20.getSource());
-    Assert.assertTrue(inputEdge20.getDestination() == outputNode);
-    Assert.assertTrue(inputEdge21.getSource() == hiddenNode1);
-    Assert.assertTrue(inputEdge21.getDestination() == outputNode);
+    assertBetweenNodes(inputNode, 0, hiddenNode0, 1);
+    assertBetweenNodes(hiddenNode0, 0, hiddenNode1, 1);
+    assertBetweenNodes(hiddenNode1, 0, outputNode, 1);
+    assertBiasEdge(inputEdge00, hiddenNode0);
+    assertBiasEdge(inputEdge10, hiddenNode1);
+    assertBiasEdge(inputEdge20, outputNode);
 
     Assert.assertTrue(inputEdge00.getOptimizer() instanceof Optimizer.SGD);
     Assert.assertTrue(inputEdge01.getOptimizer() instanceof Optimizer.SGD);
