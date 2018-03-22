@@ -16,14 +16,13 @@
 
 package org.ltr4l.trainers;
 
-import java.util.List;
-
-import org.ltr4l.Ranker;
-import org.ltr4l.nn.*;
+import org.ltr4l.nn.Activation;
+import org.ltr4l.nn.ListNetMLP;
+import org.ltr4l.nn.NetworkShape;
+import org.ltr4l.nn.Optimizer;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
@@ -36,8 +35,8 @@ public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
   private double lrRate;
   private double rgRate;
 
-  ListNetTrainer(QuerySet training, QuerySet validation, Config config) {
-    super(training, validation, config);
+  ListNetTrainer(QuerySet training, QuerySet validation, String file) {
+    super(training, validation, file);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
@@ -47,6 +46,7 @@ public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
   protected ListNetMLP constructRanker() {
     int featureLength = trainingSet.get(0).getFeatureLength();
     NetworkShape networkShape = config.getNetworkShape();
+    networkShape.add(1, new Activation.Identity());
     Optimizer.OptimizerFactory optFact = config.getOptFact();
     Regularization regularization = config.getReguFunction();
     String weightModel = config.getWeightInit();
@@ -56,6 +56,11 @@ public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
   @Override
   protected Error makeErrorFunc(){
     return new Error.Entropy();
+  }
+
+  @Override
+  public Class<MLPTrainer.MLPConfig> getConfigClass(){
+    return MLPTrainer.MLPConfig.class;
   }
 
   @Override

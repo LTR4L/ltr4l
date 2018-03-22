@@ -98,52 +98,91 @@ $ ant clean package
 4-run the following command :
 
 ```
-java -jar LTR4L-X.X.X.jar data/MQ2008/Fold1/train.txt data/MQ2008/Fold1/vali.txt confs/ranknet.config
+java -jar LTR4L-X.X.X.jar ranknet data/MQ2008/Fold1/train.txt data/MQ2008/Fold1/vali.txt confs/ranknet.json
 ```
 
 5- open the report file:
 
 ```
-open report.csv
+open ranknet-report.csv
 ```
 
 #### Changing Parameters
 Below is an example of a config file:
+
 ```
-name:RankNet
-numIterations:100
-learningRate:0.0001
-optimizer:sgd
-weightInit:normal
-reguFunction:L2
-reguRate:0.01
-layers:10,Sigmoid 1,Identity
+{
+  "algorithm" : "RankNet",
+  "numIterations" : 100,
+  "params" : {
+    "learningRate" : 0.00001,
+    "optimizer" : "adam",
+    "weightInit" : "xavier",
+    "regularization" : {
+      "regularizer" : "L2",
+      "rate" : 0.01
+    },
+    "layers" : [
+      {
+        "activator" : "Sigmoid",
+        "num" : 10
+      }
+    ]
+  },
+
+  "dataSet" : {
+    "training" : "data/MQ2008/Fold1/train.txt",
+    "validation" : "data/MQ2008/Fold1/vali.txt",
+    "test" : "data/MQ2008/Fold1/test.txt"
+  },
+
+  "model" : {
+    "format" : "json",
+    "file" : "ranknet-model.json"
+  },
+
+  "evaluation" : {
+    "evaluator" : "NDCG",
+    "params" : {
+      "k" : 10
+    }
+  },
+
+  "report" : {
+    "format" : "csv",
+    "file" : "ranknet-report.csv"
+  }
+}
 ```
 
 You must specify the number of nodes and activation for each hidden layer and the output layer.
 However, for NNRank, you do not need to specify the final layer.
 For example, to add another layer of 3 ReLu nodes and the output layer to Sigmoid, change layers to:
-```
-layers:10,Sigmoid 3,Relu 1,Sigmoid
-```
-
-You can also change the gradient descent optimization algorithm used during training.
-The following optimization algorithms have been implemented (specification in the config file is case-insensitive):  
-SGD  
-Adam  
-Momentum  
-Nesterov  
-Adagrad  
-RMSProp  
-Adamax  
-Nadam  
-AMSGrad  
-
-The training data and validation data used can be changed by changing the path of the first and second argument while executing the program:
 
 ```
-java -jar data/MQ2007/Fold1/train.txt data/MQ2007/Fold1/vali.txt confs/ranknet.config
+    "layers" : [
+      {
+        "activator" : "Sigmoid",
+        "num" : 10
+      },
+      {
+        "activator" : "ReLU",
+        "num" : 3
+      },
+      {
+        "activator" : "Sigmoid",
+        "num" : 1
+      }
+    ]
 ```
+
+You can also change the training data and validation data by changing the path of the first and second argument while executing the program:
+
+```
+java -jar LTR4L-X.X.X.jar ranknet data/MQ2007/Fold1/train.txt data/MQ2007/Fold1/vali.txt confs/ranknet.json
+```
+
+
 
 
 ## Experiments
@@ -312,7 +351,7 @@ Note: FRankNet is still work in progress.
 |Learning Rate|0.001|
 |Regularization|L2|
 |Regularization Rate|0.01|
-|Time Elapsed| 32.6s|
+|Time Elapsed| 42.1s|
 
 ![Alt Text](figures/LambdaRankNDCG2008.jpg)
 ![Alt Text](figures/LambdaRankError2008.jpg)
@@ -346,23 +385,23 @@ Note: FRankNet is still work in progress.
 |Parameter|Value|
 |:-:|:-:|
 |Algorithm|ListNet|
-|Dataset|LETOR:MQ2008 Fold 1|
+|Dataset|LETOR:MQ2007 Fold 1|
 |Optimizer|Adam|
 |Weights Initialization|Xavier|
 |Bias Initialization|Constant (0.1)|
-|Layers|[46, 15, 1]|
-|Hidden Activation|Identity|
+|Layers|[46, 15, 1, 1]|
+|Hidden Activation|Identity, Sigmoid|
 |Output Activation|Sigmoid|
 |Loss Function|Cross Entropy|
 |Epochs|100|
 |Learning Rate|0.001|
 |Regularization|L2|
 |Regularization Rate|0.01|
-|Time Elapsed| 35.7s|
+|Time Elapsed| 70.8s|
 
 
-![Alt Text](figures/ListNetNDCG2008.jpg)
-![Alt Text](figures/ListNetError2008.jpg)
+![Alt Text](figures/ListNetNDCG.jpg)
+![Alt Text](figures/ListNetError.jpg)
 
 
 ## Overview of Algorithms

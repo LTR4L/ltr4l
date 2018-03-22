@@ -1,6 +1,15 @@
 <ivy-module version="2.0">
-    <info organisation="org.ltr4l" module="org.ltr4l"/>
-    <dependencies>
-        <dependency org="junit" name="junit" rev="4.12"/>
-    </dependencies>
+  <info organisation="org.ltr4l" module="org.ltr4l"/>
+  <dependencies>
+    <dependency org="junit" name="junit" rev="4.12"/>
+    <dependency org="com.fasterxml.jackson.core" name="jackson-core" rev="2.9.4">
+      <artifact name="jackson-core" type="jar" url="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.9.4/jackson-core-2.9.4.jar"/>
+    </dependency>
+    <dependency org="com.fasterxml.jackson.core" name="jackson-databind" rev="2.9.4">
+      <artifact name="jackson-databind" type="jar" url="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.9.4/jackson-databind-2.9.4.jar"/>
+    </dependency>
+    <dependency org="com.fasterxml.jackson.core" name="jackson-annotations" rev="2.9.4">
+      <artifact name="jackson-annotations" type="jar" url="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.9.4/jackson-annotations-2.9.4.jar"/>
+    </dependency>
+  </dependencies>
 </ivy-module>

@@ -19,7 +19,6 @@ package org.ltr4l;
 import java.io.IOException;
 
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Config;
 import org.ltr4l.trainers.Trainer;
 
 /**
@@ -30,16 +29,15 @@ import org.ltr4l.trainers.Trainer;
  */
 public class Main {
   public static void main(String[] args) throws IOException {
-    String trainingPath = args[0];
-    String validationPath = args[1];
-    String configPath = args[2];
+    String algorithm = args[0];
+    String trainingPath = args[1];
+    String validationPath = args[2];
+    String configPath = args[3];
 
     QuerySet trainingSet = QuerySet.create(trainingPath);
     QuerySet validationSet = QuerySet.create(validationPath);
-    Config configs = Config.get(configPath);
 
-    String algorithm = configs.getName();
-    Trainer trainer = Trainer.TrainerFactory.getTrainer(algorithm, trainingSet, validationSet, configs);
+    Trainer trainer = Trainer.TrainerFactory.getTrainer(algorithm, trainingSet, validationSet, configPath);
     long startTime = System.currentTimeMillis();
     trainer.trainAndValidate();
     long endTime = System.currentTimeMillis();

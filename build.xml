@@ -100,12 +100,15 @@
     <target name="package" depends="jar" description="make package"/>
 
     <target name="run" depends="compile" description="run Main program">
+        <property name="algo" value="ranknet"/>
         <property name="train" value="data/MQ2008/Fold1/train.txt"/>
         <property name="valid" value="data/MQ2008/Fold1/vali.txt"/>
-        <property name="algo" value="ranknet"/>
         <java classname="org.ltr4l.Main">
-            <arg line="${train} ${valid} ${conf.dir}/${algo}.config"/>
+            <arg line="${algo} ${train} ${valid} ${conf.dir}/${algo}.json"/>
             <classpath path="${cls.dir}"/>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
         </java>
     </target>
 
@@ -119,8 +122,11 @@
 
     <target name="ivy-bootstrap" description="--> retrieve dependencies with ivy">
         <ivy:retrieve />
+<!--
         <ivy:retrieve sync="true" type="jar" />
+-->
     </target>
+
     <target name="javadoc" description="generate documentation">
         <javadoc sourcepath="${src.dir}/main/java" destdir="${doc.dir}" locale="en_US"/>
     </target>

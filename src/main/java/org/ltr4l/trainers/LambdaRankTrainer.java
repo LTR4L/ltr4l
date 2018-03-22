@@ -16,16 +16,15 @@
 
 package org.ltr4l.trainers;
 
-import org.ltr4l.nn.Activation;
-import org.ltr4l.tools.Config;
-import org.ltr4l.query.Document;
-import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+
+import org.ltr4l.nn.Activation;
+import org.ltr4l.query.Document;
+import org.ltr4l.query.Query;
+import org.ltr4l.query.QuerySet;
 
 /**
  * LambdaRankTrainer trains the RankNetTrainer's network
@@ -34,7 +33,7 @@ import java.util.List;
  * */
 public class LambdaRankTrainer extends RankNetTrainer {
 
-  LambdaRankTrainer(QuerySet training, QuerySet validation, Config config) {
+  LambdaRankTrainer(QuerySet training, QuerySet validation, String config) {
     super(training, validation, config);
   }
 

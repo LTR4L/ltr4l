@@ -1,0 +1,46 @@
+{
+  "algorithm" : "ListNet",
+  "numIterations" : 100,
+  "params" : {
+    "learningRate" : 0.001,
+    "optimizer" : "adam",
+    "weightInit" : "xavier",
+    "regularization" : {
+      "regularizer" : "L2",
+      "rate" : 0.01
+    },
+    "layers" : [
+      {
+        "activator" : "Identity",
+        "num" : 15
+      },
+      {
+        "activator" : "Sigmoid",
+        "num" : 1
+      }
+    ]
+  },
+
+  "dataSet" : {
+    "training" : "data/MQ2008/Fold1/train.txt",
+    "validation" : "data/MQ2008/Fold1/vali.txt",
+    "test" : "data/MQ2008/Fold1/test.txt"
+  },
+
+  "model" : {
+    "format" : "json",
+    "file" : "listnet-model.json"
+  },
+
+  "evaluation" : {
+    "evaluator" : "NDCG",
+    "params" : {
+      "k" : 10
+    }
+  },
+
+  "report" : {
+    "format" : "csv",
+    "file" : "listnet-report.csv"
+  }
+}

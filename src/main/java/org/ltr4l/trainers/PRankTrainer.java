@@ -16,33 +16,28 @@
 
 package org.ltr4l.trainers;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Error;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.ltr4l.tools.Config;
+import org.ltr4l.tools.Error;
 
 /**
  * The implementation of LTRTrainer which uses the
  * PRank(Perceptron Ranking) algorithm.
  *
  */
-public class PRankTrainer extends LTRTrainer<PRank> {
+public class PRankTrainer extends LTRTrainer<PRank, Config> {
   private final  List<Document> trainingDocList;
 
-  PRankTrainer(QuerySet training, QuerySet validation, Config config) {
+  PRankTrainer(QuerySet training, QuerySet validation, String config) {
     super(training, validation, config);
     maxScore = 0.0;
     trainingDocList = new ArrayList<>();
@@ -72,12 +67,17 @@ public class PRankTrainer extends LTRTrainer<PRank> {
   }
 
   @Override
+  public Class<Config> getConfigClass() {
+    return Config.class;
+  }
+
+  @Override
   protected PRank constructRanker() {
     return new PRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet));
   }
 }
 
-class PRank extends Ranker{
+class PRank extends Ranker<Config> {
   protected double[] weights;
   protected double[] thresholds;
 
@@ -100,7 +100,9 @@ class PRank extends Ranker{
     return thresholds;
   }
 
-  public void writeModel(Properties props, String file) {
+  @Override
+  public void writeModel(Config config, String file) {
+    /* TODO: implement
     try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
       props.store(pw, "Saved model");
       pw.println("model=" + Arrays.toString(weights)); //To ensure model gets written at the end.
@@ -111,6 +113,7 @@ class PRank extends Ranker{
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+    */
   }
 
   //Weight and thresholds must be given as string, separated by "++"

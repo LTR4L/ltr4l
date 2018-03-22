@@ -22,6 +22,7 @@ import java.util.List;
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
+import org.ltr4l.trainers.MLPTrainer;
 
 public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEdge> {
 

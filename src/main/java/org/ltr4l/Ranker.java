@@ -18,9 +18,10 @@ package org.ltr4l;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.ltr4l.tools.Config;
 
 /**
  * Ranker classes use a model to make predictions for a document.
@@ -29,12 +30,12 @@ import java.util.stream.Collectors;
  *
  * Rankers are the model holders.
  */
-public abstract class Ranker {
+public abstract class Ranker<C extends Config> {
   protected static final String DEFAULT_MODEL_FILE = "model.txt";
 
-  public abstract void writeModel(Properties prop, String file);
-  public void writeModel(Properties prop){
-    writeModel(prop, DEFAULT_MODEL_FILE);
+  public abstract void writeModel(C config, String file);
+  public void writeModel(C config){
+    writeModel(config, DEFAULT_MODEL_FILE);
   }
   public abstract double predict(List<Double> features);
 
