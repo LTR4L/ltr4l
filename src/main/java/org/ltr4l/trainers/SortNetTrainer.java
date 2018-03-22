@@ -19,6 +19,7 @@ package org.ltr4l.trainers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.ltr4l.Ranker;
 import org.ltr4l.nn.*;
@@ -147,7 +148,10 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP> {
         continue;
       double queryLoss = 0d;
       for (Document[] pair : pairs) {
-        double[] outputs = ranker.forwardProp(pair[0], pair[1]);
+        List<Double> combinedFeatures = new ArrayList<>(pair[0].getFeatures());
+        combinedFeatures.addAll(pair[1].getFeatures());
+        ranker.forwardProp(combinedFeatures);
+        double[] outputs = ranker.getOutputs();
         queryLoss += errorFunc.error(outputs[0], targets[0][0]);
         queryLoss += errorFunc.error(outputs[1], targets[0][1]);
       }

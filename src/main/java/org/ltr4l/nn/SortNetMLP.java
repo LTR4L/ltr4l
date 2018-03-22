@@ -16,41 +16,23 @@
 
 package org.ltr4l.nn;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
-import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
 public class SortNetMLP extends AbstractMLP<SortNetMLP.SNode, SortNetMLP.SEdge> {
-  final List<List<SNode>> network;
-  private long iter;
-  private int numAccumulatedDer;
-  final Regularization regularization;
 
   //Construct Network
   public SortNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
-    //Network shape describes number of nodes and their activation. Example:
-    //[
-    //[12, Sigmoid ]
-    //[4 , Softmax ]
-    //[1 , Identity]
-    //]
-    //]
-    iter = 1;
-    numAccumulatedDer = 0;
-    this.regularization = regularization;
-    networkShape.add(1, new Activation.Sigmoid()); //Will get doubled.
-    network = new ArrayList<>();
+    super(inputDim, networkShape, optFact, regularization, weightModel);
+  }
 
-    WeightInitializer weightInit = WeightInitializer.get(weightModel, inputDim, networkShape);
+  @Override
+  protected List<List<SNode>> constructNetwork(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact){
+    List<List<SNode>> network = new ArrayList<>();
 
     //Construct the initial layer:
     List<SNode> inputLayer = new ArrayList<>();
@@ -110,71 +92,46 @@ public class SortNetMLP extends AbstractMLP<SortNetMLP.SNode, SortNetMLP.SEdge> 
       }
       currentLayer.addAll(layerPrime);
     }
-  }
-
-  public List<SNode> getLayer(int i){
-    return network.get(i);
-  }
-
-  public SNode getNode(int i, int j){
-    return getLayer(i).get(j);
-  }
-
-  private List<List<List<Double>>> obtainWeights(){
-    return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null).map(layer -> layer.stream()
-        .map(node -> node.getOutputEdges().stream()
-            .map(edge -> edge.getWeight())
-            .collect(Collectors.toList()))
-        .collect(Collectors.toList()))
-        .collect(Collectors.toList());
+    return network;
   }
 
   @Override
-  public void writeModel(Properties props, String file) {
-    try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
-      props.store(pw, "Saved model");
-      pw.println("model=" + obtainWeights()); //To ensure model gets written at the end.
-      //props.setProperty("model", obtainWeights().toString());
-      //props.store(pw, "Saved model");
-
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+  protected SNode constructNode(Activation activation) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
-  public void readModel(String model){
-    int dim = 3;
-    model = model.substring(dim, model.length() - dim);
-    List<Object> modelList = toList(model, dim);
-    List<List<List<Double>>> weights = modelList.stream().map(layer -> ((List<List<Double>>) layer)).collect(Collectors.toList());
-    for (int layerId = 0; layerId < network.size() - 1; layerId++){ //Do not process last layer
-      List<SNode> layer = network.get(layerId);
-      for (int nodeId = 0; nodeId < layer.size(); nodeId++){
-        SNode node = layer.get(nodeId);
-        List<SEdge> outputEdges = node.getOutputEdges();
-        for (int edgeId = 0; edgeId < outputEdges.size(); edgeId ++){
-          SEdge edge = outputEdges.get(edgeId);
-          edge.setWeight(weights.get(layerId).get(nodeId).get(edgeId));
-        }
-      }
-    }
+  protected SEdge constructEdge(SNode source, SNode destination, Optimizer opt, double weight) {
+    throw new UnsupportedOperationException();
+  }
+
+
+  @Override
+  protected void addOutputs(NetworkShape networkShape){
+    networkShape.add(1, new Activation.Sigmoid());
+  }
+
+  public double[] getOutputs(){
+    int layer = network.size() - 1;
+    return new double[] {getNode(layer, 0).getOutput(), getNode(layer, 1).getOutput()};
   }
 
   // if > 0, doc1 is predicted to be more relevant than doc2
   // if < 0, doc1 is predicted to be less relevant than doc 2.
   public double predict(Document doc1, Document doc2) {
-    double[] output = forwardProp(doc1, doc2);
-    return output[0] - output[1];
+    List<Double> combinedFeatures = new ArrayList<>(doc1.getFeatures());
+    combinedFeatures.addAll(doc2.getFeatures());
+    return predict(combinedFeatures);
   }
 
   @Override
   public double predict(List<Double> features){
-    double[] output = forwardProp(features);
+    forwardProp(features);
+    double[] output = getOutputs();
     return output[0] - output[1];
   }
 
-  public double[] forwardProp(List<Double> features) {
+  public double forwardProp(List<Double> features) {
     //First, feed features into input layer:
     for (int i = 0; i < network.get(0).size(); i++) {
       SNode node = network.get(0).get(i);
@@ -191,16 +148,16 @@ public class SortNetMLP extends AbstractMLP<SortNetMLP.SNode, SortNetMLP.SEdge> 
     }
 
     List<SNode> outputLayer = network.get(network.size() - 1);
-    return new double[]{outputLayer.get(0).getOutput(), outputLayer.get(1).getOutput()};
+    return outputLayer.get(0).getOutput();
   }
 
-  public double[] forwardProp(Document doc1, Document doc2) {
-    List<Double> combinedFeatures = new ArrayList<>(doc1.getFeatures());
-    combinedFeatures.addAll(doc2.getFeatures());
-    return forwardProp(combinedFeatures);
+  @Override
+  public void backProp(double target, Error errorFunc) {
+
   }
 
   //Largely based on backprop for MLP.
+  @Override
   public void backProp(double[] targets, Error error) {
     //Feed output derivatives. Note: the size of the last layer should be 2.
     List<SNode> outputs = network.get(network.size() - 1);
@@ -233,7 +190,7 @@ public class SortNetMLP extends AbstractMLP<SortNetMLP.SNode, SortNetMLP.SEdge> 
           if (!edge.isDead()) {
             //(∂C/∂I)*(∂I/∂w) = Σ∂C/∂Ii *(∂Ii/∂w) = ∂C/∂w
             //(∂Ii/∂w) = Oi, because Oi*wi = Ii
-            double errorDer = node.getInputDer() * edge.getSources()[node.getGroup()].getOutput(); //(∂C/∂I)*(∂I/∂w)
+            double errorDer = node.getInputDer() * edge.getSource()[node.getGroup()].getOutput(); //(∂C/∂I)*(∂I/∂w)
             accErrDer = edge.getAccErrorDer();
             accErrDer += errorDer;
             edge.setAccErrorDer(accErrDer);
@@ -246,7 +203,7 @@ public class SortNetMLP extends AbstractMLP<SortNetMLP.SNode, SortNetMLP.SEdge> 
           double oder = 0;
           for (SEdge outEdge : node.getOutputEdges()) {
             //∂C/∂Oi = ∂Ik/∂Oi * ∂C/∂Ik
-            oder += outEdge.getWeight() * outEdge.getDestinations()[node.getGroup()].getInputDer();
+            oder += outEdge.getWeight() * outEdge.getDestination()[node.getGroup()].getInputDer();
           }
           node.setOutputDer(oder);
         }
@@ -256,6 +213,7 @@ public class SortNetMLP extends AbstractMLP<SortNetMLP.SNode, SortNetMLP.SEdge> 
   }
 
   //Same implementation as MLP class...
+  @Override
   public void updateWeights(double lrRate, double rgRate) {
     //Update all weights in all edges.
     for (int layerId = 1; layerId < network.size(); layerId++) {  //All Layers
@@ -300,34 +258,12 @@ public class SortNetMLP extends AbstractMLP<SortNetMLP.SNode, SortNetMLP.SEdge> 
    * node1:nodeA = node1':nodeA' and node1:nodeA' = node1':nodeA,
    * where nodeX:nodeY = weight between node x and node y.
    */
-  protected static class SEdge extends AbstractEdge<SNode> {
-    private final SNode[] source;
-    private final SNode[] destination;
+  protected static class SEdge extends AbstractEdge.AbstractCmpEdge<SNode> {
     private double accErrorDer;
 
     protected SEdge(SNode[] source, SNode[] destination, Optimizer optimizer, double weight) {
-      super(null, null, optimizer, weight);
-      this.source = source;
-      this.destination = destination;
+      super(source, destination, optimizer, weight);
       accErrorDer = 0.0;
-    }
-
-    @Override
-    public SNode getSource(){
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public SNode getDestination(){
-      throw new UnsupportedOperationException();
-    }
-
-    public SNode[] getSources() {
-      return source;
-    }
-
-    public SNode[] getDestinations() {
-      return destination;
     }
 
     public void setAccErrorDer(double accErrorDer) {
@@ -351,7 +287,7 @@ public class SortNetMLP extends AbstractMLP<SortNetMLP.SNode, SortNetMLP.SEdge> 
     public void updateOutput() {
       totalInput = inputEdges.get(0).getWeight();
       for (int i = 1; i < inputEdges.size(); i++) {
-        totalInput += inputEdges.get(i).getWeight() * inputEdges.get(i).getSources()[group].getOutput();
+        totalInput += inputEdges.get(i).getWeight() * inputEdges.get(i).getSource()[group].getOutput();
       }
       output = activation.output(totalInput);
     }
