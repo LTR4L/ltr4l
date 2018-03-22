@@ -17,12 +17,15 @@
 package org.ltr4l.nn;
 
 import org.junit.Assert;
+import org.ltr4l.nn.AbstractEdge.AbstractFFEdge;
+import org.ltr4l.nn.AbstractNode.Node;
 
-public abstract class MLPTestBase<N extends Node, E extends AbstractEdge> {
+public abstract class MLPTestBase<N extends Node, E extends AbstractFFEdge> {
 
   protected void assertBetweenNodes(N sn, int i, N dn, int j) throws Exception {
-    AbstractEdge oe = sn.getOutputEdge(i);
-    AbstractEdge ie = dn.getInputEdge(j);
+    //Because N is an extension of Node, the saved Edges should be of type AbstractFFEdge.
+    AbstractFFEdge oe = (AbstractFFEdge) sn.getOutputEdge(i);
+    AbstractFFEdge ie = (AbstractFFEdge) dn.getInputEdge(j);
     Assert.assertTrue(oe == ie);
     Assert.assertTrue(sn == oe.getSource());
     Assert.assertTrue(dn == oe.getDestination());
