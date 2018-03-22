@@ -23,7 +23,7 @@ import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
-public class SortNetMLP extends AbstractMLP<SortNetMLP.SNode, SortNetMLP.SEdge> {
+public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEdge> {
 
   //Construct Network
   public SortNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
@@ -93,16 +93,6 @@ public class SortNetMLP extends AbstractMLP<SortNetMLP.SNode, SortNetMLP.SEdge> 
       currentLayer.addAll(layerPrime);
     }
     return network;
-  }
-
-  @Override
-  protected SNode constructNode(Activation activation) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  protected SEdge constructEdge(SNode source, SNode destination, Optimizer opt, double weight) {
-    throw new UnsupportedOperationException();
   }
 
   @Override
