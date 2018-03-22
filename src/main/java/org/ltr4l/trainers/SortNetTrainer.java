@@ -19,9 +19,7 @@ package org.ltr4l.trainers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
-import org.ltr4l.Ranker;
 import org.ltr4l.nn.*;
 
 import org.ltr4l.query.Document;

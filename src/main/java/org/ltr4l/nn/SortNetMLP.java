@@ -105,7 +105,6 @@ public class SortNetMLP extends AbstractMLP<SortNetMLP.SNode, SortNetMLP.SEdge> 
     throw new UnsupportedOperationException();
   }
 
-
   @Override
   protected void addOutputs(NetworkShape networkShape){
     networkShape.add(1, new Activation.Sigmoid());
@@ -151,23 +150,13 @@ public class SortNetMLP extends AbstractMLP<SortNetMLP.SNode, SortNetMLP.SEdge> 
     return outputLayer.get(0).getOutput();
   }
 
+  //This only sets the first node.
+  //Use backProp(double target, Error errorFunc)!!
   @Override
   public void backProp(double target, Error errorFunc) {
-
-  }
-
-  //Largely based on backprop for MLP.
-  @Override
-  public void backProp(double[] targets, Error error) {
-    //Feed output derivatives. Note: the size of the last layer should be 2.
-    List<SNode> outputs = network.get(network.size() - 1);
-    for (int i = 0; i < outputs.size(); i++) { //outputs.size chosen over targets.length; error if too many nodes.
-      SNode outputNode = outputs.get(i);
-      double output = outputNode.getOutput();
-      double target = targets[i];
-      double outDer = error.der(output, target);
-      outputNode.setOutputDer(outDer);
-    }
+    SNode outputNode1 = getNode(network.size() - 1, 0);
+    double der = errorFunc.der(outputNode1.getOutput(), target);
+    outputNode1.setOutputDer(der);
     for (int layerIdx = network.size() - 1; layerIdx >= 1; layerIdx--) { //When going through each layer, you modify the previous layer.
       List<SNode> layer = network.get(layerIdx);
 
