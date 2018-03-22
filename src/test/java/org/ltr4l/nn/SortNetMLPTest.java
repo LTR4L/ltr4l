@@ -36,7 +36,7 @@ public class SortNetMLPTest {
 
     Assert.assertTrue(mlp.regularization instanceof Regularization.L1);
 
-    // SortNetMLP always adds an output Node with Activation.Sigmoid
+    // SortNetMLP always adds an output AbstractNode with Activation.Sigmoid
     Assert.assertEquals(3, mlp.network.size());
     Assert.assertEquals(2, mlp.getLayer(2).size());
     SortNetMLP.SNode outputNode0 = mlp.getNode(2, 0);
@@ -148,7 +148,7 @@ public class SortNetMLPTest {
 
     Assert.assertTrue(mlp.regularization instanceof Regularization.L2);
 
-    // SortNetMLP always adds an output Node with Activation.Sigmoid
+    // SortNetMLP always adds an output AbstractNode with Activation.Sigmoid
     Assert.assertEquals(3, mlp.network.size());
     Assert.assertEquals(2, mlp.getLayer(2).size());
     SortNetMLP.SNode outputNode0 = mlp.getNode(2, 0);

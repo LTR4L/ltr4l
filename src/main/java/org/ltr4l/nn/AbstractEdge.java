@@ -47,7 +47,7 @@ public abstract class AbstractEdge { //Serializable?
 
   public void setDead(boolean dead) { isDead = dead; }
 
-  public static abstract class AbstractFFEdge<N extends Node> extends AbstractEdge {
+  public static abstract class AbstractFFEdge<N extends AbstractNode> extends AbstractEdge {
     protected final N source;
     protected final N destination;
 
@@ -62,7 +62,7 @@ public abstract class AbstractEdge { //Serializable?
     public N getDestination() { return destination; }
   }
 
-  public static abstract class AbstractCmpEdge<N extends Node> extends AbstractEdge{
+  public static abstract class AbstractCmpEdge<N extends AbstractNode> extends AbstractEdge{
     protected final N[] source;
     protected final N[] destination;
 

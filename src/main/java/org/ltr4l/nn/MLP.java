@@ -176,7 +176,7 @@ public class MLP extends AbstractMLP<MLP.MNode, MLP.Edge> {
   /**
    * Defines what type of AbstractEdge the node will hold for convenience.
    */
-  protected static class MNode extends Node<Edge> {
+  protected static class MNode extends AbstractNode.Node<Edge> {
     MNode(Activation activation){
       super(activation);
     }

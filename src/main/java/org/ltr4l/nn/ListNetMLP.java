@@ -211,7 +211,7 @@ public class ListNetMLP extends AbstractMLP<ListNetMLP.LNode, ListNetMLP.LEdge> 
   /**
    * MNode which holds LEdges.
    */
-  static class LNode extends Node<LEdge> {
+  static class LNode extends AbstractNode.Node<LEdge> {
 
     LNode(Activation activation) {
       super(activation);

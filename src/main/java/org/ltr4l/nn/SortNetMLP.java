@@ -275,7 +275,7 @@ public class SortNetMLP extends AbstractMLP<SortNetMLP.SNode, SortNetMLP.SEdge> 
     }
   }
 
-  protected static class SNode extends Node<SEdge> {
+  protected static class SNode extends AbstractNode<SEdge> {
     private final int group;
 
     protected SNode(int group, Activation activation) {
