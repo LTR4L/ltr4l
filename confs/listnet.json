@@ -12,11 +12,7 @@
     "layers" : [
       {
         "activator" : "Identity",
-        "num" : 15
-      },
-      {
-        "activator" : "Sigmoid",
-        "num" : 1
+        "num" : 10
       }
     ]
   },

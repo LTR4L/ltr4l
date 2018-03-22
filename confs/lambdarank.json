@@ -2,7 +2,7 @@
   "algorithm" : "LambdaRank",
   "numIterations" : 100,
   "params" : {
-    "learningRate" : 0.01,
+    "learningRate" : 0.001,
     "optimizer" : "adam",
     "weightInit" : "xavier",
     "regularization" : {
@@ -11,12 +11,8 @@
     },
     "layers" : [
       {
-        "activator" : "Identity",
-        "num" : 10
-      },
-      {
         "activator" : "Sigmoid",
-        "num" : 1
+        "num" : 10
       }
     ]
   },

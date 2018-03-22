@@ -3,7 +3,7 @@
   "numIterations" : 100,
   "params" : {
     "learningRate" : 0.001,
-    "optimizer" : "sgd",
+    "optimizer" : "momentum",
     "weightInit" : "normal",
     "regularization" : {
       "regularizer" : "L2",
@@ -11,12 +11,8 @@
     },
     "layers" : [
       {
-        "activator" : "Identity",
-        "num" : 5
-      },
-      {
         "activator" : "Sigmoid",
-        "num" : 1
+        "num" : 5
       }
     ]
   },
