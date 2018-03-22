@@ -20,7 +20,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.ltr4l.tools.Regularization;
 
-public class ListNetMLPTest {
+public class ListNetMLPTest extends MLPTestBase<ListNetMLP.LNode, ListNetMLP.LEdge> {
 
   @Test
   public void testConstructorMinimum() throws Exception {
@@ -68,19 +68,6 @@ public class ListNetMLPTest {
     Assert.assertTrue(inputEdge0.getOptimizer() instanceof Optimizer.SGD);
     Assert.assertTrue(outputEdge1.getOptimizer() instanceof Optimizer.SGD);
     Assert.assertTrue(inputEdge2.getOptimizer() instanceof Optimizer.SGD);
-  }
-
-  private void assertBetweenNodes(ListNetMLP.LNode sn, int i, ListNetMLP.LNode dn, int j) throws Exception {
-    ListNetMLP.LEdge oe = sn.getOutputEdge(i);
-    ListNetMLP.LEdge ie = dn.getInputEdge(j);
-    Assert.assertTrue(oe == ie);
-    Assert.assertTrue(sn == oe.getSource());
-    Assert.assertTrue(dn == oe.getDestination());
-  }
-
-  private void assertBiasEdge(ListNetMLP.LEdge edge, ListNetMLP.LNode dn) throws Exception {
-    Assert.assertNull(edge.getSource());
-    Assert.assertTrue(dn == edge.getDestination());
   }
 
   @Test
