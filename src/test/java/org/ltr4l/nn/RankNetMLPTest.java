@@ -18,10 +18,10 @@ package org.ltr4l.nn;
 
 import org.ltr4l.tools.Regularization;
 
-public class ListNetMLPTest extends MLPAddedAnOutputNode<ListNetMLP.LNode, ListNetMLP.LEdge, ListNetMLP> {
+public class RankNetMLPTest extends MLPAddedAnOutputNode<MLP.MNode, MLP.Edge, RankNetMLP> {
 
   @Override
-  protected ListNetMLP create(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
-    return new ListNetMLP(inputDim, networkShape, optFact, regularization, weightModel);
+  protected RankNetMLP create(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
+    return new RankNetMLP(inputDim, networkShape, optFact, regularization, weightModel);
   }
 }

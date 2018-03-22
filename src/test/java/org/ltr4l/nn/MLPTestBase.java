@@ -16,12 +16,20 @@
 
 package org.ltr4l.nn;
 
-import org.ltr4l.tools.Regularization;
+import org.junit.Assert;
 
-public class ListNetMLPTest extends MLPAddedAnOutputNode<ListNetMLP.LNode, ListNetMLP.LEdge, ListNetMLP> {
+public abstract class MLPTestBase<N extends Node, E extends AbstractEdge> {
 
-  @Override
-  protected ListNetMLP create(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
-    return new ListNetMLP(inputDim, networkShape, optFact, regularization, weightModel);
+  protected void assertBetweenNodes(N sn, int i, N dn, int j) throws Exception {
+    AbstractEdge oe = sn.getOutputEdge(i);
+    AbstractEdge ie = dn.getInputEdge(j);
+    Assert.assertTrue(oe == ie);
+    Assert.assertTrue(sn == oe.getSource());
+    Assert.assertTrue(dn == oe.getDestination());
+  }
+
+  protected void assertBiasEdge(E edge, N dn) throws Exception {
+    Assert.assertNull(edge.getSource());
+    Assert.assertTrue(dn == edge.getDestination());
   }
 }
