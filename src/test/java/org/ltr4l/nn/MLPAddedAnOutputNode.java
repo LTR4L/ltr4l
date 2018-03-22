@@ -19,10 +19,16 @@ package org.ltr4l.nn;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ltr4l.tools.Regularization;
+import org.ltr4l.nn.AbstractNode.Node;
+import org.ltr4l.nn.AbstractEdge.AbstractFFEdge;
 
-public abstract class MLPAddedAnOutputNode<N extends Node, E extends AbstractEdge, MLP extends AbstractMLP> extends MLPTestBase {
+public abstract class MLPAddedAnOutputNode<N extends Node, E extends AbstractFFEdge, MLP extends AbstractMLP> extends MLPTestBase {
 
   protected abstract MLP create(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel);
+  
+  protected Node getNode(AbstractMLP mlp, int i, int j){ return (Node) mlp.getNode(i, j); }
+  protected AbstractFFEdge getOutputEdge(Node node, int i){ return (AbstractFFEdge) node.getOutputEdge(i); }
+  protected AbstractFFEdge getInputEdge(Node node, int i){ return (AbstractFFEdge) node.getInputEdge(i); }
 
   @Test
   public void testConstructorMinimum() throws Exception {
@@ -41,14 +47,14 @@ public abstract class MLPAddedAnOutputNode<N extends Node, E extends AbstractEdg
     // ListNetMLP always adds an output MNode with Activation.Identity
     Assert.assertEquals(3, mlp.network.size());
     Assert.assertEquals(1, mlp.getLayer(2).size());
-    Node outputNode = mlp.getNode(2, 0);
+    Node outputNode = getNode(mlp, 2, 0);
     Assert.assertTrue(outputNode.getActivation() instanceof Activation.Identity);
 
     Assert.assertEquals(1, mlp.getLayer(0).size());
     Assert.assertEquals(1, mlp.getLayer(1).size());
-    Node inputNode = mlp.getNode(0, 0);
+    Node inputNode = getNode(mlp, 0, 0);
     Assert.assertTrue(inputNode.getActivation() instanceof Activation.Identity);
-    Node hiddenNode = mlp.getNode(1, 0);
+    Node hiddenNode = getNode(mlp, 1, 0);
     Assert.assertTrue(hiddenNode.getActivation() instanceof Activation.Sigmoid);
     Assert.assertEquals(0, inputNode.getInputEdges().size());
     Assert.assertEquals(1, inputNode.getOutputEdges().size());
@@ -57,10 +63,10 @@ public abstract class MLPAddedAnOutputNode<N extends Node, E extends AbstractEdg
     Assert.assertEquals(2, outputNode.getInputEdges().size());
     Assert.assertEquals(0, outputNode.getOutputEdges().size());
 
-    AbstractEdge outputEdge0 = inputNode.getOutputEdge(0);
-    AbstractEdge inputEdge0 = hiddenNode.getInputEdge(0);
-    AbstractEdge outputEdge1 = hiddenNode.getOutputEdge(0);
-    AbstractEdge inputEdge2 = outputNode.getInputEdge(0);
+    AbstractFFEdge outputEdge0 = getOutputEdge(inputNode,0);
+    AbstractFFEdge inputEdge0 = getInputEdge(hiddenNode, 0);
+    AbstractFFEdge outputEdge1 = getOutputEdge(hiddenNode, 0);
+    AbstractFFEdge inputEdge2 = getInputEdge(outputNode, 0);
     assertBetweenNodes(inputNode, 0, hiddenNode, 1);
     assertBetweenNodes(hiddenNode, 0, outputNode, 1);
     assertBiasEdge(inputEdge0, hiddenNode);
@@ -91,18 +97,18 @@ public abstract class MLPAddedAnOutputNode<N extends Node, E extends AbstractEdg
     // ListNetMLP always adds an output MNode with Activation.Identity
     Assert.assertEquals(3, mlp.network.size());
     Assert.assertEquals(1, mlp.getLayer(2).size());
-    Node outputNode = mlp.getNode(2, 0);
+    Node outputNode = getNode(mlp, 2, 0);
     Assert.assertTrue(outputNode.getActivation() instanceof Activation.Identity);
 
     Assert.assertEquals(2, mlp.getLayer(0).size());
     Assert.assertEquals(2, mlp.getLayer(1).size());
-    Node inputNode0 = mlp.getNode(0, 0);
+    Node inputNode0 = getNode(mlp, 0, 0);
     Assert.assertTrue(inputNode0.getActivation() instanceof Activation.Identity);
-    Node inputNode1 = mlp.getNode(0, 1);
+    Node inputNode1 = getNode(mlp, 0, 1);
     Assert.assertTrue(inputNode1.getActivation() instanceof Activation.Identity);
-    Node hiddenNode0 = mlp.getNode(1, 0);
+    Node hiddenNode0 = getNode(mlp, 1, 0);
     Assert.assertTrue(hiddenNode0.getActivation() instanceof Activation.ReLU);
-    Node hiddenNode1 = mlp.getNode(1, 1);
+    Node hiddenNode1 = getNode(mlp, 1, 1);
     Assert.assertTrue(hiddenNode1.getActivation() instanceof Activation.ReLU);
     Assert.assertEquals(0, inputNode0.getInputEdges().size());
     Assert.assertEquals(0, inputNode1.getInputEdges().size());
@@ -114,15 +120,16 @@ public abstract class MLPAddedAnOutputNode<N extends Node, E extends AbstractEdg
     Assert.assertEquals(1, hiddenNode1.getOutputEdges().size());
     Assert.assertEquals(3, outputNode.getInputEdges().size());
 
-    AbstractEdge inputEdge00 = hiddenNode0.getInputEdge(0);
-    AbstractEdge inputEdge01 = hiddenNode0.getInputEdge(1);
-    AbstractEdge inputEdge02 = hiddenNode0.getInputEdge(2);
-    AbstractEdge inputEdge10 = hiddenNode1.getInputEdge(0);
-    AbstractEdge inputEdge11 = hiddenNode1.getInputEdge(1);
-    AbstractEdge inputEdge12 = hiddenNode1.getInputEdge(2);
-    AbstractEdge inputEdge20 = outputNode.getInputEdge(0);
-    AbstractEdge inputEdge21 = outputNode.getInputEdge(1);
-    AbstractEdge inputEdge22 = outputNode.getInputEdge(2);
+
+    AbstractFFEdge inputEdge00 = getInputEdge(hiddenNode0, 0);
+    AbstractFFEdge inputEdge01 = getInputEdge(hiddenNode0, 1);
+    AbstractFFEdge inputEdge02 = getInputEdge(hiddenNode0, 2);
+    AbstractFFEdge inputEdge10 = getInputEdge(hiddenNode1, 0);
+    AbstractFFEdge inputEdge11 = getInputEdge(hiddenNode1, 1);
+    AbstractFFEdge inputEdge12 = getInputEdge(hiddenNode1, 2);
+    AbstractFFEdge inputEdge20 = getInputEdge(outputNode, 0);
+    AbstractFFEdge inputEdge21 = getInputEdge(outputNode, 1);
+    AbstractFFEdge inputEdge22 = getInputEdge(outputNode, 2);
     assertBetweenNodes(inputNode0, 0, hiddenNode0, 1);
     assertBetweenNodes(inputNode0, 1, hiddenNode1, 1);
     assertBetweenNodes(inputNode1, 0, hiddenNode0, 2);
@@ -161,17 +168,17 @@ public abstract class MLPAddedAnOutputNode<N extends Node, E extends AbstractEdg
     // ListNetMLP always adds an output MNode with Activation.Identity
     Assert.assertEquals(4, mlp.network.size());
     Assert.assertEquals(1, mlp.getLayer(3).size());
-    Node outputNode = mlp.getNode(3, 0);
+    Node outputNode = getNode(mlp, 3, 0);
     Assert.assertTrue(outputNode.getActivation() instanceof Activation.Identity);
 
     Assert.assertEquals(1, mlp.getLayer(0).size());
     Assert.assertEquals(1, mlp.getLayer(1).size());
     Assert.assertEquals(1, mlp.getLayer(2).size());
-    Node inputNode = mlp.getNode(0, 0);
+    Node inputNode = getNode(mlp, 0, 0);
     Assert.assertTrue(inputNode.getActivation() instanceof Activation.Identity);
-    Node hiddenNode0 = mlp.getNode(1, 0);
+    Node hiddenNode0 = getNode(mlp, 1, 0);
     Assert.assertTrue(hiddenNode0.getActivation() instanceof Activation.Sigmoid);
-    Node hiddenNode1 = mlp.getNode(2, 0);
+    Node hiddenNode1 = getNode(mlp, 2, 0);
     Assert.assertTrue(hiddenNode1.getActivation() instanceof Activation.ReLU);
     Assert.assertEquals(0, inputNode.getInputEdges().size());
     Assert.assertEquals(1, inputNode.getOutputEdges().size());
@@ -182,15 +189,15 @@ public abstract class MLPAddedAnOutputNode<N extends Node, E extends AbstractEdg
     Assert.assertEquals(2, outputNode.getInputEdges().size());
     Assert.assertEquals(0, outputNode.getOutputEdges().size());
 
-    AbstractEdge outputEdge0 = inputNode.getOutputEdge(0);
-    AbstractEdge outputEdge1 = hiddenNode0.getOutputEdge(0);
-    AbstractEdge inputEdge00 = hiddenNode0.getInputEdge(0);
-    AbstractEdge inputEdge01 = hiddenNode0.getInputEdge(1);
-    AbstractEdge inputEdge10 = hiddenNode1.getInputEdge(0);
-    AbstractEdge inputEdge11 = hiddenNode1.getInputEdge(1);
-    AbstractEdge outputEdge2 = hiddenNode1.getOutputEdge(0);
-    AbstractEdge inputEdge20 = outputNode.getInputEdge(0);
-    AbstractEdge inputEdge21 = outputNode.getInputEdge(1);
+    AbstractFFEdge outputEdge0 = getOutputEdge(inputNode, 0);
+    AbstractFFEdge outputEdge1 = getOutputEdge(hiddenNode0, 0);
+    AbstractFFEdge inputEdge00 = getInputEdge(hiddenNode0, 0);
+    AbstractFFEdge inputEdge01 = getInputEdge(hiddenNode0, 1);
+    AbstractFFEdge inputEdge10 = getInputEdge(hiddenNode1, 0);
+    AbstractFFEdge inputEdge11 = getInputEdge(hiddenNode1, 1);
+    AbstractFFEdge outputEdge2 = getOutputEdge(hiddenNode1,0);
+    AbstractFFEdge inputEdge20 = getInputEdge(outputNode, 0);
+    AbstractFFEdge inputEdge21 = getInputEdge(outputNode, 1);
     assertBetweenNodes(inputNode, 0, hiddenNode0, 1);
     assertBetweenNodes(hiddenNode0, 0, hiddenNode1, 1);
     assertBetweenNodes(hiddenNode1, 0, outputNode, 1);

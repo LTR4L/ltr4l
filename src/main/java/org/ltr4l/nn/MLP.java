@@ -33,7 +33,7 @@ public class MLP extends AbstractMLP<MLP.MNode, MLP.Edge> {
   }
 
   protected void addOutputs(NetworkShape ns){
-    return; //Default is do not specify... make abstract?
+    return; //Default is do not specify
   }
 
   @Override
@@ -98,22 +98,6 @@ public class MLP extends AbstractMLP<MLP.MNode, MLP.Edge> {
     numAccumulatedDer += 1;
   }
 
-  //This is for the case of multiple output layers.
-  public void backProp(double[] targets, Error errorFunc) {
-    //First, feed derivative into each node in output layer
-    //Skip the first node, as the derivative will be set through backprop method.
-    List<MNode> outputLayer = network.get(network.size() - 1);
-    for (int i = 1; i < outputLayer.size(); i++) {
-      MNode outputNode = outputLayer.get(i);
-      double output = outputNode.getOutput();
-      double der = errorFunc.der(output, targets[i]);
-      outputNode.setOutputDer(der);
-    }
-    //Then conduct backpropagation as usual.
-    backProp(targets[0], errorFunc);
-
-  }
-
   //Note: regularization not yet implemented.
   public void updateWeights(double lrRate, double rgRate) {
     //Update all weights in all edges.
@@ -155,7 +139,7 @@ public class MLP extends AbstractMLP<MLP.MNode, MLP.Edge> {
   /**
    * Edge which holds Nodes.
    */
-  protected static class Edge extends AbstractEdge<MNode> { //Serializable?
+  protected static class Edge extends AbstractEdge.AbstractFFEdge<MNode> { //Serializable?
     private double accErrorDer;
 
     Edge(MNode source, MNode destination, Optimizer optimizer, double weight) {
@@ -176,7 +160,7 @@ public class MLP extends AbstractMLP<MLP.MNode, MLP.Edge> {
   /**
    * Defines what type of AbstractEdge the node will hold for convenience.
    */
-  protected static class MNode extends Node<Edge> {
+  protected static class MNode extends AbstractNode.Node<Edge> {
     MNode(Activation activation){
       super(activation);
     }

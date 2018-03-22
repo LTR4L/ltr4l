@@ -24,7 +24,7 @@ import java.util.List;
  * Holds information regarding the edges (which nodes are connected), and based on that information
  * the total input and output. Also contains information about Activation.
  */
-public class Node<E extends AbstractEdge> {
+public abstract class AbstractNode<E extends AbstractEdge> {
   protected final List<E> inputEdges;
   protected final List<E> outputEdges;
   protected double totalInput;
@@ -33,7 +33,7 @@ public class Node<E extends AbstractEdge> {
   protected double outputDer;
   protected final Activation activation;
 
-  protected Node(Activation activation) {
+  protected AbstractNode(Activation activation) {
     this.activation = activation;
     inputEdges = new ArrayList<>();
     outputEdges = new ArrayList<>();
@@ -51,15 +51,7 @@ public class Node<E extends AbstractEdge> {
     outputEdges.add(edge);
   }
 
-  protected void updateOutput() {
-    totalInput = inputEdges.get(0).getWeight(); //The first edge is the bias.
-
-    for (int i = 1; i < inputEdges.size(); i++) {
-      E edge = inputEdges.get(i);
-      totalInput += edge.getSource().getOutput() * edge.getWeight();
-    }
-    output = activation.output(totalInput);
-  }
+  protected abstract void updateOutput();
 
   public void setOutput(double output) { //This will be used for input layer only.
     this.output = output;
@@ -104,4 +96,26 @@ public class Node<E extends AbstractEdge> {
   public E getInputEdge(int i) { return inputEdges.get(i);}
 
   public E getOutputEdge(int i) { return outputEdges.get(i);}
+
+  /**
+   * This is the Node for FFN (Feed-Forward Networks).
+   * @param <E1>
+   */
+  public static class Node<E1 extends AbstractEdge.AbstractFFEdge> extends AbstractNode<E1>{
+    Node(Activation activation){
+      super(activation);
+    }
+
+    @Override
+    protected void updateOutput(){
+      totalInput = inputEdges.get(0).getWeight(); //The first edge is the bias.
+
+      for (int i = 1; i < inputEdges.size(); i++) {
+        E1 edge = inputEdges.get(i);
+        totalInput += edge.getSource().getOutput() * edge.getWeight();
+      }
+      output = activation.output(totalInput);
+    }
+  }
+
 }

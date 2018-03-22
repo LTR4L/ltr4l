@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.ltr4l.Ranker;
 import org.ltr4l.nn.*;
 
 import org.ltr4l.query.Document;
@@ -41,9 +40,6 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP> {
   protected double lrRate;
   protected double rgRate;
   protected final double[][] targets;
-  //protected List<Document[][]> trainingPairs;
-  //protected List<Document[][]> validationPairs;
-
 
   SortNetTrainer(QuerySet training, QuerySet validation, Config config) {
     super(training, validation, config);
@@ -51,21 +47,6 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP> {
     rgRate = config.getReguRate();
     maxScore = 0;
     targets = new double[][]{{1, 0}, {0, 1}};
-
-/*        trainingPairs = new ArrayList<>();
-        for (int i = 0; i < trainingSet.size(); i++){
-            Query query = trainingSet.get(i);
-            Document[][] documentPairs = query.orderDocPairs();
-            trainingPairs.add(documentPairs);                   //add even if null, as placeholder for query.
-        }
-
-        validationPairs = new ArrayList<>();
-        for (int i = 0; i < validationSet.size(); i++){
-            Query query = validationSet.get(i);
-            Document[][] documentPairs = query.orderDocPairs();
-            validationPairs.add(documentPairs);
-        }*/
-
   }
 
   @Override
@@ -113,32 +94,6 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP> {
     }
   }
 
-  //The below method looks over all pairs; this takes an extremely long time.
-/*    @Override
-    public void train() {
-        double threshold = 0.5;
-        for (Query query : trainingSet) {
-            List<Document> docList = query.getDocList();
-            for (int i = 0; i < docList.size() - 1; i++){
-                Document doc1 = docList.get(i);
-                for (int j = i + 1; j < docList.size(); j++) {
-                    Document doc2 = docList.get(j);
-                    double delta = doc1.getLabel() - doc2.getLabel();
-                    if (delta != 0) {
-                        double pred = smlp.predict(doc1, doc2);
-                        if (delta * pred < threshold) { //Then backprop
-                            if (delta > 0)
-                                smlp.backProp(targets[0], new Square());
-                            else
-                                smlp.backProp(targets[1], new Square());
-                            smlp.updateWeights(lrRate, rgRate);
-                        }
-                    }
-                }
-            }
-        }
-    }*/
-
   public double calculateLoss(List<Query> queries) {
     double loss = 0d;
     for (Query query : queries) {
@@ -147,7 +102,10 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP> {
         continue;
       double queryLoss = 0d;
       for (Document[] pair : pairs) {
-        double[] outputs = ranker.forwardProp(pair[0], pair[1]);
+        List<Double> combinedFeatures = new ArrayList<>(pair[0].getFeatures());
+        combinedFeatures.addAll(pair[1].getFeatures());
+        ranker.forwardProp(combinedFeatures);
+        double[] outputs = ranker.getOutputs();
         queryLoss += errorFunc.error(outputs[0], targets[0][0]);
         queryLoss += errorFunc.error(outputs[1], targets[0][1]);
       }
