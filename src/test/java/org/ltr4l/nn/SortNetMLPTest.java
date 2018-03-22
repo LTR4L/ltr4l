@@ -117,19 +117,19 @@ public class SortNetMLPTest {
 
   private void assertBetweenPairs(SortNetMLP.SNode sn0, SortNetMLP.SNode sn1, SortNetMLP.SEdge edge,
                                   SortNetMLP.SNode dn0, SortNetMLP.SNode dn1) throws Exception {
-    Assert.assertEquals(2, edge.getSource().length);
-    Assert.assertTrue(edge.getSource()[0] == sn0);
-    Assert.assertTrue(edge.getSource()[1] == sn1);
-    Assert.assertEquals(2, edge.getDestination().length);
-    Assert.assertTrue(edge.getDestination()[0] == dn0);
-    Assert.assertTrue(edge.getDestination()[1] == dn1);
+    Assert.assertEquals(2, edge.getSources().length);
+    Assert.assertTrue(edge.getSources()[0] == sn0);
+    Assert.assertTrue(edge.getSources()[1] == sn1);
+    Assert.assertEquals(2, edge.getDestinations().length);
+    Assert.assertTrue(edge.getDestinations()[0] == dn0);
+    Assert.assertTrue(edge.getDestinations()[1] == dn1);
   }
 
   private void assertBiasEdge(SortNetMLP.SEdge edge, SortNetMLP.SNode dn0, SortNetMLP.SNode dn1) throws Exception {
-    Assert.assertNull(edge.getSource());
-    Assert.assertEquals(2, edge.getDestination().length);
-    Assert.assertTrue(edge.getDestination()[0] == dn0);
-    Assert.assertTrue(edge.getDestination()[1] == dn1);
+    Assert.assertNull(edge.getSources());
+    Assert.assertEquals(2, edge.getDestinations().length);
+    Assert.assertTrue(edge.getDestinations()[0] == dn0);
+    Assert.assertTrue(edge.getDestinations()[1] == dn1);
   }
 
   @Test

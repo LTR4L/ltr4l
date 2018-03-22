@@ -29,7 +29,7 @@ import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
-public class SortNetMLP extends Ranker {
+public class SortNetMLP extends AbstractMLP<SortNetMLP.SNode, SortNetMLP.SEdge> {
   final List<List<SNode>> network;
   private long iter;
   private int numAccumulatedDer;
@@ -233,7 +233,7 @@ public class SortNetMLP extends Ranker {
           if (!edge.isDead()) {
             //(∂C/∂I)*(∂I/∂w) = Σ∂C/∂Ii *(∂Ii/∂w) = ∂C/∂w
             //(∂Ii/∂w) = Oi, because Oi*wi = Ii
-            double errorDer = node.getInputDer() * edge.getSource()[node.getGroup()].getOutput(); //(∂C/∂I)*(∂I/∂w)
+            double errorDer = node.getInputDer() * edge.getSources()[node.getGroup()].getOutput(); //(∂C/∂I)*(∂I/∂w)
             accErrDer = edge.getAccErrorDer();
             accErrDer += errorDer;
             edge.setAccErrorDer(accErrDer);
@@ -246,7 +246,7 @@ public class SortNetMLP extends Ranker {
           double oder = 0;
           for (SEdge outEdge : node.getOutputEdges()) {
             //∂C/∂Oi = ∂Ik/∂Oi * ∂C/∂Ik
-            oder += outEdge.getWeight() * outEdge.getDestination()[node.getGroup()].getInputDer();
+            oder += outEdge.getWeight() * outEdge.getDestinations()[node.getGroup()].getInputDer();
           }
           node.setOutputDer(oder);
         }
@@ -300,49 +300,34 @@ public class SortNetMLP extends Ranker {
    * node1:nodeA = node1':nodeA' and node1:nodeA' = node1':nodeA,
    * where nodeX:nodeY = weight between node x and node y.
    */
-  protected static class SEdge {
+  protected static class SEdge extends AbstractEdge<SNode> {
     private final SNode[] source;
     private final SNode[] destination;
-    private final Optimizer optimizer;
-    private double weight;
     private double accErrorDer;
-    private boolean isDead;
 
     protected SEdge(SNode[] source, SNode[] destination, Optimizer optimizer, double weight) {
+      super(null, null, optimizer, weight);
       this.source = source;
       this.destination = destination;
-      this.optimizer = optimizer;
-      this.weight = weight;
       accErrorDer = 0.0;
-      isDead = false;
     }
 
-    public boolean isDead() {
-      return isDead;
+    @Override
+    public SNode getSource(){
+      throw new UnsupportedOperationException();
     }
 
-    public void setDead(boolean bool) {
-      isDead = bool;
+    @Override
+    public SNode getDestination(){
+      throw new UnsupportedOperationException();
     }
 
-    public double getWeight() {
-      return weight;
-    }
-
-    public void setWeight(double weight) {
-      this.weight = weight;
-    }
-
-    public SNode[] getSource() {
+    public SNode[] getSources() {
       return source;
     }
 
-    public SNode[] getDestination() {
+    public SNode[] getDestinations() {
       return destination;
-    }
-
-    public Optimizer getOptimizer() {
-      return optimizer;
     }
 
     public void setAccErrorDer(double accErrorDer) {
@@ -354,89 +339,21 @@ public class SortNetMLP extends Ranker {
     }
   }
 
-  protected static class SNode {
-    private double output;
-    private double outputDer;
-    private double totalInput;
-    private double inputDer;
+  protected static class SNode extends Node<SEdge> {
     private final int group;
-    private List<SEdge> inputEdges;
-    private List<SEdge> outputEdges;
-    private final Activation activation;
 
     protected SNode(int group, Activation activation) {
-      this.activation = activation;
+      super(activation);
       this.group = group;
-      inputEdges = new ArrayList<>();
-      outputEdges = new ArrayList<>();
-      output = 0d;
-      outputDer = 0d;
-      totalInput = 0d;
-      inputDer = 0d;
     }
 
+    @Override
     public void updateOutput() {
       totalInput = inputEdges.get(0).getWeight();
       for (int i = 1; i < inputEdges.size(); i++) {
-        totalInput += inputEdges.get(i).getWeight() * inputEdges.get(i).getSource()[group].getOutput();
+        totalInput += inputEdges.get(i).getWeight() * inputEdges.get(i).getSources()[group].getOutput();
       }
       output = activation.output(totalInput);
-    }
-
-    public double getOutput() {
-      return output;
-    }
-
-    public void setOutput(double output) {
-      this.output = output;
-    }
-
-    public double getOutputDer() {
-      return outputDer;
-    }
-
-    public void setOutputDer(double outputDer) {
-      this.outputDer = outputDer;
-    }
-
-    public Activation getActivation() {
-      return activation;
-    }
-
-    public double getTotalInput() {
-      return totalInput;
-    }
-
-    public double getInputDer() {
-      return inputDer;
-    }
-
-    public void setInputDer(double inDer) {
-      inputDer = inDer;
-    }
-
-    public List<SEdge> getInputEdges() {
-      return inputEdges;
-    }
-
-    public SEdge getInputEdge(int i){
-      return inputEdges.get(i);
-    }
-
-    public List<SEdge> getOutputEdges() {
-      return outputEdges;
-    }
-
-    public SEdge getOutputEdge(int i){
-      return outputEdges.get(i);
-    }
-
-    public void addInputEdge(SEdge edge) {
-      inputEdges.add(edge);
-    }
-
-    public void addOutputEdge(SEdge edge) {
-      outputEdges.add(edge);
     }
 
     public int getGroup() {

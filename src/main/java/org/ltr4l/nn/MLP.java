@@ -155,7 +155,7 @@ public class MLP extends AbstractMLP<MLP.MNode, MLP.Edge> {
   /**
    * Edge which holds Nodes.
    */
-  protected static class Edge extends AbstractEdge<MNode> { //Serializable?
+  protected static class Edge extends AbstractEdge.AbstractFFEdge<MNode> { //Serializable?
     private double accErrorDer;
 
     Edge(MNode source, MNode destination, Optimizer optimizer, double weight) {

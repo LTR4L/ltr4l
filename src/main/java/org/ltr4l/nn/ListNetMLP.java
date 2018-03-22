@@ -181,7 +181,7 @@ public class ListNetMLP extends AbstractMLP<ListNetMLP.LNode, ListNetMLP.LEdge> 
    * Difference between LEdge and Edge is the fact that two derivatives are held.
    * See accErrorDerLabel and accErrorDerPredict.
    */
-  static class LEdge extends AbstractEdge<LNode> {
+  static class LEdge extends AbstractEdge.AbstractFFEdge<LNode> {
     private double accErrorDerLabel;   //Σexp(y)∂f/∂w
     private double accErrorDerPredict; //Σexp(f(x))∂f/∂w
 
