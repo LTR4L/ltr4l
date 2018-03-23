@@ -46,13 +46,8 @@ public class MLP extends AbstractMLP<MLP.MNode, MLP.Edge> {
     return new Edge(source, destination, opt, weight);
   }
 
-  //This is for one output node.
-  public void backProp(double target, Error errorFunc) {
-    MNode outputNode = network.get(network.size() - 1).get(0);
-    double output = outputNode.getOutput();
-    //First, get the derivative ∂C/∂O and set it to output derivative of the final node.
-    double der = errorFunc.der(output, target);
-    outputNode.setOutputDer(der);
+  public void backProp(Error errorFunc, double... target) {
+    setOutputLayerDerivatives(errorFunc, target);
 
     for (int layerIdx = network.size() - 1; layerIdx >= 1; layerIdx--) { //When going through each layer, you modify the previous layer.
       List<MNode> layer = network.get(layerIdx);

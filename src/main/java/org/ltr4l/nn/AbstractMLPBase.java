@@ -162,20 +162,16 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
     return forwardProp(features);
   }
 
-  //This is for the case of multiple output layers.
-  public void backProp(double[] targets, Error errorFunc) {
-    //First, feed derivative into each node in output layer
-    //Skip the first node, as the derivative will be set through backprop method.
+  protected void setOutputLayerDerivatives(Error errorFunc, double... targets){
+    assert(targets.length == network.get(network.size() - 1).size());
+    //Set the derivative for all nodes in the output layer.
     List<N> outputLayer = network.get(network.size() - 1);
-    for (int i = 1; i < outputLayer.size(); i++) {
+    for (int i = 0; i < outputLayer.size(); i++) {
       N outputNode = outputLayer.get(i);
       double output = outputNode.getOutput();
       double der = errorFunc.der(output, targets[i]);
       outputNode.setOutputDer(der);
     }
-    //Then conduct backpropagation as usual.
-    backProp(targets[0], errorFunc);
-
   }
 
 }

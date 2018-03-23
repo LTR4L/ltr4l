@@ -22,6 +22,6 @@ import java.util.List;
 
 public interface MLPInterface {
   double forwardProp(List<Double> features);
-  void backProp(double target, Error errorFunc);
+  void backProp(Error errorFunc, double... target);
   void updateWeights(double lrRate, double rgRate);
 }

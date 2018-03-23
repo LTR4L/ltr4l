@@ -16,18 +16,10 @@
 
 package org.ltr4l.nn;
 
-import org.ltr4l.Ranker;
-import org.ltr4l.query.Document;
-import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
 /**
  * This is the AbstractMLP class for standard Feed-Forward Neural Networks.
