@@ -15,10 +15,8 @@
  */
 package org.ltr4l;
 
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,14 +49,6 @@ public abstract class Ranker<C extends Config> {
   }
 
   public abstract double predict(List<Double> features);
-
-  public void readModel(String file) throws IOException {
-    try(Reader reader = new FileReader(file)){
-      readModel(reader);
-    }
-  }
-
-  public abstract void readModel(Reader reader) throws IOException;
 
   private static String makeRegex(String regex, int num){
     StringBuilder splitter = new StringBuilder();

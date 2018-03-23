@@ -66,8 +66,7 @@ public class PRankTest {
     StringWriter savedModel = new StringWriter();
     prankW.writeModel(config, savedModel);
 
-    PRank prankR = new PRank(5, 4);    // TODO: indicating sizes in constructor looks strange...
-    prankR.readModel(new StringReader(savedModel.toString()));
+    PRank prankR = PRank.readModel(new StringReader(savedModel.toString()));
 
     Assert.assertEquals(6, prankR.weights.length);
     Assert.assertEquals(1.1, prankR.weights[0], 0.001);

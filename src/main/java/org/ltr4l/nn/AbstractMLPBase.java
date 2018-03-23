@@ -17,7 +17,6 @@
 package org.ltr4l.nn;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -105,9 +104,8 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
     mapper.writeValue(writer, savedModel);
   }
 
-  @Override
-  public void readModel(Reader reader) throws IOException {
-    /* TODO: implement
+  /* TODO: implement
+  public static List<List<N>> readModel(Reader reader) throws IOException {
     int dim = 3;
     model = model.substring(dim, model.length() - dim);
     List<Object> modelList = toList(model, dim);
@@ -123,8 +121,8 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
         }
       }
     }
-    */
   }
+  */
 
   @Override
   public double predict(List<Double> features){
