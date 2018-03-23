@@ -49,4 +49,15 @@ public class WeightInitializerTest {
     WeightInitializer weightInit2 = WeightInitializer.get(WeightInitializer.DEFAULT.name(), 100);
     Assert.assertEquals(0.01, weightInit2.getInitialBias(), 0.001);
   }
+
+  @Test
+  public void testSequenceWeight() throws Exception {
+    WeightInitializer weightInit1 = WeightInitializer.get(WeightInitializer.Type.sequence.name(), 100);
+    Assert.assertEquals(0, weightInit1.getInitialBias(), 0.001);
+    Assert.assertEquals(1, weightInit1.getNextRandomInitialWeight(), 0.001);
+    Assert.assertEquals(2, weightInit1.getNextRandomInitialWeight(), 0.001);
+    Assert.assertEquals(3, weightInit1.getInitialBias(), 0.001);
+    Assert.assertEquals(4, weightInit1.getNextRandomInitialWeight(), 0.001);
+    Assert.assertEquals(5, weightInit1.getNextRandomInitialWeight(), 0.001);
+  }
 }
