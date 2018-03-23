@@ -16,9 +16,13 @@
 
 package org.ltr4l.nn;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
@@ -93,18 +97,11 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
   }
 
   @Override
-  public void writeModel(MLPTrainer.MLPConfig config, String file) {
-    /* TODO: implement
-    try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
-      props.store(pw, "Saved model");
-      pw.println("model=" + obtainWeights()); //To ensure model gets written at the end.
-      //props.setProperty("model", obtainWeights().toString());
-      //props.store(pw, "Saved model");
-
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-    */
+  public void writeModel(MLPTrainer.MLPConfig config, String file) throws IOException {
+    SavedModel savedModel = new SavedModel(config, obtainWeights());
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    mapper.writeValue(new File(file), savedModel);
   }
 
   @Override
@@ -173,4 +170,12 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
     }
   }
 
+  private static class SavedModel {
+    public MLPTrainer.MLPConfig config;
+    public List<List<List<Double>>> weights;
+    SavedModel(MLPTrainer.MLPConfig config, List<List<List<Double>>> weights){
+      this.config = config;
+      this.weights = weights;
+    }
+  }
 }

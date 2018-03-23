@@ -16,6 +16,8 @@
 
 package org.ltr4l.trainers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -93,18 +95,22 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends LTRTrainer<M, ML
 
   public static class MLPConfig extends Config {
 
+    @JsonIgnore
     public double getLearningRate(){
       return getReqDouble(params, "learningRate");
     }
 
+    @JsonIgnore
     public Map<String, Object> getRegularization(){
       return getReqParams(params, "regularization");
     }
 
+    @JsonIgnore
     public double getReguRate(){
       return getReqDouble(getRegularization(), "rate");
     }
 
+    @JsonIgnore
     public NetworkShape getNetworkShape(){
       List<Map<String, Object>> layers = getReqArrayParams(params, "layers");
       List<NetworkShape.LayerSetting> layerSettings = new ArrayList<>();
@@ -118,16 +124,19 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends LTRTrainer<M, ML
       return new NetworkShape(layerSettings);
     }
 
+    @JsonIgnore
     public Optimizer.OptimizerFactory getOptFact(){
       Optimizer.Type optType = Optimizer.Type.valueOf(getString(params, "optimizer", Optimizer.DEFAULT.name()));
       return Optimizer.getFactory(optType);
     }
 
+    @JsonIgnore
     public Regularization getReguFunction(){
       Regularization.Type reguType = Regularization.Type.valueOf(getString(getRegularization(), "regularizer", Regularization.DEFAULT.name()));
       return Regularization.RegularizationFactory.getRegularization(reguType);
     }
 
+    @JsonIgnore
     public String getWeightInit(){
       return getString(params, "weightInit", WeightInitializer.DEFAULT.name());
     }

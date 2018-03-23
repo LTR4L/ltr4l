@@ -16,12 +16,16 @@
 
 package org.ltr4l.trainers;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
@@ -101,19 +105,11 @@ class PRank extends Ranker<Config> {
   }
 
   @Override
-  public void writeModel(Config config, String file) {
-    /* TODO: implement
-    try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
-      props.store(pw, "Saved model");
-      pw.println("model=" + Arrays.toString(weights)); //To ensure model gets written at the end.
-      pw.println("thresholds=" + Arrays.toString(thresholds));
-      //props.setProperty("model", obtainWeights().toString());
-      //props.store(pw, "Saved model");
-
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-    */
+  public void writeModel(Config config, String file) throws IOException {
+    SavedModel savedModel = new SavedModel(config, weights, thresholds);
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    mapper.writeValue(new File(file), savedModel);
   }
 
   //Weight and thresholds must be given as string, separated by "++"
@@ -181,4 +177,14 @@ class PRank extends Ranker<Config> {
     return wx;
   }
 
+  private static class SavedModel {
+    public Config config;
+    public double[] weights;
+    public double[] thresholds;
+    SavedModel(Config config, double[] weights, double[] thresholds){
+      this.config = config;
+      this.weights = weights;
+      this.thresholds = thresholds;
+    }
+  }
 }
