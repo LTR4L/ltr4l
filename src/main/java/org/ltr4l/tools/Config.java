@@ -43,6 +43,7 @@ public class Config {
   private final int PNum;
   private final String name;
   private final Properties props;
+  private final int batchSize;
 
   public static Config get(String file){
     try(InputStream is = new FileInputStream(file)){
@@ -75,6 +76,7 @@ public class Config {
     networkShape = NetworkShape.parseSetting(props.getProperty("layers"));
     bernNum = getDoubleProp(props, "bernoulli", 0.03);
     PNum = getIntProp(props, "N", 1);   // TODO: default value 1 is appropriate?
+    batchSize = getIntProp(props, "batchSize", 0);
   }
 
   static String getStrProp(Properties props, String name, String defValue){
@@ -155,6 +157,8 @@ public class Config {
   public String getName() {
     return name;
   }
+
+  public int getBatchSize() { return batchSize; }
 
   public Properties getProps() {
     return props;
