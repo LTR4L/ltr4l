@@ -21,6 +21,7 @@ import java.io.Writer;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.ltr4l.Ranker;
@@ -104,26 +105,6 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
     mapper.writeValue(writer, savedModel);
   }
 
-  /* TODO: implement
-  public static List<List<N>> readModel(Reader reader) throws IOException {
-    int dim = 3;
-    model = model.substring(dim, model.length() - dim);
-    List<Object> modelList = toList(model, dim);
-    List<List<List<Double>>> weights = modelList.stream().map(layer -> ((List<List<Double>>) layer)).collect(Collectors.toList());
-    for (int layerId = 0; layerId < network.size() - 1; layerId++){ //Do not process last layer
-      List<N> layer = network.get(layerId);
-      for (int nodeId = 0; nodeId < layer.size(); nodeId++){
-        N node = layer.get(nodeId);
-        List<E> outputEdges = node.getOutputEdges();
-        for (int edgeId = 0; edgeId < outputEdges.size(); edgeId ++){
-          E edge = outputEdges.get(edgeId);
-          edge.setWeight(weights.get(layerId).get(nodeId).get(edgeId));
-        }
-      }
-    }
-  }
-  */
-
   @Override
   public double predict(List<Double> features){
     return forwardProp(features);
@@ -171,12 +152,32 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
     }
   }
 
-  private static class SavedModel {
+  protected static class SavedModel {
+
     public MLPTrainer.MLPConfig config;
     public List<List<List<Double>>> weights;
+
+    SavedModel(){  // this is needed for Jackson...
+    }
+
     SavedModel(MLPTrainer.MLPConfig config, List<List<List<Double>>> weights){
       this.config = config;
       this.weights = weights;
+    }
+
+    @JsonIgnore
+    public List<List<Double>> getLayer(int i){
+      return weights.get(i);
+    }
+
+    @JsonIgnore
+    public List<Double> getNode(int i, int j){
+      return weights.get(i).get(j);
+    }
+
+    @JsonIgnore
+    public double getWeight(int i, int j, int k){
+      return weights.get(i).get(j).get(k);
     }
   }
 }

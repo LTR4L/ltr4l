@@ -112,6 +112,7 @@ class PRank extends Ranker<Config> {
     mapper.writeValue(writer, savedModel);
   }
 
+  // TODO: use Factory...?
   public static PRank readModel(Reader reader) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     SavedModel savedModel = mapper.readValue(reader, SavedModel.class);
