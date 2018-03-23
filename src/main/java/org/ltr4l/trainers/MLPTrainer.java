@@ -18,6 +18,7 @@ package org.ltr4l.trainers;
 
 import java.util.List;
 
+import org.ltr4l.nn.AbstractMLP;
 import org.ltr4l.nn.MLP;
 import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
@@ -35,7 +36,7 @@ import org.ltr4l.tools.Regularization;
  * As the training method can be different depending on the algorithm used,
  * the method train() must be implemented by child classes.
  */
-abstract class MLPTrainer<M extends MLP> extends LTRTrainer<M> {
+abstract class MLPTrainer<M extends AbstractMLP> extends LTRTrainer<M> {
   protected double maxScore;
   protected double lrRate;
   protected double rgRate;
@@ -60,7 +61,7 @@ abstract class MLPTrainer<M extends MLP> extends LTRTrainer<M> {
   }
 
   @Override
-  protected MLP constructRanker(){
+  protected AbstractMLP constructRanker(){
     int featureLength = trainingSet.get(0).getFeatureLength();
     NetworkShape networkShape = config.getNetworkShape();
     Optimizer.OptimizerFactory optFact = config.getOptFact();

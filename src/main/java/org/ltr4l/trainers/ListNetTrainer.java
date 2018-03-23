@@ -32,7 +32,7 @@ import org.ltr4l.tools.Regularization;
  * Despite note extending MLPTrainer, this trainer
  * trains an MLP network.
  */
-public class ListNetTrainer extends LTRTrainer<ListNetMLP> {
+public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
   private double lrRate;
   private double rgRate;
 
@@ -68,23 +68,5 @@ public class ListNetTrainer extends LTRTrainer<ListNetMLP> {
       ranker.updateWeights(lrRate, rgRate);
     }
   }
-
-  @Override
-  protected double calculateLoss(List<Query> querySet) {
-    double loss = 0;
-    for (Query query : querySet) {
-      double targetSum = query.getDocList().stream().mapToDouble(i -> Math.exp(i.getLabel())).sum();
-      double outputSum = query.getDocList().stream().mapToDouble(i -> Math.exp(ranker.forwardProp(i))).sum();
-      double qLoss = query.getDocList().stream().mapToDouble(i -> errorFunc.error( //-Py(log(Pfx))
-          Math.exp(ranker.forwardProp(i)) / outputSum, //output: exp(f(x)) / sum(f(x))
-          i.getLabel() / targetSum))                 //target: y / sum(exp(y))
-          .sum(); //sum over all documents                // Should it be exp(y)/sum(exp(y))?
-      loss += qLoss;
-    }
-    return loss / querySet.size();
-  }
-
-
-
 }
 
