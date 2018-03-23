@@ -87,9 +87,9 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
    * @return List of weights.
    */
   protected List<List<List<Double>>> obtainWeights(){
-    return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null)
+    return network.stream().filter(layer -> !layer.get(0).getInputEdges().isEmpty())
         .map(layer -> layer.stream()
-            .map(node -> ((List<E>) node.getOutputEdges()).stream()
+            .map(node -> ((List<E>) node.getInputEdges()).stream()
                 .map(edge -> edge.getWeight())
                 .collect(Collectors.toList()))
             .collect(Collectors.toList()))
