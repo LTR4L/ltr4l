@@ -16,8 +16,9 @@
 
 package org.ltr4l.nn;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -97,15 +98,16 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
   }
 
   @Override
-  public void writeModel(MLPTrainer.MLPConfig config, String file) throws IOException {
+  public void writeModel(MLPTrainer.MLPConfig config, Writer writer) throws IOException {
     SavedModel savedModel = new SavedModel(config, obtainWeights());
     ObjectMapper mapper = new ObjectMapper();
     mapper.enable(SerializationFeature.INDENT_OUTPUT);
-    mapper.writeValue(new File(file), savedModel);
+    mapper.writeValue(writer, savedModel);
   }
 
   @Override
-  public void readModel(String model){
+  public void readModel(Reader reader) throws IOException {
+    /* TODO: implement
     int dim = 3;
     model = model.substring(dim, model.length() - dim);
     List<Object> modelList = toList(model, dim);
@@ -121,6 +123,7 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
         }
       }
     }
+    */
   }
 
   @Override

@@ -16,12 +16,12 @@
 
 package org.ltr4l.trainers;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -105,29 +105,19 @@ class PRank extends Ranker<Config> {
   }
 
   @Override
-  public void writeModel(Config config, String file) throws IOException {
+  public void writeModel(Config config, Writer writer) throws IOException {
     SavedModel savedModel = new SavedModel(config, weights, thresholds);
     ObjectMapper mapper = new ObjectMapper();
     mapper.enable(SerializationFeature.INDENT_OUTPUT);
-    mapper.writeValue(new File(file), savedModel);
+    mapper.writeValue(writer, savedModel);
   }
 
-  //Weight and thresholds must be given as string, separated by "++"
   @Override
-  public void readModel(String model){
-    final String regex = "";
-    String weights = model.split(regex)[0];
-    String thresholds = model.split(regex)[1];
-    assign(weights, this.weights);
-    assign(thresholds, this.thresholds);
-  }
-
-  private void assign(String model, double[] modelType){
-    int dim = 1;
-    model = model.substring(dim, model.length() - dim);
-    List<Object> modelList = toList(model, dim);
-    List<Double> modelD = modelList.stream().map(weight -> (Double) weight).collect(Collectors.toList());
-    for (int i = 0; i < modelType.length; i++) modelType[i] = modelD.get(i);
+  public void readModel(Reader reader) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    SavedModel savedModel = mapper.readValue(reader, SavedModel.class);
+    weights = savedModel.weights;
+    thresholds = savedModel.thresholds;
   }
 
   public void updateWeights(Document doc) {
@@ -181,6 +171,8 @@ class PRank extends Ranker<Config> {
     public Config config;
     public double[] weights;
     public double[] thresholds;
+    SavedModel(){  // this is needed for Jackson...
+    }
     SavedModel(Config config, double[] weights, double[] thresholds){
       this.config = config;
       this.weights = weights;

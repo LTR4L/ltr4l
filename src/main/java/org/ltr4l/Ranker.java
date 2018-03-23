@@ -15,7 +15,11 @@
  */
 package org.ltr4l;
 
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,13 +38,27 @@ import org.ltr4l.tools.Config;
 public abstract class Ranker<C extends Config> {
   protected static final String DEFAULT_MODEL_FILE = "model.txt";
 
-  public abstract void writeModel(C config, String file) throws IOException;
+  public void writeModel(C config, String file) throws IOException {
+    try(Writer writer = new FileWriter(file)){
+      writeModel(config, writer);
+    }
+  }
+
+  public abstract void writeModel(C config, Writer writer) throws IOException;
+
   public void writeModel(C config) throws IOException {
     writeModel(config, DEFAULT_MODEL_FILE);
   }
+
   public abstract double predict(List<Double> features);
 
-  protected abstract void readModel(String model);
+  public void readModel(String file) throws IOException {
+    try(Reader reader = new FileReader(file)){
+      readModel(reader);
+    }
+  }
+
+  public abstract void readModel(Reader reader) throws IOException;
 
   private static String makeRegex(String regex, int num){
     StringBuilder splitter = new StringBuilder();
