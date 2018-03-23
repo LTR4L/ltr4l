@@ -78,15 +78,18 @@ public class NNRankTrainer extends MLPTrainer<MLP> {
 
   @Override
   public void train() {
+    int numTrained = 0;
     for (Query query : trainingSet) {
       for (Document doc : query.getDocList()) {
         int output = (int) ranker.predict(doc.getFeatures());
         int label = doc.getLabel();
         if (output != label) {
           ranker.backProp(errorFunc, targetLabel(label));
-          ranker.updateWeights(lrRate, rgRate);
+          numTrained++;
+          if (batchSize == 0 || (batchSize != 0 && numTrained % batchSize == 0)) ranker.updateWeights(lrRate, rgRate);
         }
       }
     }
+    if (batchSize != 0) ranker.updateWeights(lrRate, rgRate);
   }
 }

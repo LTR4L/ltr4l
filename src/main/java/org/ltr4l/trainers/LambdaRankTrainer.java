@@ -40,6 +40,7 @@ public class LambdaRankTrainer extends RankNetTrainer {
 
   @Override
   public void train() {
+    int numTrained = 0;
     for (int iq = 0; iq < trainingSet.size(); iq++) {
       if (trainingPairs.get(iq) == null)
         continue;
@@ -74,9 +75,11 @@ public class LambdaRankTrainer extends RankNetTrainer {
       for (Document doc : query.getDocList()) {
         ranker.forwardProp(doc);
         ranker.backProp(lambdas.get(doc));
+        numTrained++;
+        if (batchSize != 0 && numTrained % batchSize == 0) ranker.updateWeights(lrRate, rgRate);
       }
     }
-    ranker.updateWeights(lrRate, rgRate);
+    ranker.updateWeights(lrRate, rgRate); //Update at the end of the epoch, regardless of batchSize.
   }
 
   /**
