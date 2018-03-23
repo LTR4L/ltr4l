@@ -143,10 +143,8 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
   //This only sets the first node.
   //Use backProp(double target, Error errorFunc)!!
   @Override
-  public void backProp(double target, Error errorFunc) {
-    SNode outputNode1 = getNode(network.size() - 1, 0);
-    double der = errorFunc.der(outputNode1.getOutput(), target);
-    outputNode1.setOutputDer(der);
+  public void backProp(Error errorFunc, double... target) {
+    setOutputLayerDerivatives(errorFunc, target);
     for (int layerIdx = network.size() - 1; layerIdx >= 1; layerIdx--) { //When going through each layer, you modify the previous layer.
       List<SNode> layer = network.get(layerIdx);
 

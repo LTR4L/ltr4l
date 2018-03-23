@@ -68,16 +68,16 @@ public class ListNetMLP extends AbstractMLP<ListNetMLP.LNode, ListNetMLP.LEdge> 
   }
 
   public void backProp(double target) {
-    backProp(target, null);
+    backProp(null, target);
   }
 
   //This is for one output node.
-  public void backProp(double target, Error errorFunc) {
+  public void backProp(Error errorFunc, double... target) {
     LNode outputNode = network.get(network.size() - 1).get(0);
     double output = outputNode.getOutput();
 
     double expOutput = Math.exp(output);
-    double expTarget = Math.exp(target);
+    double expTarget = Math.exp(target[0]);
 
     //Σexp(f(x)) and Σexp(py)
     accErrorDer_exSum += expOutput;

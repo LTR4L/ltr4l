@@ -84,9 +84,9 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP> {
         double prediction = ranker.predict(doc1, doc2);
         if (delta * prediction < threshold) {
           if (delta > 0)
-            ranker.backProp(targets[0], errorFunc);
+            ranker.backProp(errorFunc, targets[0]);
           else
-            ranker.backProp(targets[1], errorFunc);
+            ranker.backProp(errorFunc, targets[1]);
 
           ranker.updateWeights(lrRate, rgRate);
         }
