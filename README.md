@@ -607,7 +607,7 @@ Strengths: Faster than ranknet, updates less frequently.
 Weaknesses:  
 Network Input: A single document's features  
 Network Output: Relevance Score  
-Weights updated per query  
+Weights updated per epoch 
 
 FRankNet is a modification of RankNet. The structure of the network in FRankNet is unchanged from RankNet.
 The difference lies in the way that the weights are updated. RankNet looks at how well the current model predicts
@@ -677,7 +677,7 @@ Strengths: Faster than ranknet, updates less frequently.
 Weaknesses:  
 Network Input: A single document's features  
 Network Output: Relevance Score  
-Weights updated per query  
+Weights updated per epoch 
 
 LambdaRank is a modification of FRankNet. The structure of the network remains unchanged.
 
