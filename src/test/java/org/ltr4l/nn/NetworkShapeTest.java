@@ -27,6 +27,7 @@ public class NetworkShapeTest {
     Assert.assertEquals(1, ns1.size());
     Assert.assertEquals(3, ns1.getLayerSetting(0).getNum());
     Assert.assertTrue(ns1.getLayerSetting(0).getActivation() instanceof Activation.Identity);
+    Assert.assertEquals("[(org.ltr4l.nn.Activation.Identity,3)]", ns1.toString());
   }
 
   @Test
@@ -37,6 +38,7 @@ public class NetworkShapeTest {
     Assert.assertTrue(ns1.getLayerSetting(0).getActivation() instanceof Activation.Identity);
     Assert.assertEquals(5, ns1.getLayerSetting(1).getNum());
     Assert.assertTrue(ns1.getLayerSetting(1).getActivation() instanceof Activation.Sigmoid);
+    Assert.assertEquals("[(org.ltr4l.nn.Activation.Identity,3), (org.ltr4l.nn.Activation.Sigmoid,5)]", ns1.toString());
   }
 
   @Test
@@ -49,5 +51,7 @@ public class NetworkShapeTest {
     Assert.assertTrue(ns1.getLayerSetting(1).getActivation() instanceof Activation.Identity);
     Assert.assertEquals(10, ns1.getLayerSetting(2).getNum());
     Assert.assertTrue(ns1.getLayerSetting(2).getActivation() instanceof Activation.Sigmoid);
+    Assert.assertEquals("[(org.ltr4l.nn.Activation.ReLU,9), (org.ltr4l.nn.Activation.Identity,4), (org.ltr4l.nn.Activation.Sigmoid,10)]",
+        ns1.toString());
   }
 }

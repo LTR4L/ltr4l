@@ -16,17 +16,20 @@
 
 package org.ltr4l.trainers;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
+import org.ltr4l.tools.Error;
 import org.ltr4l.tools.RankEval;
 import org.ltr4l.tools.Report;
-import org.ltr4l.tools.Error;
 
 /**
  * Abstract class used for training the model held by Rankers.
@@ -34,26 +37,26 @@ import org.ltr4l.tools.Error;
  *
  * train() must be implemented based on algorithm used.
  */
-public abstract class LTRTrainer<R extends Ranker> implements Trainer {
+public abstract class LTRTrainer<R extends Ranker, C extends Config> implements Trainer {
   protected final int epochNum;
   protected final List<Query> trainingSet;
   protected final List<Query> validationSet;
   protected double maxScore;
   protected final Report report;
   protected final R ranker;
-  protected final Config config;
+  protected final C config;
   protected final Error errorFunc;
   protected final int batchSize;
 
-  LTRTrainer(QuerySet training, QuerySet validation, Config config) {
-    this.config = config;
-    epochNum = config.getNumIterations();
+  LTRTrainer(QuerySet training, QuerySet validation, String file) {
+    this.config = getConfig(file);
+    epochNum = config.numIterations;
     trainingSet = training.getQueries();
     validationSet = validation.getQueries();
     maxScore = 0d;
     ranker = constructRanker();
-    assert(config.getBatchSize() >= 0);
-    batchSize = config.getBatchSize();
+    assert(config.batchSize >= 0);
+    batchSize = config.batchSize;
     this.report = Report.getReport();  // TODO: use default Report for now...
     this.errorFunc = makeErrorFunc();
   }
@@ -89,10 +92,25 @@ public abstract class LTRTrainer<R extends Ranker> implements Trainer {
       validate(i);
     }
     report.close();
-    ranker.writeModel(config.getProps());
+    try {
+      ranker.writeModel(config);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
-  abstract protected <R extends Ranker> R constructRanker();
+  protected abstract <R extends Ranker> R constructRanker();
+
+  public abstract <C extends Config> Class<C> getConfigClass();
+
+  <C extends Config> C getConfig(String file){
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      return mapper.readValue(new File(file), getConfigClass());
+    } catch (IOException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
 
   /**
    * Sorts the associated documents in a  query according to the ranker's model via predict method, from highest score to lowest.

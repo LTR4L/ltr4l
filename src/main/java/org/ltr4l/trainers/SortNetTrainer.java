@@ -25,8 +25,6 @@ import org.ltr4l.nn.*;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-
-import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
@@ -35,14 +33,14 @@ import org.ltr4l.tools.Regularization;
  * This network trains an MLP network.
  *
  */
-public class SortNetTrainer extends LTRTrainer<SortNetMLP> {
+public class SortNetTrainer extends LTRTrainer<SortNetMLP, MLPTrainer.MLPConfig> {
   protected double maxScore;
   protected double lrRate;
   protected double rgRate;
   protected final double[][] targets;
 
-  SortNetTrainer(QuerySet training, QuerySet validation, Config config) {
-    super(training, validation, config);
+  SortNetTrainer(QuerySet training, QuerySet validation, String file) {
+    super(training, validation, file);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
@@ -116,6 +114,11 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP> {
       loss += queryLoss / (double) pairs.length;
     }
     return loss / (double) queries.size();
+  }
+
+  @Override
+  public Class<MLPTrainer.MLPConfig> getConfigClass() {
+    return MLPTrainer.MLPConfig.class;
   }
 
   @Override

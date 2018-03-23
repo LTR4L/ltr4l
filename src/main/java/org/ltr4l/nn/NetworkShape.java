@@ -27,6 +27,7 @@ import java.util.List;
  */
 public class NetworkShape {
 
+  @Deprecated
   public static NetworkShape parseSetting(String layers){
     if(layers == null){
       return new NetworkShape(new NetworkShape.LayerSetting(1, new Activation.Identity()));
@@ -47,6 +48,11 @@ public class NetworkShape {
       }
       return nShape;
     }
+  }
+
+  @Override
+  public String toString(){
+    return layerSettings.toString();
   }
 
   private final List<LayerSetting> layerSettings;
@@ -95,6 +101,11 @@ public class NetworkShape {
 
     public Activation getActivation(){
       return actFunc;
+    }
+
+    @Override
+    public String toString(){
+      return String.format("(%s,%d)", actFunc.getClass().getCanonicalName(), num);
     }
   }
 }

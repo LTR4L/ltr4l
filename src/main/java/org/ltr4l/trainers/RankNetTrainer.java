@@ -27,9 +27,8 @@ import org.ltr4l.nn.RankNetMLP;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Config;
-import org.ltr4l.tools.Regularization;
 import org.ltr4l.tools.Error;
+import org.ltr4l.tools.Regularization;
 
 /**
  * The implementation of MLPTrainer which uses the
@@ -40,9 +39,8 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   protected final List<Document[][]> trainingPairs;
   protected final List<Document[][]> validationPairs;
 
-  RankNetTrainer(QuerySet training, QuerySet validation, Config config) {
-    super(training, validation, config, true);
-
+  RankNetTrainer(QuerySet training, QuerySet validation, String file) {
+    super(training, validation, file, true);
 
     trainingPairs = new ArrayList<>();
     for (int i = 0; i < trainingSet.size(); i++) {
@@ -63,6 +61,7 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   protected RankNetMLP constructRanker(){
     int featureLength = trainingSet.get(0).getFeatureLength();
     NetworkShape networkShape = config.getNetworkShape();
+    networkShape.add(1, new Activation.Identity());
     Optimizer.OptimizerFactory optFact = config.getOptFact();
     Regularization regularization = config.getReguFunction();
     String weightModel = config.getWeightInit();

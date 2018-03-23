@@ -16,19 +16,20 @@
 
 package org.ltr4l.nn;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
+import org.ltr4l.trainers.MLPTrainer;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
-
-public abstract class AbstractMLPBase <N extends AbstractNode, E extends AbstractEdge> extends Ranker implements MLPInterface {
+public abstract class AbstractMLPBase <N extends AbstractNode, E extends AbstractEdge> extends Ranker<MLPTrainer.MLPConfig> implements MLPInterface {
 
   protected final List<List<N>> network;
   protected long iter;
@@ -96,16 +97,11 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
   }
 
   @Override
-  public void writeModel(Properties props, String file) {
-    try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
-      props.store(pw, "Saved model");
-      pw.println("model=" + obtainWeights()); //To ensure model gets written at the end.
-      //props.setProperty("model", obtainWeights().toString());
-      //props.store(pw, "Saved model");
-
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+  public void writeModel(MLPTrainer.MLPConfig config, String file) throws IOException {
+    SavedModel savedModel = new SavedModel(config, obtainWeights());
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    mapper.writeValue(new File(file), savedModel);
   }
 
   @Override
@@ -174,4 +170,12 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
     }
   }
 
+  private static class SavedModel {
+    public MLPTrainer.MLPConfig config;
+    public List<List<List<Double>>> weights;
+    SavedModel(MLPTrainer.MLPConfig config, List<List<List<Double>>> weights){
+      this.config = config;
+      this.weights = weights;
+    }
+  }
 }

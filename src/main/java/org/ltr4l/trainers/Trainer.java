@@ -16,12 +16,11 @@
 
 package org.ltr4l.trainers;
 
-import org.ltr4l.tools.Config;
+import java.util.List;
+
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-
-import java.util.List;
 
 
 public interface Trainer {
@@ -49,10 +48,10 @@ public interface Trainer {
      * @param algorithm Algorithm/implementation to be used.
      * @param trainingSet The QuerySet containing the data to be used for training.
      * @param validationSet The QuerySet containing the data to be used for validation.
-     * @param config The Config class containing parameters needed for Ranker class.
+     * @param config The Config file containing parameters needed for Ranker class.
      * @return new class which implements trainer.
      */
-    public static Trainer getTrainer(String algorithm, QuerySet trainingSet, QuerySet validationSet, Config config) {
+    public static Trainer getTrainer(String algorithm, QuerySet trainingSet, QuerySet validationSet, String config) {
       switch (algorithm.toLowerCase()) {
         case "prank":
           return new PRankTrainer(trainingSet, validationSet, config);
