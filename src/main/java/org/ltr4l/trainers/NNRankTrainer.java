@@ -83,7 +83,7 @@ public class NNRankTrainer extends MLPTrainer<MLP> {
         int output = (int) ranker.predict(doc.getFeatures());
         int label = doc.getLabel();
         if (output != label) {
-          ranker.backProp(targetLabel(label), errorFunc);
+          ranker.backProp(errorFunc, targetLabel(label));
           ranker.updateWeights(lrRate, rgRate);
         }
       }

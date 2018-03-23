@@ -163,6 +163,7 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
   }
 
   protected void setOutputLayerDerivatives(Error errorFunc, double... targets){
+    assert(targets.length == network.get(network.size() - 1).size());
     //Set the derivative for all nodes in the output layer.
     List<N> outputLayer = network.get(network.size() - 1);
     for (int i = 0; i < outputLayer.size(); i++) {
