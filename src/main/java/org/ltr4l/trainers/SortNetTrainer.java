@@ -68,6 +68,7 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP> {
   @Override
   public void train() {
     double threshold = 0.5;
+    int numTrained = 0;
     for (Query query : trainingSet) {
       List<Document> docList = query.getDocList();
       for (int i = 0; i < docList.size(); i++) {
@@ -79,19 +80,22 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP> {
           doc2 = docList.get(new Random().nextInt(docList.size()));
 
         double delta = doc1.getLabel() - doc2.getLabel();
-        if (delta == 0) //if the label is the same, skip.
+        if (delta == 0) { //if the label is the same, skip.
+
           continue;
+        }
         double prediction = ranker.predict(doc1, doc2);
         if (delta * prediction < threshold) {
           if (delta > 0)
             ranker.backProp(errorFunc, targets[0]);
           else
             ranker.backProp(errorFunc, targets[1]);
-
-          ranker.updateWeights(lrRate, rgRate);
+          numTrained++;
+          if (batchSize == 0 || numTrained % batchSize == 0) ranker.updateWeights(lrRate, rgRate);
         }
       }
     }
+    if (batchSize != 0) ranker.updateWeights(lrRate, rgRate);
   }
 
   public double calculateLoss(List<Query> queries) {
