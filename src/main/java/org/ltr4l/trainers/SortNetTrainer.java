@@ -91,7 +91,7 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP> {
           else
             ranker.backProp(errorFunc, targets[1]);
           numTrained++;
-          if (batchSize == 0 || (batchSize != 0 && numTrained % batchSize == 0)) ranker.updateWeights(lrRate, rgRate);
+          if (batchSize == 0 || numTrained % batchSize == 0) ranker.updateWeights(lrRate, rgRate);
         }
       }
     }

@@ -52,6 +52,7 @@ public abstract class LTRTrainer<R extends Ranker> implements Trainer {
     validationSet = validation.getQueries();
     maxScore = 0d;
     ranker = constructRanker();
+    assert(config.getBatchSize() >= 0);
     batchSize = config.getBatchSize();
     this.report = Report.getReport();  // TODO: use default Report for now...
     this.errorFunc = makeErrorFunc();
