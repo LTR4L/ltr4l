@@ -112,12 +112,14 @@ class PRank extends Ranker<Config> {
     mapper.writeValue(writer, savedModel);
   }
 
-  @Override
-  public void readModel(Reader reader) throws IOException {
+  public static PRank readModel(Reader reader) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     SavedModel savedModel = mapper.readValue(reader, SavedModel.class);
-    weights = savedModel.weights;
-    thresholds = savedModel.thresholds;
+    // TODO: don't want to do that...
+    PRank prank = new PRank(savedModel.weights.length, savedModel.thresholds.length);
+    prank.weights = savedModel.weights;
+    prank.thresholds = savedModel.thresholds;
+    return prank;
   }
 
   public void updateWeights(Document doc) {
