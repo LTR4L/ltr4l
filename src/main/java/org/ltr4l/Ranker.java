@@ -34,7 +34,6 @@ import org.ltr4l.tools.Config;
  * Rankers are the model holders.
  */
 public abstract class Ranker<C extends Config> {
-  protected static final String DEFAULT_MODEL_FILE = "model.txt";
 
   public void writeModel(C config, String file) throws IOException {
     try(Writer writer = new FileWriter(file)){
@@ -43,10 +42,6 @@ public abstract class Ranker<C extends Config> {
   }
 
   public abstract void writeModel(C config, Writer writer) throws IOException;
-
-  public void writeModel(C config) throws IOException {
-    writeModel(config, DEFAULT_MODEL_FILE);
-  }
 
   public abstract double predict(List<Double> features);
 

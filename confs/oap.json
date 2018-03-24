@@ -14,7 +14,7 @@
 
   "model" : {
     "format" : "json",
-    "file" : "oap-model.json"
+    "file" : "model/oap-model.json"
   },
 
   "evaluation" : {

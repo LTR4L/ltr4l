@@ -25,7 +25,7 @@
 
   "model" : {
     "format" : "json",
-    "file" : "ranknet-model.json"
+    "file" : "model/ranknet-model.json"
   },
 
   "evaluation" : {

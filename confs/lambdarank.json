@@ -25,7 +25,7 @@
 
   "model" : {
     "format" : "json",
-    "file" : "lambdarank-model.json"
+    "file" : "model/lambdarank-model.json"
   },
 
   "evaluation" : {

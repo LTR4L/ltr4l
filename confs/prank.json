@@ -10,7 +10,7 @@
 
   "model" : {
     "format" : "json",
-    "file" : "prank-model.json"
+    "file" : "model/prank-model.json"
   },
 
   "evaluation" : {

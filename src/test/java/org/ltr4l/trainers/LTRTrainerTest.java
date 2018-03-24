@@ -33,7 +33,7 @@ public class LTRTrainerTest {
 
   @Test
   public void testGetKofNDCGatK() throws Exception {
-    final String JSON1 = "{\n" +
+    final String JSON = "{\n" +
         "  \"algorithm\" : \"FRankNet\",\n" +
         "  \"numIterations\" : 100,\n" +
         "\n" +
@@ -45,19 +45,46 @@ public class LTRTrainerTest {
         "  }\n" +
         "}\n";
 
-    LTRTrainer trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON1));
+    LTRTrainer trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
     Assert.assertEquals(7, trainer.ndcgK);
   }
 
   @Test
   public void testDefaultKofNDCGatK() throws Exception {
-    final String JSON1 = "{\n" +
+    final String JSON = "{\n" +
         "  \"algorithm\" : \"FRankNet\",\n" +
         "  \"numIterations\" : 100\n" +
         "}\n";
 
-    LTRTrainer trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON1));
+    LTRTrainer trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
     Assert.assertEquals(10, trainer.ndcgK);
+  }
+
+  @Test
+  public void testGetModelFile() throws Exception {
+    final String JSON = "{\n" +
+        "  \"algorithm\" : \"FRankNet\",\n" +
+        "  \"numIterations\" : 100,\n" +
+        "\n" +
+        "  \"model\" : {\n" +
+        "    \"format\" : \"json\",\n" +
+        "    \"file\" : \"model/franknet-model.json\"\n" +
+        "  }\n" +
+        "}\n";
+
+    LTRTrainer trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
+    Assert.assertEquals("model/franknet-model.json", trainer.modelFile);
+  }
+
+  @Test
+  public void testDefaultModelFile() throws Exception {
+    final String JSON = "{\n" +
+        "  \"algorithm\" : \"FRankNet\",\n" +
+        "  \"numIterations\" : 100\n" +
+        "}\n";
+
+    LTRTrainer trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
+    Assert.assertEquals("model/model.txt", trainer.modelFile);
   }
 
   private static class NullRanker extends Ranker<Config> {

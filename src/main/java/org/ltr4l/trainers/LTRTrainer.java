@@ -48,6 +48,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
   protected final Error errorFunc;
   protected final int batchSize;
   protected final int ndcgK;
+  protected final String modelFile;
 
   LTRTrainer(QuerySet training, QuerySet validation, Reader reader) {
     this.config = getConfig(reader);
@@ -59,6 +60,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
     assert(config.batchSize >= 0);
     batchSize = config.batchSize;
     ndcgK  = getNdcgAtK(config);
+    modelFile = getModelFile(config);
     this.report = Report.getReport();  // TODO: use default Report for now...
     this.errorFunc = makeErrorFunc();
   }
@@ -67,6 +69,12 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
     final int K_DEFAULT = 10;
     if(config.evaluation == null || config.evaluation.params == null) return K_DEFAULT;
     return Config.getInt(config.evaluation.params, "k", K_DEFAULT);   // TODO: allow users to specify another evaluator
+  }
+
+  private static String getModelFile(Config config){
+    if(config.model == null || config.model.file == null || config.model.file.isEmpty())
+      return Config.Model.DEFAULT_MODEL_FILE;
+    return config.model.file;
   }
 
   abstract double calculateLoss(List<Query> queries);
@@ -101,7 +109,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
     }
     report.close();
     try {
-      ranker.writeModel(config);
+      ranker.writeModel(config, modelFile);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

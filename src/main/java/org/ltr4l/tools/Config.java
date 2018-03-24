@@ -42,6 +42,7 @@ public class Config {
   }
 
   public static class Model {
+    public static final String DEFAULT_MODEL_FILE = "model/model.txt";
     public String format;
     public String file;
   }

@@ -25,7 +25,7 @@
 
   "model" : {
     "format" : "json",
-    "file" : "sortnet-model.json"
+    "file" : "model/sortnet-model.json"
   },
 
   "evaluation" : {
