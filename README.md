@@ -104,7 +104,7 @@ java -jar LTR4L-X.X.X.jar ranknet data/MQ2008/Fold1/train.txt data/MQ2008/Fold1/
 5- open the report file:
 
 ```
-open ranknet-report.csv
+open report/ranknet-report.csv
 ```
 
 #### Changing Parameters
@@ -138,7 +138,7 @@ Below is an example of a config file:
 
   "model" : {
     "format" : "json",
-    "file" : "ranknet-model.json"
+    "file" : "model/ranknet-model.json"
   },
 
   "evaluation" : {
@@ -150,7 +150,7 @@ Below is an example of a config file:
 
   "report" : {
     "format" : "csv",
-    "file" : "ranknet-report.csv"
+    "file" : "report/ranknet-report.csv"
   }
 }
 ```

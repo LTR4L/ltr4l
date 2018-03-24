@@ -61,7 +61,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
     batchSize = config.batchSize;
     ndcgK  = getNdcgAtK(config);
     modelFile = getModelFile(config);
-    this.report = Report.getReport();  // TODO: use default Report for now...
+    this.report = Report.getReport(getReportFile(config));
     this.errorFunc = makeErrorFunc();
   }
 
@@ -75,6 +75,10 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
     if(config.model == null || config.model.file == null || config.model.file.isEmpty())
       return Config.Model.DEFAULT_MODEL_FILE;
     return config.model.file;
+  }
+
+  private static String getReportFile(Config config){
+    return (config.report == null) ? null : config.report.file;
   }
 
   abstract double calculateLoss(List<Query> queries);

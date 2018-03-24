@@ -16,12 +16,14 @@
 
 package org.ltr4l.trainers;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ltr4l.Ranker;
@@ -30,6 +32,20 @@ import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.*;
 
 public class LTRTrainerTest {
+
+  private LTRTrainer trainer;
+
+  @After
+  public void tearDown(){
+    Report report = trainer.report;
+    if(report != null){
+      report.close();
+      if(report.getReportFile() != null){
+        File reportFile = new File(report.getReportFile());
+        reportFile.delete();
+      }
+    }
+  }
 
   @Test
   public void testGetKofNDCGatK() throws Exception {
@@ -45,7 +61,7 @@ public class LTRTrainerTest {
         "  }\n" +
         "}\n";
 
-    LTRTrainer trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
+    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
     Assert.assertEquals(7, trainer.ndcgK);
   }
 
@@ -56,7 +72,7 @@ public class LTRTrainerTest {
         "  \"numIterations\" : 100\n" +
         "}\n";
 
-    LTRTrainer trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
+    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
     Assert.assertEquals(10, trainer.ndcgK);
   }
 
@@ -72,7 +88,7 @@ public class LTRTrainerTest {
         "  }\n" +
         "}\n";
 
-    LTRTrainer trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
+    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
     Assert.assertEquals("model/franknet-model.json", trainer.modelFile);
   }
 
@@ -83,8 +99,35 @@ public class LTRTrainerTest {
         "  \"numIterations\" : 100\n" +
         "}\n";
 
-    LTRTrainer trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
+    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
     Assert.assertEquals("model/model.txt", trainer.modelFile);
+  }
+
+  @Test
+  public void testGetReportFile() throws Exception {
+    final String JSON = "{\n" +
+        "  \"algorithm\" : \"FRankNet\",\n" +
+        "  \"numIterations\" : 100,\n" +
+        "\n" +
+        "  \"report\" : {\n" +
+        "    \"format\" : \"csv\",\n" +
+        "    \"file\" : \"report/franknet-report.csv\"\n" +
+        "  }\n" +
+        "}\n";
+
+    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
+    Assert.assertEquals("report/franknet-report.csv", trainer.report.getReportFile());
+  }
+
+  @Test
+  public void testDefaultReportFile() throws Exception {
+    final String JSON = "{\n" +
+        "  \"algorithm\" : \"FRankNet\",\n" +
+        "  \"numIterations\" : 100\n" +
+        "}\n";
+
+    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
+    Assert.assertEquals("report/report.csv", trainer.report.getReportFile());
   }
 
   private static class NullRanker extends Ranker<Config> {

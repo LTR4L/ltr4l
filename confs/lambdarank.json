@@ -37,6 +37,6 @@
 
   "report" : {
     "format" : "csv",
-    "file" : "lambdarank-report.csv"
+    "file" : "report/lambdarank-report.csv"
   }
 }

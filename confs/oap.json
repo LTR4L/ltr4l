@@ -26,6 +26,6 @@
 
   "report" : {
     "format" : "csv",
-    "file" : "oap-report.csv"
+    "file" : "report/oap-report.csv"
   }
 }

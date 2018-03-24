@@ -37,6 +37,6 @@
 
   "report" : {
     "format" : "csv",
-    "file" : "listnet-report.csv"
+    "file" : "report/listnet-report.csv"
   }
 }
