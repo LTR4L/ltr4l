@@ -16,6 +16,7 @@
 
 package org.ltr4l.trainers;
 
+import java.io.Reader;
 import java.util.List;
 
 import org.ltr4l.nn.Activation;
@@ -37,8 +38,8 @@ public class NNRankTrainer extends MLPTrainer<MLP> {
 
   //Last layer of the network has a number of nodes equal to the number of categories.
   //That layer is created in the constructor, so it is not necessary to specify last layer in config file.
-  NNRankTrainer(QuerySet training, QuerySet validation, String config) {
-    super(training, validation, config, true);
+  NNRankTrainer(QuerySet training, QuerySet validation, Reader reader) {
+    super(training, validation, reader, true);
     outputNodeNumber = QuerySet.findMaxLabel(trainingSet) + 1;
   }
 

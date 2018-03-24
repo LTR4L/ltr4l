@@ -16,6 +16,7 @@
 
 package org.ltr4l.trainers;
 
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -36,8 +37,8 @@ public class OAPBPMTrainer extends LTRTrainer<OAPBPMRank, OAPBPMTrainer.OAPBPMCo
   private double maxScore;
   private final  List<Document> trainingDocList;
 
-  OAPBPMTrainer(QuerySet training, QuerySet validation, String file) {
-    super(training, validation, file);
+  OAPBPMTrainer(QuerySet training, QuerySet validation, Reader reader) {
+    super(training, validation, reader);
     maxScore = 0d;
     trainingDocList = new ArrayList<>();
     for (Query query : trainingSet)

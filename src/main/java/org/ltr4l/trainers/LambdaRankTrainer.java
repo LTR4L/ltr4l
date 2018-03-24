@@ -16,6 +16,7 @@
 
 package org.ltr4l.trainers;
 
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -33,8 +34,8 @@ import org.ltr4l.query.QuerySet;
  * */
 public class LambdaRankTrainer extends RankNetTrainer {
 
-  LambdaRankTrainer(QuerySet training, QuerySet validation, String config) {
-    super(training, validation, config);
+  LambdaRankTrainer(QuerySet training, QuerySet validation, Reader reader) {
+    super(training, validation, reader);
   }
 
   @Override

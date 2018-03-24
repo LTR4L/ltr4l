@@ -16,6 +16,7 @@
 
 package org.ltr4l.trainers;
 
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -39,8 +40,8 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP, MLPTrainer.MLPConfig>
   protected double rgRate;
   protected final double[][] targets;
 
-  SortNetTrainer(QuerySet training, QuerySet validation, String file) {
-    super(training, validation, file);
+  SortNetTrainer(QuerySet training, QuerySet validation, Reader reader) {
+    super(training, validation, reader);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;

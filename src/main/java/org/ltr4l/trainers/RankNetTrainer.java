@@ -16,6 +16,7 @@
 
 package org.ltr4l.trainers;
 
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -39,8 +40,8 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   protected final List<Document[][]> trainingPairs;
   protected final List<Document[][]> validationPairs;
 
-  RankNetTrainer(QuerySet training, QuerySet validation, String file) {
-    super(training, validation, file, true);
+  RankNetTrainer(QuerySet training, QuerySet validation, Reader reader) {
+    super(training, validation, reader, true);
 
     trainingPairs = new ArrayList<>();
     for (int i = 0; i < trainingSet.size(); i++) {

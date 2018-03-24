@@ -16,12 +16,12 @@
 
 package org.ltr4l.trainers;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.ltr4l.nn.AbstractMLP;
 import org.ltr4l.nn.Activation;
 import org.ltr4l.nn.MLP;
@@ -46,14 +46,14 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends LTRTrainer<M, ML
   protected double rgRate;
   //protected Config config;
 
-  MLPTrainer(QuerySet training, QuerySet validation, String jsonConfig) {
-    this(training, validation, jsonConfig, false);
+  MLPTrainer(QuerySet training, QuerySet validation, Reader reader) {
+    this(training, validation, reader, false);
   }
 
   //This constructor exists solely for the purpose of child classes
   //It gives child classes the ability to assign an extended MLP.
-  MLPTrainer(QuerySet training, QuerySet validation, String jsonConfig, boolean hasOtherMLP) {
-    super(training, validation, jsonConfig);
+  MLPTrainer(QuerySet training, QuerySet validation, Reader reader, boolean hasOtherMLP) {
+    super(training, validation, reader);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
