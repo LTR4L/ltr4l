@@ -25,7 +25,7 @@
 
   "model" : {
     "format" : "json",
-    "file" : "nnrank-model.json"
+    "file" : "model/nnrank-model.json"
   },
 
   "evaluation" : {

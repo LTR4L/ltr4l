@@ -25,7 +25,7 @@
 
   "model" : {
     "format" : "json",
-    "file" : "listnet-model.json"
+    "file" : "model/listnet-model.json"
   },
 
   "evaluation" : {
