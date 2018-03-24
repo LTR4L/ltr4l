@@ -37,6 +37,6 @@
 
   "report" : {
     "format" : "csv",
-    "file" : "sortnet-report.csv"
+    "file" : "report/sortnet-report.csv"
   }
 }

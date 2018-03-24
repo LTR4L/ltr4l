@@ -22,6 +22,6 @@
 
   "report" : {
     "format" : "csv",
-    "file" : "prank-report.csv"
+    "file" : "report/prank-report.csv"
   }
 }

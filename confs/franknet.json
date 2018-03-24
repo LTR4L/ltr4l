@@ -37,6 +37,6 @@
 
   "report" : {
     "format" : "csv",
-    "file" : "franknet-report.csv"
+    "file" : "report/franknet-report.csv"
   }
 }

@@ -37,6 +37,6 @@
 
   "report" : {
     "format" : "csv",
-    "file" : "nnrank-report.csv"
+    "file" : "report/nnrank-report.csv"
   }
 }
