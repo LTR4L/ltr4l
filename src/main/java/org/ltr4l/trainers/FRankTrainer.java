@@ -16,6 +16,7 @@
 
 package org.ltr4l.trainers;
 
+import java.io.Reader;
 import java.util.HashMap;
 
 import org.ltr4l.nn.Activation;
@@ -32,8 +33,8 @@ import org.ltr4l.query.QuerySet;
 public class FRankTrainer extends RankNetTrainer {
 
 
-  FRankTrainer(QuerySet training, QuerySet validation, String config) {
-    super(training, validation, config);
+  FRankTrainer(QuerySet training, QuerySet validation, Reader reader) {
+    super(training, validation, reader);
   }
 
   @Override

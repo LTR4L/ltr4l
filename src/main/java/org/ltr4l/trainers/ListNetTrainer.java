@@ -16,6 +16,8 @@
 
 package org.ltr4l.trainers;
 
+import java.io.Reader;
+
 import org.ltr4l.nn.Activation;
 import org.ltr4l.nn.ListNetMLP;
 import org.ltr4l.nn.NetworkShape;
@@ -35,8 +37,8 @@ public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
   private double lrRate;
   private double rgRate;
 
-  ListNetTrainer(QuerySet training, QuerySet validation, String file) {
-    super(training, validation, file);
+  ListNetTrainer(QuerySet training, QuerySet validation, Reader reader) {
+    super(training, validation, reader);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;

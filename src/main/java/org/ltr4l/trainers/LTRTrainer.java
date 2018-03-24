@@ -16,8 +16,8 @@
 
 package org.ltr4l.trainers;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,9 +47,10 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
   protected final C config;
   protected final Error errorFunc;
   protected final int batchSize;
+  protected final int ndcgK;
 
-  LTRTrainer(QuerySet training, QuerySet validation, String file) {
-    this.config = getConfig(file);
+  LTRTrainer(QuerySet training, QuerySet validation, Reader reader) {
+    this.config = getConfig(reader);
     epochNum = config.numIterations;
     trainingSet = training.getQueries();
     validationSet = validation.getQueries();
@@ -57,8 +58,15 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
     ranker = constructRanker();
     assert(config.batchSize >= 0);
     batchSize = config.batchSize;
+    ndcgK  = getNdcgAtK(config);
     this.report = Report.getReport();  // TODO: use default Report for now...
     this.errorFunc = makeErrorFunc();
+  }
+
+  private static int getNdcgAtK(Config config){
+    final int K_DEFAULT = 10;
+    if(config.evaluation == null || config.evaluation.params == null) return K_DEFAULT;
+    return Config.getInt(config.evaluation.params, "k", K_DEFAULT);   // TODO: allow users to specify another evaluator
   }
 
   abstract double calculateLoss(List<Query> queries);
@@ -89,7 +97,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
   public void trainAndValidate() {
     for (int i = 1; i <= epochNum; i++) {
       train();
-      validate(i);
+      validate(i, ndcgK);
     }
     report.close();
     try {
@@ -103,10 +111,10 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
 
   public abstract <C extends Config> Class<C> getConfigClass();
 
-  <C extends Config> C getConfig(String file){
+  <C extends Config> C getConfig(Reader reader){
     ObjectMapper mapper = new ObjectMapper();
     try {
-      return mapper.readValue(new File(file), getConfigClass());
+      return mapper.readValue(reader, getConfigClass());
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     }

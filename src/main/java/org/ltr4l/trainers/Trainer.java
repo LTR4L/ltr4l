@@ -16,6 +16,9 @@
 
 package org.ltr4l.trainers;
 
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.List;
 
 import org.ltr4l.query.Document;
@@ -26,12 +29,6 @@ import org.ltr4l.query.QuerySet;
 public interface Trainer {
 
   void train();
-
-  //default NDCG@10
-  default void validate(int iter) {
-    validate(iter, 10);
-
-  }
 
   void validate(int iter, int pos);
 
@@ -48,29 +45,34 @@ public interface Trainer {
      * @param algorithm Algorithm/implementation to be used.
      * @param trainingSet The QuerySet containing the data to be used for training.
      * @param validationSet The QuerySet containing the data to be used for validation.
-     * @param config The Config file containing parameters needed for Ranker class.
+     * @param configFile The Config file containing parameters needed for Ranker class.
      * @return new class which implements trainer.
      */
-    public static Trainer getTrainer(String algorithm, QuerySet trainingSet, QuerySet validationSet, String config) {
-      switch (algorithm.toLowerCase()) {
-        case "prank":
-          return new PRankTrainer(trainingSet, validationSet, config);
-        case "oap":
-          return new OAPBPMTrainer(trainingSet, validationSet, config);
-        case "ranknet":
-          return new RankNetTrainer(trainingSet, validationSet, config);
-        case "franknet":
-          return new FRankTrainer(trainingSet, validationSet, config);
-        case "lambdarank":
-          return new LambdaRankTrainer(trainingSet, validationSet, config);
-        case "nnrank":
-          return new NNRankTrainer(trainingSet, validationSet, config);
-        case "sortnet":
-          return new SortNetTrainer(trainingSet, validationSet, config);
-        case "listnet":
-          return new ListNetTrainer(trainingSet, validationSet, config);
-        default:
-          return null;
+    public static Trainer getTrainer(String algorithm, QuerySet trainingSet, QuerySet validationSet, String configFile) {
+      try(Reader reader = new FileReader(configFile)){
+        switch (algorithm.toLowerCase()) {
+          case "prank":
+            return new PRankTrainer(trainingSet, validationSet, reader);
+          case "oap":
+            return new OAPBPMTrainer(trainingSet, validationSet, reader);
+          case "ranknet":
+            return new RankNetTrainer(trainingSet, validationSet, reader);
+          case "franknet":
+            return new FRankTrainer(trainingSet, validationSet, reader);
+          case "lambdarank":
+            return new LambdaRankTrainer(trainingSet, validationSet, reader);
+          case "nnrank":
+            return new NNRankTrainer(trainingSet, validationSet, reader);
+          case "sortnet":
+            return new SortNetTrainer(trainingSet, validationSet, reader);
+          case "listnet":
+            return new ListNetTrainer(trainingSet, validationSet, reader);
+          default:
+            return null;
+        }
+      }
+      catch (IOException e){
+        throw new IllegalArgumentException(e);
       }
     }
   }
