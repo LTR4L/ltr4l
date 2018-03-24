@@ -16,11 +16,59 @@
 
 package org.ltr4l.nn;
 
+import java.io.StringReader;
+import java.io.StringWriter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ltr4l.tools.Regularization;
+import org.ltr4l.trainers.MLPTrainer;
 
 public class SortNetMLPTest {
+
+  static final String JSON_CONFIG = "{\n" +
+      "  \"algorithm\" : \"SortNet\",\n" +
+      "  \"numIterations\" : 100,\n" +
+      "  \"params\" : {\n" +
+      "    \"learningRate\" : 0.01,\n" +
+      "    \"optimizer\" : \"momentum\",\n" +
+      "    \"weightInit\" : \"xavier\",\n" +
+      "    \"regularization\" : {\n" +
+      "      \"regularizer\" : \"L2\",\n" +
+      "      \"rate\" : 0.01\n" +
+      "    },\n" +
+      "    \"layers\" : [\n" +
+      "      {\n" +
+      "        \"activator\" : \"Sigmoid\",\n" +
+      "        \"num\" : 3\n" +
+      "      }\n" +
+      "    ]\n" +
+      "  },\n" +
+      "\n" +
+      "  \"dataSet\" : {\n" +
+      "    \"training\" : \"data/MQ2008/Fold1/train.txt\",\n" +
+      "    \"validation\" : \"data/MQ2008/Fold1/vali.txt\",\n" +
+      "    \"test\" : \"data/MQ2008/Fold1/test.txt\"\n" +
+      "  },\n" +
+      "\n" +
+      "  \"model\" : {\n" +
+      "    \"format\" : \"json\",\n" +
+      "    \"file\" : \"sortnet-model.json\"\n" +
+      "  },\n" +
+      "\n" +
+      "  \"evaluation\" : {\n" +
+      "    \"evaluator\" : \"NDCG\",\n" +
+      "    \"params\" : {\n" +
+      "      \"k\" : 10\n" +
+      "    }\n" +
+      "  },\n" +
+      "\n" +
+      "  \"report\" : {\n" +
+      "    \"format\" : \"csv\",\n" +
+      "    \"file\" : \"sortnet-report.csv\"\n" +
+      "  }\n" +
+      "}\n";
 
   @Test
   public void testConstructorMinimum() throws Exception {
@@ -403,5 +451,32 @@ public class SortNetMLPTest {
     assertBetweenPairs(hiddenNode2, hiddenNode3, outputEdge40, outputNode0, outputNode1);
     assertBetweenPairs(hiddenNode3, hiddenNode2, outputEdge50, outputNode0, outputNode1);
     assertBiasEdge(inputEdge40, outputNode0, outputNode1);
+  }
+
+  @Test
+  public void testModelWriteRead() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    MLPTrainer.MLPConfig config = mapper.readValue(new StringReader(JSON_CONFIG), MLPTrainer.MLPConfig.class);
+
+    SortNetMLP mlpW = new SortNetMLP(2, NetworkShape.parseSetting("2,ReLU"),
+        new Optimizer.SGDFactory(), new Regularization.L2(), WeightInitializer.Type.sequence.name());
+
+    StringWriter savedModel = new StringWriter();
+    mlpW.writeModel(config, savedModel);
+
+    System.out.println(savedModel.toString());
+    /* TODO: implement
+    AbstractMLP.ModelReader modelReader = new AbstractMLP.ModelReader<MLP.MNode, MLP.Edge>();
+    MyMLP dummy = new MyMLP(0, NetworkShape.parseSetting("1,Identity"), Optimizer.getFactory(Optimizer.DEFAULT),
+        Regularization.RegularizationFactory.getRegularization(Regularization.DEFAULT), WeightInitializer.DEFAULT.name());
+    List<List<MLP.MNode>> modelR = modelReader.readModel(new StringReader(savedModel.toString()), dummy);
+    NetworkTestUtil ntu = new NetworkTestUtil<MLP.MNode>();
+
+    Assert.assertEquals(4, modelR.size());
+    ntu.assertLayer(modelR, 0, "|");    // inputLayer must have two nodes that don't have any inputEdges
+    ntu.assertLayer(modelR, 1, "0,1,2|0,3,4|0,5,6");
+    ntu.assertLayer(modelR, 2, "0,7,8,9|0,10,11,12");
+    ntu.assertLayer(modelR, 3, "0,13,14|0,15,16|0,17,18|0,19,20");
+    */
   }
 }
