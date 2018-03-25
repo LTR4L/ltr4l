@@ -28,6 +28,7 @@ import org.ltr4l.nn.RankNetMLP;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
+import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
@@ -40,8 +41,8 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   protected final List<Document[][]> trainingPairs;
   protected final List<Document[][]> validationPairs;
 
-  RankNetTrainer(QuerySet training, QuerySet validation, Reader reader) {
-    super(training, validation, reader, true);
+  RankNetTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    super(training, validation, reader, override, true);
 
     trainingPairs = new ArrayList<>();
     for (int i = 0; i < trainingSet.size(); i++) {

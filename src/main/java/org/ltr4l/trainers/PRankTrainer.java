@@ -41,8 +41,8 @@ import org.ltr4l.tools.Error;
 public class PRankTrainer extends LTRTrainer<PRank, Config> {
   private final  List<Document> trainingDocList;
 
-  PRankTrainer(QuerySet training, QuerySet validation, Reader reader) {
-    super(training, validation, reader);
+  PRankTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    super(training, validation, reader, override);
     maxScore = 0.0;
     trainingDocList = new ArrayList<>();
     for (Query query : trainingSet)

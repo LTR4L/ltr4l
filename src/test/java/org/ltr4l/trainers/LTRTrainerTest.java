@@ -61,7 +61,7 @@ public class LTRTrainerTest {
         "  }\n" +
         "}\n";
 
-    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
+    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON), null);
     Assert.assertEquals(7, trainer.ndcgK);
   }
 
@@ -72,7 +72,7 @@ public class LTRTrainerTest {
         "  \"numIterations\" : 100\n" +
         "}\n";
 
-    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
+    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON), null);
     Assert.assertEquals(10, trainer.ndcgK);
   }
 
@@ -88,7 +88,7 @@ public class LTRTrainerTest {
         "  }\n" +
         "}\n";
 
-    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
+    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON), null);
     Assert.assertEquals("model/franknet-model.json", trainer.modelFile);
   }
 
@@ -99,7 +99,7 @@ public class LTRTrainerTest {
         "  \"numIterations\" : 100\n" +
         "}\n";
 
-    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
+    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON), null);
     Assert.assertEquals("model/model.txt", trainer.modelFile);
   }
 
@@ -115,7 +115,7 @@ public class LTRTrainerTest {
         "  }\n" +
         "}\n";
 
-    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
+    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON), null);
     Assert.assertEquals("report/franknet-report.csv", trainer.report.getReportFile());
   }
 
@@ -126,7 +126,7 @@ public class LTRTrainerTest {
         "  \"numIterations\" : 100\n" +
         "}\n";
 
-    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON));
+    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON), null);
     Assert.assertEquals("report/report.csv", trainer.report.getReportFile());
   }
 
@@ -145,8 +145,8 @@ public class LTRTrainerTest {
 
   private static class NullLTRTrainer extends LTRTrainer<NullRanker, Config> {
 
-    NullLTRTrainer(QuerySet training, QuerySet validation, Reader reader) {
-      super(training, validation, reader);
+    NullLTRTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+      super(training, validation, reader, override);
     }
 
     @Override

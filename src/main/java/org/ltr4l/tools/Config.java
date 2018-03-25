@@ -27,13 +27,28 @@ import java.util.Objects;
 public class Config {
 
   public String algorithm;
-  public int numIterations;
+  public int numIterations = 100;
   public int batchSize;
   public Map<String, Object> params;
   public Config.DataSet dataSet;
   public Config.Model model;
   public Config.Evaluation evaluation;
   public Config.Report report;
+
+  public Config overrideBy(Config override){
+    if(override != null){
+      this.algorithm = override.algorithm;
+      this.numIterations = override.numIterations;
+      this.batchSize = override.batchSize;
+      this.params = override.params;
+      this.dataSet = override.dataSet;
+      this.model = override.model;
+      this.evaluation = override.evaluation;
+      this.report = override.report;
+    }
+
+    return this;
+  }
 
   public static class DataSet {
     public String training;

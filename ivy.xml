@@ -11,5 +11,6 @@
     <dependency org="com.fasterxml.jackson.core" name="jackson-annotations" rev="2.9.4">
       <artifact name="jackson-annotations" type="jar" url="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.9.4/jackson-annotations-2.9.4.jar"/>
     </dependency>
+    <dependency org="commons-cli" name="commons-cli" rev="1.4"/>
   </dependencies>
 </ivy-module>

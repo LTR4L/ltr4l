@@ -92,19 +92,17 @@
         <jar destfile="${product.jar}" basedir="${cls.dir}">
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
-                <attribute name="Main-Class" value="org.ltr4l.Main"/>
+                <attribute name="Main-Class" value="org.ltr4l.cli.Train"/>
             </manifest>
         </jar>
     </target>
 
     <target name="package" depends="jar" description="make package"/>
 
-    <target name="run" depends="compile" description="run Main program">
+    <target name="train" depends="compile" description="run Train program">
         <property name="algo" value="ranknet"/>
-        <property name="train" value="data/MQ2008/Fold1/train.txt"/>
-        <property name="valid" value="data/MQ2008/Fold1/vali.txt"/>
-        <java classname="org.ltr4l.Main">
-            <arg line="${algo} ${train} ${valid} ${conf.dir}/${algo}.json"/>
+        <java classname="org.ltr4l.cli.Train">
+            <arg line="${algo}"/>
             <classpath path="${cls.dir}"/>
             <classpath>
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>

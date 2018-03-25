@@ -26,6 +26,7 @@ import org.ltr4l.nn.Optimizer;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
+import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Regularization;
 
 /**
@@ -38,8 +39,8 @@ public class NNRankTrainer extends MLPTrainer<MLP> {
 
   //Last layer of the network has a number of nodes equal to the number of categories.
   //That layer is created in the constructor, so it is not necessary to specify last layer in config file.
-  NNRankTrainer(QuerySet training, QuerySet validation, Reader reader) {
-    super(training, validation, reader, true);
+  NNRankTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    super(training, validation, reader, override, true);
     outputNodeNumber = QuerySet.findMaxLabel(trainingSet) + 1;
   }
 

@@ -23,6 +23,7 @@ import org.ltr4l.nn.Activation;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
+import org.ltr4l.tools.Config;
 
 /**
  * An extension of RankNetTrainer.
@@ -33,8 +34,8 @@ import org.ltr4l.query.QuerySet;
 public class FRankTrainer extends RankNetTrainer {
 
 
-  FRankTrainer(QuerySet training, QuerySet validation, Reader reader) {
-    super(training, validation, reader);
+  FRankTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    super(training, validation, reader, override);
   }
 
   @Override

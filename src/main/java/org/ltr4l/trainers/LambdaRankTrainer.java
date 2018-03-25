@@ -26,6 +26,7 @@ import org.ltr4l.nn.Activation;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
+import org.ltr4l.tools.Config;
 
 /**
  * LambdaRankTrainer trains the RankNetTrainer's network
@@ -34,8 +35,8 @@ import org.ltr4l.query.QuerySet;
  * */
 public class LambdaRankTrainer extends RankNetTrainer {
 
-  LambdaRankTrainer(QuerySet training, QuerySet validation, Reader reader) {
-    super(training, validation, reader);
+  LambdaRankTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    super(training, validation, reader, override);
   }
 
   @Override
