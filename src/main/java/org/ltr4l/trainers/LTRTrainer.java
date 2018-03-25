@@ -50,8 +50,9 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
   protected final int ndcgK;
   protected final String modelFile;
 
-  LTRTrainer(QuerySet training, QuerySet validation, Reader reader) {
+  LTRTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
     this.config = getConfig(reader);
+    config.overrideBy(override);     // TODO: want to use generic C instead of Config
     epochNum = config.numIterations;
     trainingSet = training.getQueries();
     validationSet = validation.getQueries();

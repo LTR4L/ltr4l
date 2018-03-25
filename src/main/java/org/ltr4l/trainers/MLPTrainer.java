@@ -46,14 +46,14 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends LTRTrainer<M, ML
   protected double rgRate;
   //protected Config config;
 
-  MLPTrainer(QuerySet training, QuerySet validation, Reader reader) {
-    this(training, validation, reader, false);
+  MLPTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    this(training, validation, reader, override, false);
   }
 
   //This constructor exists solely for the purpose of child classes
   //It gives child classes the ability to assign an extended MLP.
-  MLPTrainer(QuerySet training, QuerySet validation, Reader reader, boolean hasOtherMLP) {
-    super(training, validation, reader);
+  MLPTrainer(QuerySet training, QuerySet validation, Reader reader, Config override, boolean hasOtherMLP) {
+    super(training, validation, reader, override);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;

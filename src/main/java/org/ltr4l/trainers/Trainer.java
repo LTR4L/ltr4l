@@ -24,6 +24,7 @@ import java.util.List;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
+import org.ltr4l.tools.Config;
 
 
 public interface Trainer {
@@ -48,25 +49,25 @@ public interface Trainer {
      * @param configFile The Config file containing parameters needed for Ranker class.
      * @return new class which implements trainer.
      */
-    public static Trainer getTrainer(String algorithm, QuerySet trainingSet, QuerySet validationSet, String configFile) {
+    public static Trainer getTrainer(String algorithm, QuerySet trainingSet, QuerySet validationSet, String configFile, Config override) {
       try(Reader reader = new FileReader(configFile)){
         switch (algorithm.toLowerCase()) {
           case "prank":
-            return new PRankTrainer(trainingSet, validationSet, reader);
+            return new PRankTrainer(trainingSet, validationSet, reader, override);
           case "oap":
-            return new OAPBPMTrainer(trainingSet, validationSet, reader);
+            return new OAPBPMTrainer(trainingSet, validationSet, reader, override);
           case "ranknet":
-            return new RankNetTrainer(trainingSet, validationSet, reader);
+            return new RankNetTrainer(trainingSet, validationSet, reader, override);
           case "franknet":
-            return new FRankTrainer(trainingSet, validationSet, reader);
+            return new FRankTrainer(trainingSet, validationSet, reader, override);
           case "lambdarank":
-            return new LambdaRankTrainer(trainingSet, validationSet, reader);
+            return new LambdaRankTrainer(trainingSet, validationSet, reader, override);
           case "nnrank":
-            return new NNRankTrainer(trainingSet, validationSet, reader);
+            return new NNRankTrainer(trainingSet, validationSet, reader, override);
           case "sortnet":
-            return new SortNetTrainer(trainingSet, validationSet, reader);
+            return new SortNetTrainer(trainingSet, validationSet, reader, override);
           case "listnet":
-            return new ListNetTrainer(trainingSet, validationSet, reader);
+            return new ListNetTrainer(trainingSet, validationSet, reader, override);
           default:
             return null;
         }

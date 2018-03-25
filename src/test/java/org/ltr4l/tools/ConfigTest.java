@@ -20,9 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.cli.CommandLine;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.ltr4l.cli.Train;
 
 public class ConfigTest {
 
@@ -126,5 +128,48 @@ public class ConfigTest {
       Assert.fail("NPE must occur!");
     }
     catch (NullPointerException expected){}
+  }
+
+  @Test
+  public void testOverrideByNull() throws Exception {
+    config.overrideBy(null);
+    test();
+  }
+
+  @Test
+  public void testOverride() throws Exception {
+    CommandLine line = Train.getCommandLine(Train.createOptions(),
+        new String[] {"franknet",
+            "-iterations", "500",
+            "-training", "mytrain.txt",
+            "-validation", "myvali.txt",
+            "-model", "mymodel.json",
+            "-report", "myreport.csv"});
+    String configPath = Train.getConfigPath(line, line.getArgs());
+    Config override = Train.createOptionalConfig(configPath, line);
+    config.overrideBy(override);
+
+    Assert.assertEquals("FRankNet", config.algorithm);
+    Assert.assertEquals(500, config.numIterations);
+    Assert.assertEquals("mytrain.txt", config.dataSet.training);
+    Assert.assertEquals("myvali.txt", config.dataSet.validation);
+    Assert.assertEquals("data/MQ2008/Fold1/test.txt", config.dataSet.test);
+    Assert.assertEquals("json", config.model.format);
+    Assert.assertEquals("mymodel.json", config.model.file);
+    Assert.assertEquals("NDCG", config.evaluation.evaluator);
+    Assert.assertEquals(10, Config.getReqInt(config.evaluation.params, "k"));
+    Assert.assertEquals("csv", config.report.format);
+    Assert.assertEquals("myreport.csv", config.report.file);
+
+    Assert.assertEquals(0.001, Config.getReqDouble(config.params, "learningRate"), 0.00001);
+    Assert.assertEquals("momentum", Config.getReqString(config.params, "optimizer"));
+    Assert.assertEquals("normal", Config.getReqString(config.params, "weightInit"));
+    Assert.assertEquals("L2", Config.getString(Config.getReqParams(config.params, "regularization"), "regularizer", "L1"));
+    Assert.assertEquals(0.01, Config.getReqDouble(Config.getReqParams(config.params, "regularization"), "rate"), 0.0001);
+
+    List<Map<String, Object>> layersParams = Config.getReqArrayParams(config.params, "layers");
+    Assert.assertEquals(1, layersParams.size());
+    Assert.assertEquals("Sigmoid", Config.getReqString(layersParams.get(0), "activator"));
+    Assert.assertEquals(5, Config.getReqInt(layersParams.get(0), "num"));
   }
 }

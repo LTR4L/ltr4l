@@ -25,6 +25,7 @@ import org.ltr4l.nn.Optimizer;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
+import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
@@ -37,8 +38,8 @@ public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
   private double lrRate;
   private double rgRate;
 
-  ListNetTrainer(QuerySet training, QuerySet validation, Reader reader) {
-    super(training, validation, reader);
+  ListNetTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    super(training, validation, reader, override);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;

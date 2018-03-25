@@ -26,6 +26,7 @@ import org.ltr4l.nn.*;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
+import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
@@ -40,8 +41,8 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP, MLPTrainer.MLPConfig>
   protected double rgRate;
   protected final double[][] targets;
 
-  SortNetTrainer(QuerySet training, QuerySet validation, Reader reader) {
-    super(training, validation, reader);
+  SortNetTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    super(training, validation, reader, override);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
