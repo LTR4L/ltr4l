@@ -134,8 +134,9 @@
 
     <target name="train" depends="compile" description="run Train program">
         <property name="algo" value="ranknet"/>
+        <property name="opt.ite" value="100"/>
         <java classname="org.ltr4l.cli.Train">
-            <arg line="${algo}"/>
+            <arg line="${algo} -iterations ${opt.ite}"/>
             <classpath path="${cls.dir}"/>
             <classpath>
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
