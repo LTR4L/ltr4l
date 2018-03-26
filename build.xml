@@ -111,10 +111,11 @@
 -->
     <!-- This jar package is used via "java -cp LTR4L-0.1-dev.jar org.ltr4l.cli.Train $*" -->
     <target name="jar" depends="compile" description="make jar file">
+        <property file="ivy-jars.properties"/>
         <jar destfile="${product.jar}">
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
-                <attribute name="Class-Path" value="lib/commons-cli-1.4.jar lib/jackson-annotations-2.9.4.jar lib/jackson-core-2.9.4.jar lib/jackson-databind-2.9.4.jar"/>
+                <attribute name="Class-Path" value="${RUNTIME_JARS}"/>
             </manifest>
             <fileset dir="${cls.dir}">
                 <include name="**/*.class"/>
@@ -151,6 +152,7 @@
     </target>
 
     <target name="ivy-bootstrap" description="--> retrieve dependencies with ivy">
+        <property file="ivy-jars.properties"/>
         <ivy:retrieve />
 <!--
         <ivy:retrieve sync="true" type="jar" />
