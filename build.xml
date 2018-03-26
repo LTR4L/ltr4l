@@ -3,21 +3,12 @@
          xmlns:jacoco="antlib:org.jacoco.ant"
          default="compile" basedir=".">
 
-    <property name="src.dir" value="src"/>
-    <property name="cls.dir" value="classes"/>
-    <property name="lib.dir" value="lib"/>
-    <property name="test.result.dir" value="test-result"/>
-    <property name="conf.dir" value="confs"/>
-    <property name="jacoco.report.dir" value="jacoco-report"/>
-    <property name="jacoco.version" value="0.8.0"/>
-    <property name="doc.dir" value="javadocs"/>
-
-    <property name="PRODUCT_NAME" value="LTR4L"/>
-    <property name="PRODUCT_VERSION" value="0.1-dev"/>
-    <property name="product.jar" value="${PRODUCT_NAME}-${PRODUCT_VERSION}.jar"/>
+    <property file="version.properties"/>
+    <property file="build.properties"/>
 
     <target name="compile" description="compile source and test code">
         <mkdir dir="${cls.dir}"/>
+        <copy file="version.properties" todir="${cls.dir}"/>
         <javac srcdir="${src.dir}/main/java" destdir="${cls.dir}" debug="on" includes="**/*.java">
             <classpath path="${cls.dir}"/>
             <classpath>
@@ -119,6 +110,7 @@
             </manifest>
             <fileset dir="${cls.dir}">
                 <include name="**/*.class"/>
+                <include name="*.properties"/>
             </fileset>
             <fileset dir=".">
                 <include name="${lib.dir}/*.jar"/>
