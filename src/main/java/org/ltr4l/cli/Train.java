@@ -18,6 +18,7 @@ package org.ltr4l.cli;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.CommandLine;
@@ -27,6 +28,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.ltr4l.Version;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 import org.ltr4l.trainers.Trainer;
@@ -41,6 +43,11 @@ public class Train {
     CommandLine line = getCommandLine(options, args);
 
     if(line.hasOption("help")) printUsage(options);
+
+    if(line.hasOption("version")){
+      System.out.printf("%s release %s\n", MethodHandles.lookup().lookupClass().getCanonicalName(), Version.version);
+      System.exit(0);
+    }
 
     // get LTR-algorithm-name
     String[] params = line.getArgs();
