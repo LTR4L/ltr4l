@@ -45,7 +45,7 @@
             <classpath path="${lib.dir}/jacocoant.jar"/>
         </taskdef>
         <jacoco:coverage destfile="${jacoco.report.dir}/jacoco-report">
-            <junit fork="true" forkmode="once" printsummary="on"
+            <junit fork="true" forkmode="once" printsummary="on" dir="${src.dir}/test/resources"
                    haltonfailure="no"
                    errorProperty="tests.failed"
                    failureProperty="tests.failed">
