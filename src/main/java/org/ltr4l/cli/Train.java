@@ -40,6 +40,8 @@ public class Train {
     Options options = createOptions();
     CommandLine line = getCommandLine(options, args);
 
+    if(line.hasOption("help")) printUsage(options);
+
     // get LTR-algorithm-name
     String[] params = line.getArgs();
     if(params == null || params.length == 0){
@@ -50,8 +52,6 @@ public class Train {
       System.err.printf("Too many argument is specified: %s", params[1]);
       printUsage(options);
     }
-
-    if(line.hasOption("help")) printUsage(options);
 
     String configPath = getConfigPath(line, params);
     Config optionalConfig = createOptionalConfig(configPath, line);

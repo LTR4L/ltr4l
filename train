@@ -14,4 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-java -jar LTR4L-0.1-dev.jar org.ltr4l.cli.Train $*
+JAR_FILE=$(ls -1 LTR4L-*.jar|head -n 1)
+
+java -cp $JAR_FILE org.ltr4l.cli.Train $*
