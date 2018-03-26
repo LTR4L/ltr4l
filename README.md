@@ -98,7 +98,34 @@ $ ant clean package
 4-run the following command :
 
 ```
-java -jar LTR4L-X.X.X.jar ranknet data/MQ2008/Fold1/train.txt data/MQ2008/Fold1/vali.txt confs/ranknet.json
+train ranknet
+```
+
+To see help of train command, use -help option:
+
+```
+train -help
+
+usage: train <LTR-algorithm-name> [-config <file>] [-debug] [-help]
+       [-iterations <num>] [-model <file>] [-report <file>] [-training
+       <file>] [-validation <file>] [-verbose] [-version]
+
+Execute Learning-to-Rank training algorithm. The algorithm is specified by
+the required argument <LTR-algorithm-name>. The program will look for the
+configuration file "config/<LTR-algorithm-name>.json" unless config option
+is specified. The following options can be specified in order to override
+the existing settings in the config file.
+
+ -config <file>       use given file for configuration
+ -debug               print debugging information
+ -help                print this message
+ -iterations <num>    use given number of iterations
+ -model <file>        specify model file name
+ -report <file>       specify report file name
+ -training <file>     use given file for training
+ -validation <file>   use given file for validation
+ -verbose             be extra verbose
+ -version             print the version information and exit
 ```
 
 5- open the report file:
