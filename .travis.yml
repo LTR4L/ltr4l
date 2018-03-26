@@ -19,3 +19,11 @@ install:
 
 script:
   - ant test
+  - ant train -Dalgo=franknet -Dopt.ite=10
+  - ant train -Dalgo=lambdarank -Dopt.ite=10
+  - ant train -Dalgo=listnet -Dopt.ite=10
+  - ant train -Dalgo=nnrank -Dopt.ite=10
+  - ant train -Dalgo=oap -Dopt.ite=10
+  - ant train -Dalgo=prank -Dopt.ite=10
+  - ant train -Dalgo=ranknet -Dopt.ite=10
+  - ant train -Dalgo=sortnet -Dopt.ite=10
