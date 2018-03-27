@@ -48,7 +48,7 @@ public class Report {
 
   public void log(int iter, double ndcg, double tloss, double vloss){
     // TODO: eval method should be mutable
-    System.out.printf("%d tr_loss: %f va_loss: %f ndcg@10: %f\n", iter, tloss, vloss, ndcg);
+    System.out.printf("%d tr_loss: %f va_loss: %f calculate@10: %f\n", iter, tloss, vloss, ndcg);
     pw.printf("%d,%f,%f,%f\n", iter, ndcg, tloss, vloss);
   }
 

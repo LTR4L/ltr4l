@@ -23,12 +23,12 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.Ranker;
+import org.ltr4l.evaluation.DCG;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
-import org.ltr4l.tools.RankEval;
 import org.ltr4l.tools.Report;
 
 /**
@@ -98,7 +98,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
 
   @Override
   public void validate(int iter, int pos) {
-    double newScore = RankEval.ndcgAvg(this, validationSet, pos);
+    double newScore = new DCG.NDCG().calculateAvgAllQueries(this, validationSet, pos);
     if (newScore > maxScore) {
       maxScore = newScore;
     }
