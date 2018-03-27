@@ -19,9 +19,9 @@ package org.ltr4l.trainers;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.ltr4l.Ranker;
+import org.ltr4l.nn.OAPBPMRank;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
@@ -91,39 +91,3 @@ public class OAPBPMTrainer extends LTRTrainer<OAPBPMRank, OAPBPMTrainer.OAPBPMCo
   }
 }
 
-class OAPBPMRank extends PRank {
-  private List<PRank> pRanks;
-  private final double bernProb;
-
-  OAPBPMRank(int featureLength, int maxLabel, int pNumber, double bernNumber) {
-    super(featureLength, maxLabel);
-    pRanks = new ArrayList<>();
-    for (int i = 0; i < pNumber; i++)
-      pRanks.add(new PRank(featureLength, maxLabel));
-    bernProb = bernNumber; //Note: must be between 0 and 1.
-  }
-
-  @Override
-  public void updateWeights(Document doc) {
-    for (PRank prank : pRanks) {
-      //Will or will not present document to the perceptron.
-      if (bernoulli() == 1) {
-        double prediction = prank.predict(doc.getFeatures());
-        int label = doc.getLabel();
-        if (label != prediction) { //if the prediction is wrong, update that perceptron's weights
-          prank.updateWeights(doc);
-          for (int i = 0; i < weights.length; i++)
-            weights[i] += prank.getWeights()[i] / (double) pRanks.size(); //and update overall weights
-          for (int i = 0; i < thresholds.length; i++)
-            thresholds[i] += prank.getThresholds()[i] / (double) pRanks.size();
-        }
-      }
-
-    }
-  }
-
-  private int bernoulli() {
-    return new Random().nextDouble() < bernProb ? 1 : 0;
-  }
-
-}

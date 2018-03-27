@@ -22,6 +22,7 @@ import java.io.StringWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
+import org.ltr4l.nn.PRank;
 import org.ltr4l.tools.Config;
 
 public class PRankTest {
