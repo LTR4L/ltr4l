@@ -29,7 +29,7 @@
   },
 
   "evaluation" : {
-    "evaluator" : "NDCG",
+    "evaluator" : "map",
     "params" : {
       "k" : 10
     }

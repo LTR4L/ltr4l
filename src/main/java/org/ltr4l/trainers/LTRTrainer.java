@@ -24,6 +24,8 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.Ranker;
 import org.ltr4l.evaluation.DCG;
+import org.ltr4l.evaluation.RankEval;
+import org.ltr4l.evaluation.RankEval.RankEvalFactory;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
@@ -49,6 +51,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
   protected final int batchSize;
   protected final int ndcgK;
   protected final String modelFile;
+  protected final RankEval eval;
 
   LTRTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
     this.config = getConfig(reader);
@@ -60,13 +63,22 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
     ranker = constructRanker();
     assert(config.batchSize >= 0);
     batchSize = config.batchSize;
-    ndcgK  = getNdcgAtK(config);
+    eval = getEvaluator(config);
+    ndcgK  = getEvaluatorAtK(config);
     modelFile = getModelFile(config);
     this.report = Report.getReport(getReportFile(config));
     this.errorFunc = makeErrorFunc();
   }
 
-  private static int getNdcgAtK(Config config){
+  private static RankEval getEvaluator(Config config){
+    if (config.evaluation == null || config.evaluation.evaluator == null || config.evaluation.evaluator.equals(""))
+      return new DCG.NDCG();
+    final String evaluator = config.evaluation.evaluator;
+    System.out.println("Will use " + evaluator);
+    return RankEvalFactory.get(evaluator);
+  }
+
+  private static int getEvaluatorAtK(Config config){
     final int K_DEFAULT = 10;
     if(config.evaluation == null || config.evaluation.params == null) return K_DEFAULT;
     return Config.getInt(config.evaluation.params, "k", K_DEFAULT);   // TODO: allow users to specify another evaluator
@@ -98,7 +110,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
 
   @Override
   public void validate(int iter, int pos) {
-    double newScore = new DCG.NDCG().calculateAvgAllQueries(this, validationSet, pos);
+    double newScore = eval.calculateAvgAllQueries(this, validationSet, pos);
     if (newScore > maxScore) {
       maxScore = newScore;
     }

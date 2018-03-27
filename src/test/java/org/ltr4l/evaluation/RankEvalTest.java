@@ -19,6 +19,7 @@ package org.ltr4l.evaluation;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ltr4l.query.Document;
+import org.ltr4l.evaluation.RankEval.*;
 
 import java.util.List;
 
@@ -35,6 +36,21 @@ public class RankEvalTest {
     List<Document> docs = DCGTest.docs(0, 0, 0, 0, 0, 0, 0, 0);
     Assert.assertEquals(0, RankEval.countNumRelDocs(docs));
   }
+
+  @Test
+  public void factoryTest() {
+    Assert.assertTrue(RankEvalFactory.get("NDCG") instanceof DCG.NDCG);
+    Assert.assertTrue(RankEvalFactory.get("MAP") instanceof Precision.AP);
+    Assert.assertTrue(RankEvalFactory.get("MRR") instanceof MRR);
+    Assert.assertTrue(RankEvalFactory.get("WAP") instanceof Precision.WAP);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void factoryBadOptionTest(){
+    RankEvalFactory.get("MyGreatestEvaluator!");
+  }
+
+
 
 
 }
