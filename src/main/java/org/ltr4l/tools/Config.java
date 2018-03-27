@@ -29,6 +29,7 @@ public class Config {
   public String algorithm;
   public int numIterations = 100;
   public int batchSize;
+
   public Map<String, Object> params;
   public Config.DataSet dataSet;
   public Config.Model model;

@@ -43,6 +43,7 @@ public interface Precision {
       return calculate(docRanks);
     }
 
+    //TODO: Confirm what "total number of relevant documents" means, and what to do in the case of 0.
     public double calculate(List<Document> docRanks){
       double ap = 0;
       int numRelDocs = RankEval.countNumRelDocs(docRanks);

@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
+import org.ltr4l.tools.Config;
 import org.ltr4l.trainers.Trainer;
 
 public interface RankEval {
@@ -46,4 +47,20 @@ public interface RankEval {
 
   double calculate(List<Document> docRanks, int position);
 
+  public static class RankEvalFactory {
+    public static RankEval get(String eval){
+      switch (eval.toLowerCase()){
+        case "ndcg":
+          return new DCG.NDCG();
+        case "map":
+          return new Precision.AP();
+        case "wap":
+          return new Precision.WAP();
+        case "mrr":
+          return new MRR();
+        default:
+          throw new IllegalArgumentException("Invalid evaluation type specified.");
+      }
+    }
+  }
 }
