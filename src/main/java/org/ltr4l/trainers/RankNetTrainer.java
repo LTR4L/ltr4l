@@ -16,6 +16,7 @@
 
 package org.ltr4l.trainers;
 
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -28,8 +29,8 @@ import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
-import org.ltr4l.tools.Regularization;
 import org.ltr4l.tools.Error;
+import org.ltr4l.tools.Regularization;
 
 /**
  * The implementation of MLPTrainer which uses the
@@ -40,9 +41,8 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   protected final List<Document[][]> trainingPairs;
   protected final List<Document[][]> validationPairs;
 
-  RankNetTrainer(QuerySet training, QuerySet validation, Config config) {
-    super(training, validation, config, true);
-
+  RankNetTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    super(training, validation, reader, override, true);
 
     trainingPairs = new ArrayList<>();
     for (int i = 0; i < trainingSet.size(); i++) {
@@ -106,15 +106,15 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   @Override
   public void train() {
     double threshold = 0.5;
-
     //Present all docs of randomly selected query
     //For number of queries / 6 times.
+    int numTrained = 0;
     for (int i = 0; i < trainingPairs.size() / 6; i++) {
       int iq = new Random().nextInt(trainingPairs.size());
-      if (trainingPairs.get(iq) == null) {
+      if (trainingPairs.get(iq) == null)
         //i--;  //Note: if all queries have null for document pairs, will loop infinitely.
         continue;
-      }
+
       for (Document[] docPair : trainingPairs.get(iq)) { //for each document pair in query iq
         Document docA = docPair[0];
         Document docB = docPair[1];
@@ -128,10 +128,15 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
           ranker.backProp(sigma);
           ranker.forwardProp(docA);
           ranker.backProp(-sigma);
-          ranker.updateWeights(lrRate, rgRate);
+          numTrained++;
+          if(batchSize == 0) ranker.updateWeights(lrRate, rgRate);
         }
       }
+      if (batchSize != 0 && ((numTrained) % batchSize) == 0){
+        ranker.updateWeights(lrRate, rgRate);
+      }
     }
+    if (batchSize != 0) ranker.updateWeights(lrRate, rgRate); //Update at the end of the epoch, regardless of batchSize.
   }
 }
 

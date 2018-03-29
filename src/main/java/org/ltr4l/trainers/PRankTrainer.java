@@ -16,34 +16,33 @@
 
 package org.ltr4l.trainers;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Error;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.ltr4l.tools.Config;
+import org.ltr4l.tools.Error;
 
 /**
  * The implementation of LTRTrainer which uses the
  * PRank(Perceptron Ranking) algorithm.
  *
  */
-public class PRankTrainer extends LTRTrainer<PRank> {
+public class PRankTrainer extends LTRTrainer<PRank, Config> {
   private final  List<Document> trainingDocList;
 
-  PRankTrainer(QuerySet training, QuerySet validation, Config config) {
-    super(training, validation, config);
+  PRankTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    super(training, validation, reader, override);
     maxScore = 0.0;
     trainingDocList = new ArrayList<>();
     for (Query query : trainingSet)
@@ -72,12 +71,17 @@ public class PRankTrainer extends LTRTrainer<PRank> {
   }
 
   @Override
+  public Class<Config> getConfigClass() {
+    return Config.class;
+  }
+
+  @Override
   protected PRank constructRanker() {
     return new PRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet));
   }
 }
 
-class PRank extends Ranker{
+class PRank extends Ranker<Config> {
   protected double[] weights;
   protected double[] thresholds;
 
@@ -100,35 +104,23 @@ class PRank extends Ranker{
     return thresholds;
   }
 
-  public void writeModel(Properties props, String file) {
-    try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
-      props.store(pw, "Saved model");
-      pw.println("model=" + Arrays.toString(weights)); //To ensure model gets written at the end.
-      pw.println("thresholds=" + Arrays.toString(thresholds));
-      //props.setProperty("model", obtainWeights().toString());
-      //props.store(pw, "Saved model");
-
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  //Weight and thresholds must be given as string, separated by "++"
   @Override
-  public void readModel(String model){
-    final String regex = "";
-    String weights = model.split(regex)[0];
-    String thresholds = model.split(regex)[1];
-    assign(weights, this.weights);
-    assign(thresholds, this.thresholds);
+  public void writeModel(Config config, Writer writer) throws IOException {
+    SavedModel savedModel = new SavedModel(config, weights, thresholds);
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    mapper.writeValue(writer, savedModel);
   }
 
-  private void assign(String model, double[] modelType){
-    int dim = 1;
-    model = model.substring(dim, model.length() - dim);
-    List<Object> modelList = toList(model, dim);
-    List<Double> modelD = modelList.stream().map(weight -> (Double) weight).collect(Collectors.toList());
-    for (int i = 0; i < modelType.length; i++) modelType[i] = modelD.get(i);
+  // TODO: use Factory...?
+  public static PRank readModel(Reader reader) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    SavedModel savedModel = mapper.readValue(reader, SavedModel.class);
+    // TODO: don't want to do that...
+    PRank prank = new PRank(savedModel.weights.length, savedModel.thresholds.length);
+    prank.weights = savedModel.weights;
+    prank.thresholds = savedModel.thresholds;
+    return prank;
   }
 
   public void updateWeights(Document doc) {
@@ -178,4 +170,16 @@ class PRank extends Ranker{
     return wx;
   }
 
+  private static class SavedModel {
+    public Config config;
+    public double[] weights;
+    public double[] thresholds;
+    SavedModel(){  // this is needed for Jackson...
+    }
+    SavedModel(Config config, double[] weights, double[] thresholds){
+      this.config = config;
+      this.weights = weights;
+      this.thresholds = thresholds;
+    }
+  }
 }

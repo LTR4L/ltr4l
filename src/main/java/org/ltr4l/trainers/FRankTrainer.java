@@ -16,13 +16,14 @@
 
 package org.ltr4l.trainers;
 
+import java.io.Reader;
+import java.util.HashMap;
+
 import org.ltr4l.nn.Activation;
-import org.ltr4l.tools.Config;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-
-import java.util.HashMap;
+import org.ltr4l.tools.Config;
 
 /**
  * An extension of RankNetTrainer.
@@ -33,12 +34,13 @@ import java.util.HashMap;
 public class FRankTrainer extends RankNetTrainer {
 
 
-  FRankTrainer(QuerySet training, QuerySet validation, Config config) {
-    super(training, validation, config);
+  FRankTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    super(training, validation, reader, override);
   }
 
   @Override
   public void train() {
+    int numTrained = 0;
     for (int iq = 0; iq < trainingSet.size(); iq++) {  //index query
       if (trainingPairs.get(iq) == null)
         continue; //if there are no valid pairs for the query, skip.
@@ -64,9 +66,11 @@ public class FRankTrainer extends RankNetTrainer {
       for (Document doc : query.getDocList()) {
         ranker.forwardProp(doc);
         ranker.backProp(lambdas.get(doc));
+        numTrained++;
+        if (batchSize != 0 && numTrained % batchSize == 0) ranker.updateWeights(lrRate, rgRate);
       }
     }
-    ranker.updateWeights(lrRate, rgRate);
+    ranker.updateWeights(lrRate, rgRate); //Update at the end of the epoch, regardless of batchSize.
   }
 
 }

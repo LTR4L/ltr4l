@@ -16,161 +16,160 @@
 
 package org.ltr4l.tools;
 
-import java.io.StringReader;
-import java.util.Properties;
+import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.cli.CommandLine;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.ltr4l.nn.Activation;
-import org.ltr4l.nn.NetworkShape;
-import org.ltr4l.nn.Optimizer;
-import org.ltr4l.nn.WeightInitializer;
+import org.ltr4l.cli.Train;
 
 public class ConfigTest {
 
-  @Test
-  public void testGetStrProp() throws Exception {
-    Properties props = new Properties();
-    props.setProperty("prop1", "strval");
-    Assert.assertEquals("strval", Config.getStrProp(props, "prop1", "defval"));
-    Assert.assertEquals("defval", Config.getStrProp(props, "prop2", "defval"));
-  }
+  static final String JSON_SRC = "{\n" +
+      "  \"algorithm\" : \"FRankNet\",\n" +
+      "  \"numIterations\" : 150,\n" +
+      "  \"params\" : {\n" +
+      "    \"learningRate\" : 0.001,\n" +
+      "    \"optimizer\" : \"sgd\",\n" +
+      "    \"weightInit\" : \"normal\",\n" +
+      "    \"regularization\" : {\n" +
+      "      \"regularizer\" : \"L2\",\n" +
+      "      \"rate\" : 0.01\n" +
+      "    },\n" +
+      "    \"layers\" : [\n" +
+      "      {\n" +
+      "        \"activator\" : \"Identity\",\n" +
+      "        \"num\" : 5\n" +
+      "      },\n" +
+      "      {\n" +
+      "        \"activator\" : \"Sigmoid\",\n" +
+      "        \"num\" : 1\n" +
+      "      }\n" +
+      "    ]\n" +
+      "  },\n" +
+      "\n" +
+      "  \"dataSet\" : {\n" +
+      "    \"training\" : \"data/MQ2008/Fold1/train.txt\",\n" +
+      "    \"validation\" : \"data/MQ2008/Fold1/vali.txt\",\n" +
+      "    \"test\" : \"data/MQ2008/Fold1/test.txt\"\n" +
+      "  },\n" +
+      "\n" +
+      "  \"model\" : {\n" +
+      "    \"format\" : \"json\",\n" +
+      "    \"file\" : \"franknet-model.json\"\n" +
+      "  },\n" +
+      "\n" +
+      "  \"evaluation\" : {\n" +
+      "    \"evaluator\" : \"NDCG\",\n" +
+      "    \"params\" : {\n" +
+      "      \"k\" : 10\n" +
+      "    }\n" +
+      "  },\n" +
+      "\n" +
+      "  \"report\" : {\n" +
+      "    \"format\" : \"csv\",\n" +
+      "    \"file\" : \"franknet-report.csv\"\n" +
+      "  }\n" +
+      "}\n";
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testGetReqStrProp() throws Exception {
-    Properties props = new Properties();
-    props.setProperty("prop1", "100");
-    Config.getReqStrProp(props, "prop2");
-  }
+  private Config config;
 
-  @Test
-  public void testGetIntProp() throws Exception {
-    Properties props = new Properties();
-    props.setProperty("prop1", "100");
-    Assert.assertEquals(100, Config.getIntProp(props, "prop1", 200));
-    Assert.assertEquals(200, Config.getIntProp(props, "prop2", 200));
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testGetReqIntProp() throws Exception {
-    Properties props = new Properties();
-    props.setProperty("prop1", "100");
-    Config.getReqIntProp(props, "prop2");
-  }
-
-  @Test
-  public void testGetDoubleProp() throws Exception {
-    Properties props = new Properties();
-    props.setProperty("prop1", "100");
-    Assert.assertEquals(100, Config.getDoubleProp(props, "prop1", 200), 0.001);
-    Assert.assertEquals(200, Config.getDoubleProp(props, "prop2", 200), 0.001);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testGetReqDoubleProp() throws Exception {
-    Properties props = new Properties();
-    props.setProperty("prop1", "100");
-    Config.getReqDoubleProp(props, "prop2");
-  }
-
-  @Test
-  public void testDefaultValues() throws Exception {
-    String strConfig = "name:OAP\n";
-    Config config = Config.get(new StringReader(strConfig));
-
-    Assert.assertEquals(100, config.getNumIterations());
-    Assert.assertEquals(0, config.getLearningRate(), 0.001);
-    Assert.assertEquals(WeightInitializer.DEFAULT.name(), config.getWeightInit());
-    Assert.assertEquals(0.03, config.getBernNum(), 0.0001);
-    Assert.assertEquals(1, config.getPNum());
-    Assert.assertEquals(0, config.getReguRate(), 0.0001);
+  @Before
+  public void setUp() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    config = mapper.readValue(JSON_SRC, Config.class);
   }
 
   @Test
-  public void testSimple() throws Exception {
-    String strConfig = "name:OAP\n" +
-        "numIterations:200\n" +
-        "bernoulli:0.03\n" +
-        "N:250\n" +
-        "reguRate:0.01\n";
-    Config config = Config.get(new StringReader(strConfig));
+  public void test() throws Exception {
+    Assert.assertEquals("FRankNet", config.algorithm);
+    Assert.assertEquals(150, config.numIterations);
+    Assert.assertEquals("data/MQ2008/Fold1/train.txt", config.dataSet.training);
+    Assert.assertEquals("data/MQ2008/Fold1/vali.txt", config.dataSet.validation);
+    Assert.assertEquals("data/MQ2008/Fold1/test.txt", config.dataSet.test);
+    Assert.assertEquals("json", config.model.format);
+    Assert.assertEquals("franknet-model.json", config.model.file);
+    Assert.assertEquals("NDCG", config.evaluation.evaluator);
+    Assert.assertEquals(10, Config.getReqInt(config.evaluation.params, "k"));
+    Assert.assertEquals("csv", config.report.format);
+    Assert.assertEquals("franknet-report.csv", config.report.file);
 
-    Assert.assertEquals("OAP", config.getName());
-    Assert.assertEquals(200, config.getNumIterations());
-    Assert.assertEquals(0.03, config.getBernNum(), 0.0001);
-    Assert.assertEquals(250, config.getPNum());
-    Assert.assertEquals(0.01, config.getReguRate(), 0.0001);
+    Assert.assertEquals(0.001, Config.getReqDouble(config.params, "learningRate"), 0.00001);
+    Assert.assertEquals("sgd", Config.getReqString(config.params, "optimizer"));
+    Assert.assertEquals("normal", Config.getReqString(config.params, "weightInit"));
+    Assert.assertEquals("L2", Config.getString(Config.getReqParams(config.params, "regularization"), "regularizer", "L1"));
+    Assert.assertEquals(0.01, Config.getReqDouble(Config.getReqParams(config.params, "regularization"), "rate"), 0.0001);
+
+    List<Map<String, Object>> layersParams = Config.getReqArrayParams(config.params, "layers");
+    Assert.assertEquals(2, layersParams.size());
+    Assert.assertEquals("Identity", Config.getReqString(layersParams.get(0), "activator"));
+    Assert.assertEquals(5, Config.getReqInt(layersParams.get(0), "num"));
+    Assert.assertEquals("Sigmoid", Config.getReqString(layersParams.get(1), "activator"));
+    Assert.assertEquals(1, Config.getReqInt(layersParams.get(1), "num"));
   }
 
   @Test
-  public void testGetOptimizerFactory() throws Exception {
-    Config config1 = Config.get(new StringReader("name:OAP\noptimizer:adam"));
-    Assert.assertTrue(config1.getOptFact() instanceof Optimizer.AdamFactory);
-
-    Config config2 = Config.get(new StringReader("name:OAP\noptimizer:sgd"));
-    Assert.assertTrue(config2.getOptFact() instanceof Optimizer.SGDFactory);
-
-    Config config3 = Config.get(new StringReader("name:OAP\noptimizer:momentum"));
-    Assert.assertTrue(config3.getOptFact() instanceof Optimizer.MomentumFactory);
-
-    Config config4 = Config.get(new StringReader("name:OAP\noptimizer:nesterov"));
-    Assert.assertTrue(config4.getOptFact() instanceof Optimizer.NesterovFactory);
-
-    // if no optimizer is specified, it returns SGD
-    Config config5 = Config.get(new StringReader("name:OAP\n"));
-    Assert.assertTrue(config5.getOptFact() instanceof Optimizer.SGDFactory);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testGetOptimizerFactoryIAE() throws Exception {
-    Config config5 = Config.get(new StringReader("name:OAP\noptimizer:myGreatestOptimizer!"));
-    Assert.assertTrue(config5.getOptFact() instanceof Optimizer.SGDFactory);
+  public void testReq(){
+    try {
+      Config.getReqString(config.params, "optimizer1");
+      Assert.fail("NPE must occur!");
+    }
+    catch (NullPointerException expected){}
+    try {
+      Config.getReqInt(config.params, "num1");
+      Assert.fail("NPE must occur!");
+    }
+    catch (NullPointerException expected){}
+    try {
+      Config.getReqDouble(config.params, "learningRate1");
+      Assert.fail("NPE must occur!");
+    }
+    catch (NullPointerException expected){}
   }
 
   @Test
-  public void testGetRegularizationFunction() throws Exception {
-    Config config1 = Config.get(new StringReader("name:OAP\nreguFunction:L1"));
-    Assert.assertTrue(config1.getReguFunction() instanceof Regularization.L1);
-
-    Config config2 = Config.get(new StringReader("name:OAP\nreguFunction:L2"));
-    Assert.assertTrue(config2.getReguFunction() instanceof Regularization.L2);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testGetRegularizationFunctionIAE() throws Exception {
-    Config config3 = Config.get(new StringReader("name:OAP\nreguFunction:myGreatestRegularizationFunc!"));
-    Assert.assertTrue(config3.getReguFunction() instanceof Regularization.L2);
+  public void testOverrideByNull() throws Exception {
+    config.overrideBy(null);
+    test();
   }
 
   @Test
-  public void testGetWeightInit() throws Exception {
-    Config config1 = Config.get(new StringReader("name:OAP\nweightInit:normal"));
-    Assert.assertEquals("normal", config1.getWeightInit());
+  public void testOverride() throws Exception {
+    CommandLine line = Train.getCommandLine(Train.createOptions(),
+        new String[] {"franknet",
+            "-iterations", "500",
+            "-training", "mytrain.txt",
+            "-validation", "myvali.txt",
+            "-model", "mymodel.json",
+            "-report", "myreport.csv"});
+    String configPath = Train.getConfigPath(line, line.getArgs());
+    Config override = Train.createOptionalConfig(configPath, line);
+    config.overrideBy(override);
 
-    Config config2 = Config.get(new StringReader("name:OAP\nweightInit:xavier"));
-    Assert.assertEquals("xavier", config2.getWeightInit());
+    Assert.assertEquals("FRankNet", config.algorithm);
+    Assert.assertEquals(500, config.numIterations);
+    Assert.assertEquals("mytrain.txt", config.dataSet.training);
+    Assert.assertEquals("myvali.txt", config.dataSet.validation);
+    Assert.assertEquals("data/MQ2008/Fold1/test.txt", config.dataSet.test);
+    Assert.assertEquals("json", config.model.format);
+    Assert.assertEquals("mymodel.json", config.model.file);
+    Assert.assertEquals("NDCG", config.evaluation.evaluator);
+    Assert.assertEquals(10, Config.getReqInt(config.evaluation.params, "k"));
+    Assert.assertEquals("csv", config.report.format);
+    Assert.assertEquals("myreport.csv", config.report.file);
 
-    Config config3 = Config.get(new StringReader("name:OAP\nweightInit:zero"));
-    Assert.assertEquals("zero", config3.getWeightInit());
+    Assert.assertEquals(0.001, Config.getReqDouble(config.params, "learningRate"), 0.00001);
+    Assert.assertEquals("momentum", Config.getReqString(config.params, "optimizer"));
+    Assert.assertEquals("normal", Config.getReqString(config.params, "weightInit"));
+    Assert.assertEquals("L2", Config.getString(Config.getReqParams(config.params, "regularization"), "regularizer", "L1"));
+    Assert.assertEquals(0.01, Config.getReqDouble(Config.getReqParams(config.params, "regularization"), "rate"), 0.0001);
 
-    Config config4 = Config.get(new StringReader("name:OAP\nweightInit:somethingElse"));
-    Assert.assertEquals("somethingElse", config4.getWeightInit());
-  }
-
-  @Test
-  public void testGetNetworkShape() throws Exception {
-    Config config1 = Config.get(new StringReader("name:OAP\nlayers:5,Identity 1,Sigmoid"));
-    NetworkShape ns1 = config1.getNetworkShape();
-    Assert.assertEquals(2, ns1.size());
-    Assert.assertEquals(5, ns1.getLayerSetting(0).getNum());
-    Assert.assertTrue(ns1.getLayerSetting(0).getActivation() instanceof Activation.Identity);
-    Assert.assertEquals(1, ns1.getLayerSetting(1).getNum());
-    Assert.assertTrue(ns1.getLayerSetting(1).getActivation() instanceof Activation.Sigmoid);
-
-    Config config2 = Config.get(new StringReader("name:OAP\nlayers:15,Sigmoid"));
-    NetworkShape ns2 = config2.getNetworkShape();
-    Assert.assertEquals(1, ns2.size());
-    Assert.assertEquals(15, ns2.getLayerSetting(0).getNum());
-    Assert.assertTrue(ns2.getLayerSetting(0).getActivation() instanceof Activation.Sigmoid);
+    List<Map<String, Object>> layersParams = Config.getReqArrayParams(config.params, "layers");
+    Assert.assertEquals(1, layersParams.size());
+    Assert.assertEquals("Sigmoid", Config.getReqString(layersParams.get(0), "activator"));
+    Assert.assertEquals(5, Config.getReqInt(layersParams.get(0), "num"));
   }
 }

@@ -16,6 +16,7 @@
 
 package org.ltr4l.trainers;
 
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -32,12 +33,12 @@ import org.ltr4l.tools.Error;
  * OAP-BPM algorithm.
  *
  */
-public class OAPBPMTrainer extends LTRTrainer<OAPBPMRank> {
+public class OAPBPMTrainer extends LTRTrainer<OAPBPMRank, OAPBPMTrainer.OAPBPMConfig> {
   private double maxScore;
   private final  List<Document> trainingDocList;
 
-  OAPBPMTrainer(QuerySet training, QuerySet validation, Config config) {
-    super(training, validation, config);
+  OAPBPMTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    super(training, validation, reader, override);
     maxScore = 0d;
     trainingDocList = new ArrayList<>();
     for (Query query : trainingSet)
@@ -55,6 +56,15 @@ public class OAPBPMTrainer extends LTRTrainer<OAPBPMRank> {
     return new Error.Square();
   }
 
+  @Override
+  public Class<OAPBPMConfig> getConfigClass() {
+    return getCC();
+  }
+
+  static Class<OAPBPMConfig> getCC(){
+    return OAPBPMConfig.class;
+  }
+
   protected double calculateLoss(List<Query> queries) {
     double loss = 0d;
     for (Query query : queries) {
@@ -67,6 +77,17 @@ public class OAPBPMTrainer extends LTRTrainer<OAPBPMRank> {
   @Override
   protected Ranker constructRanker() {
     return new OAPBPMRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet), config.getPNum(), config.getBernNum());
+  }
+
+  public static class OAPBPMConfig extends Config {
+
+    public int getPNum(){
+      return getInt(params, "N", 1);   // TODO: default value 1 is appropriate?
+    }
+
+    public double getBernNum(){
+      return getDouble(params, "bernoulli", 0.03);
+    }
   }
 }
 

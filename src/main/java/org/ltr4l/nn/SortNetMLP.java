@@ -16,40 +16,24 @@
 
 package org.ltr4l.nn;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
-import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
+import org.ltr4l.trainers.MLPTrainer;
 
-public class SortNetMLP extends Ranker {
-  private final List<List<SNode>> network;
-  private long iter;
-  private int numAccumulatedDer;
-  private final Regularization regularization;
+public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEdge> {
 
   //Construct Network
   public SortNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
-    //Network shape describes number of nodes and their activation. Example:
-    //[
-    //[12, Sigmoid ]
-    //[4 , Softmax ]
-    //[1 , Identity]
-    //]
-    //]
-    iter = 1;
-    numAccumulatedDer = 0;
-    this.regularization = regularization;
-    network = new ArrayList<>();
+    super(inputDim, networkShape, optFact, regularization, weightModel);
+  }
 
-    WeightInitializer weightInit = WeightInitializer.get(weightModel, inputDim, networkShape);
+  @Override
+  protected List<List<SNode>> constructNetwork(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact){
+    List<List<SNode>> network = new ArrayList<>();
 
     //Construct the initial layer:
     List<SNode> inputLayer = new ArrayList<>();
@@ -77,10 +61,9 @@ public class SortNetMLP extends Ranker {
         currentLayer.add(sNode0);
         layerPrime.add(sNode1);
         SNode[] sNodePair = {sNode0, sNode1};
-        Optimizer opt = optFact.getOptimizer();
 
         //Add bias
-        SEdge biasEdge = new SEdge(null, sNodePair, opt, bias);
+        SEdge biasEdge = new SEdge(null, sNodePair, optFact.getOptimizer(), bias);
         sNode0.addInputEdge(biasEdge);
         sNode1.addInputEdge(biasEdge);
 
@@ -91,7 +74,7 @@ public class SortNetMLP extends Ranker {
           SNode prevSNode1 = prevLayer.get(nodeId + prevLayer.size() / 2);
           double weight = weightInit.getNextRandomInitialWeight();
           SNode[] prevNodePair = {prevSNode0, prevSNode1};
-          SEdge sEdge = new SEdge(prevNodePair, sNodePair, opt, weight);
+          SEdge sEdge = new SEdge(prevNodePair, sNodePair, optFact.getOptimizer(), weight);
 
           prevSNode0.addOutputEdge(sEdge);
           prevSNode1.addOutputEdge(sEdge);
@@ -101,7 +84,7 @@ public class SortNetMLP extends Ranker {
           //Get another weight, and set up an edge for reversed pair.
           weight = weightInit.getNextRandomInitialWeight();
           prevNodePair = new SNode[]{prevSNode1, prevSNode0};
-          sEdge = new SEdge(prevNodePair, sNodePair, opt, weight);
+          sEdge = new SEdge(prevNodePair, sNodePair, optFact.getOptimizer(), weight);
           prevSNode1.addOutputEdge(sEdge);
           prevSNode0.addOutputEdge(sEdge);
           sNode0.addInputEdge(sEdge);
@@ -110,63 +93,35 @@ public class SortNetMLP extends Ranker {
       }
       currentLayer.addAll(layerPrime);
     }
-  }
-
-  private List<List<List<Double>>> obtainWeights(){
-    return network.stream().filter(layer -> layer.get(0).getOutputEdges() != null).map(layer -> layer.stream()
-        .map(node -> node.getOutputEdges().stream()
-            .map(edge -> edge.getWeight())
-            .collect(Collectors.toList()))
-        .collect(Collectors.toList()))
-        .collect(Collectors.toList());
+    return network;
   }
 
   @Override
-  public void writeModel(Properties props, String file) {
-    try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
-      props.store(pw, "Saved model");
-      pw.println("model=" + obtainWeights()); //To ensure model gets written at the end.
-      //props.setProperty("model", obtainWeights().toString());
-      //props.store(pw, "Saved model");
-
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+  protected void addOutputs(NetworkShape networkShape){
+    networkShape.add(1, new Activation.Sigmoid());
   }
 
-  @Override
-  public void readModel(String model){
-    int dim = 3;
-    model = model.substring(dim, model.length() - dim);
-    List<Object> modelList = toList(model, dim);
-    List<List<List<Double>>> weights = modelList.stream().map(layer -> ((List<List<Double>>) layer)).collect(Collectors.toList());
-    for (int layerId = 0; layerId < network.size() - 1; layerId++){ //Do not process last layer
-      List<SNode> layer = network.get(layerId);
-      for (int nodeId = 0; nodeId < layer.size(); nodeId++){
-        SNode node = layer.get(nodeId);
-        List<SEdge> outputEdges = node.getOutputEdges();
-        for (int edgeId = 0; edgeId < outputEdges.size(); edgeId ++){
-          SEdge edge = outputEdges.get(edgeId);
-          edge.setWeight(weights.get(layerId).get(nodeId).get(edgeId));
-        }
-      }
-    }
+  public double[] getOutputs(){
+    int layer = network.size() - 1;
+    return new double[] {getNode(layer, 0).getOutput(), getNode(layer, 1).getOutput()};
   }
 
   // if > 0, doc1 is predicted to be more relevant than doc2
   // if < 0, doc1 is predicted to be less relevant than doc 2.
   public double predict(Document doc1, Document doc2) {
-    double[] output = forwardProp(doc1, doc2);
-    return output[0] - output[1];
+    List<Double> combinedFeatures = new ArrayList<>(doc1.getFeatures());
+    combinedFeatures.addAll(doc2.getFeatures());
+    return predict(combinedFeatures);
   }
 
   @Override
   public double predict(List<Double> features){
-    double[] output = forwardProp(features);
+    forwardProp(features);
+    double[] output = getOutputs();
     return output[0] - output[1];
   }
 
-  public double[] forwardProp(List<Double> features) {
+  public double forwardProp(List<Double> features) {
     //First, feed features into input layer:
     for (int i = 0; i < network.get(0).size(); i++) {
       SNode node = network.get(0).get(i);
@@ -183,26 +138,14 @@ public class SortNetMLP extends Ranker {
     }
 
     List<SNode> outputLayer = network.get(network.size() - 1);
-    return new double[]{outputLayer.get(0).getOutput(), outputLayer.get(1).getOutput()};
+    return outputLayer.get(0).getOutput();
   }
 
-  public double[] forwardProp(Document doc1, Document doc2) {
-    List<Double> combinedFeatures = new ArrayList<>(doc1.getFeatures());
-    combinedFeatures.addAll(doc2.getFeatures());
-    return forwardProp(combinedFeatures);
-  }
-
-  //Largely based on backprop for MLP.
-  public void backProp(double[] targets, Error error) {
-    //Feed output derivatives. Note: the size of the last layer should be 2.
-    List<SNode> outputs = network.get(network.size() - 1);
-    for (int i = 0; i < outputs.size(); i++) { //outputs.size chosen over targets.length; error if too many nodes.
-      SNode outputNode = outputs.get(i);
-      double output = outputNode.getOutput();
-      double target = targets[i];
-      double outDer = error.der(output, target);
-      outputNode.setOutputDer(outDer);
-    }
+  //This only sets the first node.
+  //Use backProp(double target, Error errorFunc)!!
+  @Override
+  public void backProp(Error errorFunc, double... target) {
+    setOutputLayerDerivatives(errorFunc, target);
     for (int layerIdx = network.size() - 1; layerIdx >= 1; layerIdx--) { //When going through each layer, you modify the previous layer.
       List<SNode> layer = network.get(layerIdx);
 
@@ -235,15 +178,12 @@ public class SortNetMLP extends Ranker {
       if (layerIdx != 1) {
         List<SNode> previousLayer = network.get(layerIdx - 1);
         for (SNode node : previousLayer) {
-          //double oder = node.getOutputDer();
-          //node.setOutputDer(0);
-          node.setOutputDer(0);
           double oder = 0;
           for (SEdge outEdge : node.getOutputEdges()) {
-            //And finally, ∂C/∂w = ∂C/∂I * ∂I/∂w
+            //∂C/∂Oi = ∂Ik/∂Oi * ∂C/∂Ik
             oder += outEdge.getWeight() * outEdge.getDestination()[node.getGroup()].getInputDer();
-            node.setOutputDer(oder);
           }
+          node.setOutputDer(oder);
         }
       }
     }
@@ -251,6 +191,7 @@ public class SortNetMLP extends Ranker {
   }
 
   //Same implementation as MLP class...
+  @Override
   public void updateWeights(double lrRate, double rgRate) {
     //Update all weights in all edges.
     for (int layerId = 1; layerId < network.size(); layerId++) {  //All Layers
@@ -295,49 +236,12 @@ public class SortNetMLP extends Ranker {
    * node1:nodeA = node1':nodeA' and node1:nodeA' = node1':nodeA,
    * where nodeX:nodeY = weight between node x and node y.
    */
-  protected static class SEdge {
-    private SNode[] source;
-    private SNode[] destination;
-    private Optimizer optimizer;
-    private double weight;
+  protected static class SEdge extends AbstractEdge.AbstractCmpEdge<SNode> {
     private double accErrorDer;
-    private boolean isDead;
 
     protected SEdge(SNode[] source, SNode[] destination, Optimizer optimizer, double weight) {
-      this.source = source;
-      this.destination = destination;
-      this.optimizer = optimizer;
-      this.weight = weight;
+      super(source, destination, optimizer, weight);
       accErrorDer = 0.0;
-      isDead = false;
-    }
-
-    public boolean isDead() {
-      return isDead;
-    }
-
-    public void setDead(boolean bool) {
-      isDead = bool;
-    }
-
-    public double getWeight() {
-      return weight;
-    }
-
-    public void setWeight(double weight) {
-      this.weight = weight;
-    }
-
-    public SNode[] getSource() {
-      return source;
-    }
-
-    public SNode[] getDestination() {
-      return destination;
-    }
-
-    public Optimizer getOptimizer() {
-      return optimizer;
     }
 
     public void setAccErrorDer(double accErrorDer) {
@@ -349,85 +253,21 @@ public class SortNetMLP extends Ranker {
     }
   }
 
-  protected static class SNode {
-    private double output;
-    private double outputDer;
-    private double totalInput;
-    private double inputDer;
-    private int group;
-    private List<SEdge> inputEdges;
-    private List<SEdge> outputEdges;
-    private Activation activation;
+  protected static class SNode extends AbstractNode<SEdge> {
+    private final int group;
 
     protected SNode(int group, Activation activation) {
-      this.activation = activation;
+      super(activation);
       this.group = group;
-      inputEdges = null;
-      outputEdges = null;
-      output = 0d;
-      outputDer = 0d;
-      totalInput = 0d;
-      inputDer = 0d;
     }
 
+    @Override
     public void updateOutput() {
       totalInput = inputEdges.get(0).getWeight();
       for (int i = 1; i < inputEdges.size(); i++) {
         totalInput += inputEdges.get(i).getWeight() * inputEdges.get(i).getSource()[group].getOutput();
       }
       output = activation.output(totalInput);
-    }
-
-    public double getOutput() {
-      return output;
-    }
-
-    public void setOutput(double output) {
-      this.output = output;
-    }
-
-    public double getOutputDer() {
-      return outputDer;
-    }
-
-    public void setOutputDer(double outputDer) {
-      this.outputDer = outputDer;
-    }
-
-    public Activation getActivation() {
-      return activation;
-    }
-
-    public double getTotalInput() {
-      return totalInput;
-    }
-
-    public double getInputDer() {
-      return inputDer;
-    }
-
-    public void setInputDer(double inDer) {
-      inputDer = inDer;
-    }
-
-    public List<SEdge> getInputEdges() {
-      return inputEdges;
-    }
-
-    public List<SEdge> getOutputEdges() {
-      return outputEdges;
-    }
-
-    public void addInputEdge(SEdge edge) {
-      if (inputEdges == null)
-        inputEdges = new ArrayList<>();
-      inputEdges.add(edge);
-    }
-
-    public void addOutputEdge(SEdge edge) {
-      if (outputEdges == null)
-        outputEdges = new ArrayList<>();
-      outputEdges.add(edge);
     }
 
     public int getGroup() {

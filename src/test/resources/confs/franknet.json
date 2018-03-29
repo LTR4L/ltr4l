@@ -1,0 +1,42 @@
+{
+  "algorithm" : "FRankNet",
+  "numIterations" : 100,
+  "params" : {
+    "learningRate" : 0.001,
+    "optimizer" : "momentum",
+    "weightInit" : "normal",
+    "regularization" : {
+      "regularizer" : "L2",
+      "rate" : 0.01
+    },
+    "layers" : [
+      {
+        "activator" : "Sigmoid",
+        "num" : 5
+      }
+    ]
+  },
+
+  "dataSet" : {
+    "training" : "data/MQ2008/Fold1/train.txt",
+    "validation" : "data/MQ2008/Fold1/vali.txt",
+    "test" : "data/MQ2008/Fold1/test.txt"
+  },
+
+  "model" : {
+    "format" : "json",
+    "file" : "model/franknet-model.json"
+  },
+
+  "evaluation" : {
+    "evaluator" : "NDCG",
+    "params" : {
+      "k" : 10
+    }
+  },
+
+  "report" : {
+    "format" : "csv",
+    "file" : "report/franknet-report.csv"
+  }
+}

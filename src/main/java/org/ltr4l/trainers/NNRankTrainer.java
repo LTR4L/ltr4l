@@ -16,6 +16,9 @@
 
 package org.ltr4l.trainers;
 
+import java.io.Reader;
+import java.util.List;
+
 import org.ltr4l.nn.Activation;
 import org.ltr4l.nn.MLP;
 import org.ltr4l.nn.NetworkShape;
@@ -24,10 +27,7 @@ import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
-import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
-
-import java.util.List;
 
 /**
  * The implementation of MLPTrainer which uses the
@@ -39,8 +39,8 @@ public class NNRankTrainer extends MLPTrainer<MLP> {
 
   //Last layer of the network has a number of nodes equal to the number of categories.
   //That layer is created in the constructor, so it is not necessary to specify last layer in config file.
-  NNRankTrainer(QuerySet training, QuerySet validation, Config config) {
-    super(training, validation, config, true);
+  NNRankTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    super(training, validation, reader, override, true);
     outputNodeNumber = QuerySet.findMaxLabel(trainingSet) + 1;
   }
 
@@ -60,7 +60,7 @@ public class NNRankTrainer extends MLPTrainer<MLP> {
         double threshold = 0.5;
         forwardProp(features);
         for (int nodeId = 0; nodeId < network.get(network.size() - 1).size(); nodeId++) {
-          Node node = network.get(network.size() - 1).get(nodeId);
+          MNode node = network.get(network.size() - 1).get(nodeId);
           if (node.getOutput() < threshold)
             return nodeId - 1;
         }
@@ -79,15 +79,18 @@ public class NNRankTrainer extends MLPTrainer<MLP> {
 
   @Override
   public void train() {
+    int numTrained = 0;
     for (Query query : trainingSet) {
       for (Document doc : query.getDocList()) {
         int output = (int) ranker.predict(doc.getFeatures());
         int label = doc.getLabel();
         if (output != label) {
-          ranker.backProp(targetLabel(label), errorFunc);
-          ranker.updateWeights(lrRate, rgRate);
+          ranker.backProp(errorFunc, targetLabel(label));
+          numTrained++;
+          if (batchSize == 0 || numTrained % batchSize == 0) ranker.updateWeights(lrRate, rgRate);
         }
       }
     }
+    if (batchSize != 0) ranker.updateWeights(lrRate, rgRate);
   }
 }

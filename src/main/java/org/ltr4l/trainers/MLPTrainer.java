@@ -16,16 +16,21 @@
 
 package org.ltr4l.trainers;
 
+import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.ltr4l.nn.AbstractMLP;
+import org.ltr4l.nn.Activation;
 import org.ltr4l.nn.MLP;
 import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
-import org.ltr4l.Ranker;
+import org.ltr4l.nn.WeightInitializer;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
@@ -35,20 +40,20 @@ import org.ltr4l.tools.Regularization;
  * As the training method can be different depending on the algorithm used,
  * the method train() must be implemented by child classes.
  */
-abstract class MLPTrainer<M extends MLP> extends LTRTrainer<M> {
+public abstract class MLPTrainer<M extends AbstractMLP> extends LTRTrainer<M, MLPTrainer.MLPConfig> {
   protected double maxScore;
   protected double lrRate;
   protected double rgRate;
   //protected Config config;
 
-  MLPTrainer(QuerySet training, QuerySet validation, Config config) {
-    this(training, validation, config, false);
+  MLPTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    this(training, validation, reader, override, false);
   }
 
   //This constructor exists solely for the purpose of child classes
   //It gives child classes the ability to assign an extended MLP.
-  MLPTrainer(QuerySet training, QuerySet validation, Config config, boolean hasOtherMLP) {
-    super(training, validation, config);
+  MLPTrainer(QuerySet training, QuerySet validation, Reader reader, Config override, boolean hasOtherMLP) {
+    super(training, validation, reader, override);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
@@ -60,7 +65,7 @@ abstract class MLPTrainer<M extends MLP> extends LTRTrainer<M> {
   }
 
   @Override
-  protected MLP constructRanker(){
+  protected AbstractMLP constructRanker(){
     int featureLength = trainingSet.get(0).getFeatureLength();
     NetworkShape networkShape = config.getNetworkShape();
     Optimizer.OptimizerFactory optFact = config.getOptFact();
@@ -79,4 +84,61 @@ abstract class MLPTrainer<M extends MLP> extends LTRTrainer<M> {
     return loss / queries.size();
   }
 
+  @Override
+  public Class<MLPConfig> getConfigClass(){
+    return getCC();
+  }
+
+  static Class<MLPConfig> getCC(){
+    return MLPConfig.class;
+  }
+
+  public static class MLPConfig extends Config {
+
+    @JsonIgnore
+    public double getLearningRate(){
+      return getReqDouble(params, "learningRate");
+    }
+
+    @JsonIgnore
+    public Map<String, Object> getRegularization(){
+      return getReqParams(params, "regularization");
+    }
+
+    @JsonIgnore
+    public double getReguRate(){
+      return getReqDouble(getRegularization(), "rate");
+    }
+
+    @JsonIgnore
+    public NetworkShape getNetworkShape(){
+      List<Map<String, Object>> layers = getReqArrayParams(params, "layers");
+      List<NetworkShape.LayerSetting> layerSettings = new ArrayList<>();
+      for(Map<String, Object> params: layers){
+        int num = getReqInt(params, "num");
+        String activation = getString(params, "activator", "identity");
+        Activation actFunc = Activation.ActivationFactory.getActivator(Activation.Type.valueOf(activation));
+        layerSettings.add(new NetworkShape.LayerSetting(num, actFunc));
+      }
+
+      return new NetworkShape(layerSettings);
+    }
+
+    @JsonIgnore
+    public Optimizer.OptimizerFactory getOptFact(){
+      Optimizer.Type optType = Optimizer.Type.valueOf(getString(params, "optimizer", Optimizer.DEFAULT.name()));
+      return Optimizer.getFactory(optType);
+    }
+
+    @JsonIgnore
+    public Regularization getReguFunction(){
+      Regularization.Type reguType = Regularization.Type.valueOf(getString(getRegularization(), "regularizer", Regularization.DEFAULT.name()));
+      return Regularization.RegularizationFactory.getRegularization(reguType);
+    }
+
+    @JsonIgnore
+    public String getWeightInit(){
+      return getString(params, "weightInit", WeightInitializer.DEFAULT.name());
+    }
+  }
 }

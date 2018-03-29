@@ -1,12 +1,12 @@
 /*
  * Copyright 2018 org.LTR4L
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,12 +15,16 @@
  */
 package org.ltr4l;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.ltr4l.tools.Config;
 
 /**
  * Ranker classes use a model to make predictions for a document.
@@ -29,16 +33,17 @@ import java.util.stream.Collectors;
  *
  * Rankers are the model holders.
  */
-public abstract class Ranker {
-  protected static final String DEFAULT_MODEL_FILE = "model.txt";
+public abstract class Ranker<C extends Config> {
 
-  public abstract void writeModel(Properties prop, String file);
-  public void writeModel(Properties prop){
-    writeModel(prop, DEFAULT_MODEL_FILE);
+  public void writeModel(C config, String file) throws IOException {
+    try(Writer writer = new FileWriter(file)){
+      writeModel(config, writer);
+    }
   }
-  public abstract double predict(List<Double> features);
 
-  protected abstract void readModel(String model);
+  public abstract void writeModel(C config, Writer writer) throws IOException;
+
+  public abstract double predict(List<Double> features);
 
   private static String makeRegex(String regex, int num){
     StringBuilder splitter = new StringBuilder();

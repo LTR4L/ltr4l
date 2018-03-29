@@ -24,6 +24,7 @@ public class WeightInitializer {
   private final Type type;
   private final int num;
   private final Random r;
+  private int seq;    // test purpose only
 
   static WeightInitializer get(String type, int num){
     return new WeightInitializer(Type.valueOf(type), num);
@@ -45,6 +46,7 @@ public class WeightInitializer {
     this.type = type;
     this.num = num;
     this.r = new Random(System.currentTimeMillis());
+    this.seq = 0;
   }
 
   public double getNextRandomInitialWeight(){
@@ -53,16 +55,22 @@ public class WeightInitializer {
       case normal: return r.nextGaussian();
       case uniform: return r.nextDouble();
       case zero: return 0;
+      case sequence: return seq++;
       default: return r.nextGaussian();
     }
   }
 
   public double getInitialBias(){
     if(type == Type.zero) return 0;
+    else if(type == Type.sequence) return seq++;
     else return 0.01;
   }
 
   public enum Type {
-    xavier, normal, uniform, zero;
+    xavier,
+    normal,
+    uniform,
+    zero,
+    sequence;  // test purpose only
   }
 }

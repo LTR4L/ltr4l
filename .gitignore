@@ -7,7 +7,7 @@ classes
 test-result
 target
 LTR4L-*.jar
-*.csv
 jacoco-report
 javadocs
 comparison
+out

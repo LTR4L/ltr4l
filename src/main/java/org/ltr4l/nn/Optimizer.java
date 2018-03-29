@@ -31,7 +31,7 @@ public interface Optimizer {
     Optimizer getOptimizer();
   }
 
-  class Adam implements Optimizer {
+  public class Adam implements Optimizer {
     private final double beta1;
     private final double beta2;
     private final double eps;
@@ -57,7 +57,7 @@ public interface Optimizer {
     }
   }
 
-  class AdamFactory implements OptimizerFactory {
+  public class AdamFactory implements OptimizerFactory {
 
     @Override
     public Optimizer getOptimizer() {
@@ -65,7 +65,7 @@ public interface Optimizer {
     }
   }
 
-  class SGD implements Optimizer {
+  public class SGD implements Optimizer {
 
     @Override
     public double optimize(double dw, double rate, long iter) {
@@ -73,7 +73,7 @@ public interface Optimizer {
     }
   }
 
-  class SGDFactory implements OptimizerFactory {
+  public class SGDFactory implements OptimizerFactory {
 
     @Override
     public Optimizer getOptimizer() {
@@ -81,7 +81,7 @@ public interface Optimizer {
     }
   }
 
-  class Momentum implements Optimizer {
+  public class Momentum implements Optimizer {
     private final double beta;
     private double m;
 
@@ -97,7 +97,7 @@ public interface Optimizer {
     }
   }
 
-  class MomentumFactory implements OptimizerFactory {
+  public class MomentumFactory implements OptimizerFactory {
 
     @Override
     public Optimizer getOptimizer() {
@@ -105,7 +105,7 @@ public interface Optimizer {
     }
   }
 
-  class Nesterov implements Optimizer {
+  public class Nesterov implements Optimizer {
     private final double beta;
     private double mp;
     private double m;
@@ -124,7 +124,7 @@ public interface Optimizer {
     }
   }
 
-  class NesterovFactory implements OptimizerFactory {
+  public class NesterovFactory implements OptimizerFactory {
 
     @Override
     public Optimizer getOptimizer() {
@@ -132,7 +132,7 @@ public interface Optimizer {
     }
   }
 
-  class Adagrad implements Optimizer {
+  public class Adagrad implements Optimizer {
     private final double eps;
     private double cache;
 
@@ -148,7 +148,7 @@ public interface Optimizer {
     }
   }
 
-  class AdagradFactory implements OptimizerFactory {
+  public class AdagradFactory implements OptimizerFactory {
 
     @Override
     public Optimizer getOptimizer() {
@@ -156,7 +156,7 @@ public interface Optimizer {
     }
   }
 
-  class RMSProp implements Optimizer{
+  public class RMSProp implements Optimizer{
     private double cache;
     private static final double eps = 1e-6;   //Note: different values possible
     private static final double decay = 0.99; //Note: different values possible
@@ -172,7 +172,7 @@ public interface Optimizer {
     }
   }
 
-  class RMSFactory implements OptimizerFactory {
+  public class RMSFactory implements OptimizerFactory {
 
     @Override
     public Optimizer getOptimizer() {
@@ -180,7 +180,7 @@ public interface Optimizer {
     }
   }
 
-  class Adamax implements Optimizer { //Recommended rate is 0.002
+  public class Adamax implements Optimizer { //Recommended rate is 0.002
     private final double beta1;
     private final double beta2;
     private double m;
@@ -201,7 +201,7 @@ public interface Optimizer {
     }
   }
 
-  class AdamaxFactory implements OptimizerFactory {
+  public class AdamaxFactory implements OptimizerFactory {
 
     @Override
     public Optimizer getOptimizer() {
@@ -209,7 +209,7 @@ public interface Optimizer {
     }
   }
 
-  class Nadam implements Optimizer {
+  public class Nadam implements Optimizer {
     private final double beta1;
     private final double beta2;
     private double m;
@@ -235,7 +235,7 @@ public interface Optimizer {
     }
   }
 
-  class NadamFactory implements OptimizerFactory {
+  public class NadamFactory implements OptimizerFactory {
 
     @Override
     public Optimizer getOptimizer() {
@@ -243,7 +243,7 @@ public interface Optimizer {
     }
   }
 
-  class AMSGrad implements Optimizer {
+  public class AMSGrad implements Optimizer {
     private final double beta1;
     private final double beta2;
     private final double eps;
@@ -271,7 +271,7 @@ public interface Optimizer {
     }
   }
 
-  class AMSGradFactory implements OptimizerFactory {
+  public class AMSGradFactory implements OptimizerFactory {
 
     @Override
     public Optimizer getOptimizer() {

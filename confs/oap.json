@@ -1,0 +1,31 @@
+{
+  "algorithm" : "OAP",
+  "numIterations" : 100,
+  "params" : {
+    "bernoulli" : 0.03,
+    "N" : 100
+  },
+
+  "dataSet" : {
+    "training" : "data/MQ2008/Fold1/train.txt",
+    "validation" : "data/MQ2008/Fold1/vali.txt",
+    "test" : "data/MQ2008/Fold1/test.txt"
+  },
+
+  "model" : {
+    "format" : "json",
+    "file" : "model/oap-model.json"
+  },
+
+  "evaluation" : {
+    "evaluator" : "NDCG",
+    "params" : {
+      "k" : 10
+    }
+  },
+
+  "report" : {
+    "format" : "csv",
+    "file" : "report/oap-report.csv"
+  }
+}

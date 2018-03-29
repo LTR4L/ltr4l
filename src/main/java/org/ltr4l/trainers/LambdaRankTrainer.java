@@ -16,16 +16,17 @@
 
 package org.ltr4l.trainers;
 
-import org.ltr4l.nn.Activation;
-import org.ltr4l.tools.Config;
-import org.ltr4l.query.Document;
-import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
-
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+
+import org.ltr4l.nn.Activation;
+import org.ltr4l.query.Document;
+import org.ltr4l.query.Query;
+import org.ltr4l.query.QuerySet;
+import org.ltr4l.tools.Config;
 
 /**
  * LambdaRankTrainer trains the RankNetTrainer's network
@@ -34,12 +35,13 @@ import java.util.List;
  * */
 public class LambdaRankTrainer extends RankNetTrainer {
 
-  LambdaRankTrainer(QuerySet training, QuerySet validation, Config config) {
-    super(training, validation, config);
+  LambdaRankTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    super(training, validation, reader, override);
   }
 
   @Override
   public void train() {
+    int numTrained = 0;
     for (int iq = 0; iq < trainingSet.size(); iq++) {
       if (trainingPairs.get(iq) == null)
         continue;
@@ -74,9 +76,11 @@ public class LambdaRankTrainer extends RankNetTrainer {
       for (Document doc : query.getDocList()) {
         ranker.forwardProp(doc);
         ranker.backProp(lambdas.get(doc));
+        numTrained++;
+        if (batchSize != 0 && numTrained % batchSize == 0) ranker.updateWeights(lrRate, rgRate);
       }
     }
-    ranker.updateWeights(lrRate, rgRate);
+    ranker.updateWeights(lrRate, rgRate); //Update at the end of the epoch, regardless of batchSize.
   }
 
   /**

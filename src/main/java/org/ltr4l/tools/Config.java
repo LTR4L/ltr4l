@@ -16,147 +16,109 @@
 
 package org.ltr4l.tools;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.Properties;
 
-import org.ltr4l.nn.NetworkShape;
-import org.ltr4l.nn.Optimizer;
-import org.ltr4l.nn.WeightInitializer;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * This class is responsible for parsing the file for the required parameters for training and holding the parameters.
  */
 public class Config {
 
-  private final int numIterations;
-  private final double learningRate;
-  private final Optimizer.OptimizerFactory optFact;
-  private final Regularization reguFunction;
-  private final String weightInit;
-  private final double reguRate;
-  private final NetworkShape networkShape;
-  private final double bernNum;
-  private final int PNum;
-  private final String name;
-  private final Properties props;
+  public String algorithm;
+  public int numIterations = 100;
+  public int batchSize;
 
-  public static Config get(String file){
-    try(InputStream is = new FileInputStream(file)){
-      try(Reader reader = new InputStreamReader(is)){
-        Config configs = get(reader);
-        return configs;
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+  public Map<String, Object> params;
+  public Config.DataSet dataSet;
+  public Config.Model model;
+  public Config.Evaluation evaluation;
+  public Config.Report report;
+
+  public Config overrideBy(Config override){
+    if(override != null){
+      this.algorithm = override.algorithm;
+      this.numIterations = override.numIterations;
+      this.batchSize = override.batchSize;
+      this.params = override.params;
+      this.dataSet = override.dataSet;
+      this.model = override.model;
+      this.evaluation = override.evaluation;
+      this.report = override.report;
     }
+
+    return this;
   }
 
-  public static Config get(Reader reader) throws IOException {
-    return new Config(reader);
+  public static class DataSet {
+    public String training;
+    public String validation;
+    public String test;
   }
 
-  private Config(Reader reader) throws IOException {
-    props = new Properties(); //Changed to class variable for printing model.
-    props.load(reader);
-
-    name = getReqStrProp(props, "name");
-    numIterations = getIntProp(props, "numIterations", 100);
-    learningRate = getDoubleProp(props, "learningRate", 0);   // TODO: default value 0 is correct??
-    Optimizer.Type optType = Optimizer.Type.valueOf(getStrProp(props, "optimizer", Optimizer.DEFAULT.name()));
-    optFact = Optimizer.getFactory(optType);
-    Regularization.Type reguType = Regularization.Type.valueOf(getStrProp(props, "reguFunction", Regularization.DEFAULT.name()));
-    reguFunction = Regularization.RegularizationFactory.getRegularization(reguType);
-    weightInit = getStrProp(props, "weightInit", WeightInitializer.DEFAULT.name());
-    reguRate = getDoubleProp(props, "reguRate", 0); // TODO: default value 0 is correct??
-    networkShape = NetworkShape.parseSetting(props.getProperty("layers"));
-    bernNum = getDoubleProp(props, "bernoulli", 0.03);
-    PNum = getIntProp(props, "N", 1);   // TODO: default value 1 is appropriate?
+  public static class Model {
+    public static final String DEFAULT_MODEL_FILE = "model/model.txt";
+    public String format;
+    public String file;
   }
 
-  static String getStrProp(Properties props, String name, String defValue){
-    String value = props.getProperty(name);
-    return value == null ? defValue : value;
+  public static class Evaluation {
+    public String evaluator;
+    public Map<String, Object> params;
   }
 
-  static String getReqStrProp(Properties props, String name){
-    String value = props.getProperty(name);
-    if(value == null) throw new IllegalArgumentException(String.format("parameter \"%s\" must be set in config file", name));
-    return value;
+  public static class Report {
+    public String format;
+    public String file;
   }
 
-  static int getIntProp(Properties props, String name, int defValue){
-    String value = props.getProperty(name);
-    return value == null ? defValue : Integer.parseInt(value);
+  public static String getReqString(Map<String, Object> params, String name){
+    Object obj = params.get(name);
+    return Objects.requireNonNull(obj, name + " must be set in params!").toString();
   }
 
-  static int getReqIntProp(Properties props, String name){
-    String value = props.getProperty(name);
-    if(value == null) throw new IllegalArgumentException(String.format("parameter \"%s\" must be set in config file", name));
-    return Integer.parseInt(value);
-  }
-
-  static double getDoubleProp(Properties props, String name, double defValue){
-    String value = props.getProperty(name);
-    return value == null ? defValue : Double.parseDouble(value);
-  }
-
-  static double getReqDoubleProp(Properties props, String name){
-    String value = props.getProperty(name);
-    if(value == null) throw new IllegalArgumentException(String.format("parameter \"%s\" must be set in config file", name));
-    return Double.parseDouble(value);
-  }
-
-  public double getLearningRate() {
-    return learningRate;
-  }
-
-  public double getReguRate() {
-    return reguRate;
-  }
-
-  public int getNumIterations() {
-    return numIterations;
-  }
-
-  public Regularization getReguFunction() {
-    return reguFunction;
-  }
-
-  public String getWeightInit() {
-    //Default Weight initialization to be determined in NN Constructor
-    return weightInit;
-  }
-
-  //Have
-  public Optimizer.OptimizerFactory getOptFact() {
-    if (optFact == null) {
-      System.err.println("No or invalid optimizer specified. Will use default SGD.");
-      return new Optimizer.SGDFactory();
+  public static String getString(Map<String, Object> params, String name, String defValue){
+    Object obj = params.get(name);
+    if(obj == null){
+      return defValue;
     }
-    return optFact;
+    return obj.toString();
   }
 
-  public NetworkShape getNetworkShape() {
-    return networkShape;
+  public static int getReqInt(Map<String, Object> params, String name){
+    Object obj = params.get(name);
+    return Integer.parseInt(Objects.requireNonNull(obj, name + " must be set in params!").toString());
   }
 
-  public double getBernNum() {
-    return bernNum;
+  public static int getInt(Map<String, Object> params, String name, int defValue){
+    Object obj = params.get(name);
+    if(obj == null){
+      return defValue;
+    }
+    return Integer.parseInt(obj.toString());
   }
 
-  public int getPNum() {
-    return PNum;
+  public static double getReqDouble(Map<String, Object> params, String name){
+    Object obj = params.get(name);
+    return Double.parseDouble(Objects.requireNonNull(obj).toString());
   }
 
-  public String getName() {
-    return name;
+  public static double getDouble(Map<String, Object> params, String name, double defValue){
+    Object obj = params.get(name);
+    if(obj == null){
+      return defValue;
+    }
+    return Double.parseDouble(obj.toString());
   }
 
-  public Properties getProps() {
-    return props;
+  public static Map<String, Object> getReqParams(Map<String, Object> params, String name){
+    Object obj = params.get(name);
+    return (Map<String, Object>)Objects.requireNonNull(obj, name + " must be set in params!");
+  }
+
+  public static List<Map<String, Object>> getReqArrayParams(Map<String, Object> params, String name){
+    Object obj = params.get(name);
+    return (List<Map<String, Object>>)Objects.requireNonNull(obj, name + " must be set in params!");
   }
 }

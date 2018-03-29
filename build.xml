@@ -3,21 +3,12 @@
          xmlns:jacoco="antlib:org.jacoco.ant"
          default="compile" basedir=".">
 
-    <property name="src.dir" value="src"/>
-    <property name="cls.dir" value="classes"/>
-    <property name="lib.dir" value="lib"/>
-    <property name="test.result.dir" value="test-result"/>
-    <property name="conf.dir" value="confs"/>
-    <property name="jacoco.report.dir" value="jacoco-report"/>
-    <property name="jacoco.version" value="0.8.0"/>
-    <property name="doc.dir" value="javadocs"/>
-
-    <property name="PRODUCT_NAME" value="LTR4L"/>
-    <property name="PRODUCT_VERSION" value="0.1-dev"/>
-    <property name="product.jar" value="${PRODUCT_NAME}-${PRODUCT_VERSION}.jar"/>
+    <property file="version.properties"/>
+    <property file="build.properties"/>
 
     <target name="compile" description="compile source and test code">
         <mkdir dir="${cls.dir}"/>
+        <copy file="version.properties" todir="${cls.dir}"/>
         <javac srcdir="${src.dir}/main/java" destdir="${cls.dir}" debug="on" includes="**/*.java">
             <classpath path="${cls.dir}"/>
             <classpath>
@@ -54,7 +45,7 @@
             <classpath path="${lib.dir}/jacocoant.jar"/>
         </taskdef>
         <jacoco:coverage destfile="${jacoco.report.dir}/jacoco-report">
-            <junit fork="true" forkmode="once" printsummary="on"
+            <junit fork="true" forkmode="once" printsummary="on" dir="${src.dir}/test/resources"
                    haltonfailure="no"
                    errorProperty="tests.failed"
                    failureProperty="tests.failed">
@@ -88,24 +79,59 @@
         </jacoco:report>
     </target>
 
+    <!-- This jar package is used via "java -jar LTR4L-0.1-dev.jar $*"
     <target name="jar" depends="compile" description="make jar file">
-        <jar destfile="${product.jar}" basedir="${cls.dir}">
+        <jar destfile="${product.jar}">
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
-                <attribute name="Main-Class" value="org.ltr4l.Main"/>
+                <attribute name="Main-Class" value="org.ltr4l.cli.Train"/>
+                <attribute name="Class-Path" value="lib/commons-cli-1.4.jar lib/jackson-annotations-2.9.4.jar lib/jackson-core-2.9.4.jar lib/jackson-databind-2.9.4.jar"/>
             </manifest>
+            <fileset dir="${cls.dir}">
+                <include name="**/*.class"/>
+            </fileset>
+            <fileset dir=".">
+                <include name="${lib.dir}/*.jar"/>
+                <exclude name="${lib.dir}/*-javadoc.jar"/>
+                <exclude name="${lib.dir}/*-sources.jar"/>
+                <exclude name="${lib.dir}/*jacoco*.jar"/>
+                <exclude name="${lib.dir}/*junit*.jar"/>
+            </fileset>
+        </jar>
+    </target>
+-->
+    <!-- This jar package is used via "java -cp LTR4L-0.1-dev.jar org.ltr4l.cli.Train $*" -->
+    <target name="jar" depends="compile" description="make jar file">
+        <property file="ivy-jars.properties"/>
+        <jar destfile="${product.jar}">
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Class-Path" value="${RUNTIME_JARS}"/>
+            </manifest>
+            <fileset dir="${cls.dir}">
+                <include name="**/*.class"/>
+                <include name="*.properties"/>
+            </fileset>
+            <fileset dir=".">
+                <include name="${lib.dir}/*.jar"/>
+                <exclude name="${lib.dir}/*-javadoc.jar"/>
+                <exclude name="${lib.dir}/*-sources.jar"/>
+                <exclude name="${lib.dir}/*jacoco*.jar"/>
+                <exclude name="${lib.dir}/*junit*.jar"/>
+            </fileset>
         </jar>
     </target>
 
     <target name="package" depends="jar" description="make package"/>
 
-    <target name="run" depends="compile" description="run Main program">
-        <property name="train" value="data/MQ2008/Fold1/train.txt"/>
-        <property name="valid" value="data/MQ2008/Fold1/vali.txt"/>
+    <target name="train" depends="compile" description="run Train program">
         <property name="algo" value="ranknet"/>
-        <java classname="org.ltr4l.Main">
-            <arg line="${train} ${valid} ${conf.dir}/${algo}.config"/>
+        <java classname="org.ltr4l.cli.Train">
+            <arg line="${algo}"/>
             <classpath path="${cls.dir}"/>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
         </java>
     </target>
 
@@ -118,9 +144,13 @@
     </target>
 
     <target name="ivy-bootstrap" description="--> retrieve dependencies with ivy">
+        <property file="ivy-jars.properties"/>
         <ivy:retrieve />
+<!--
         <ivy:retrieve sync="true" type="jar" />
+-->
     </target>
+
     <target name="javadoc" description="generate documentation">
         <javadoc sourcepath="${src.dir}/main/java" destdir="${doc.dir}" locale="en_US"/>
     </target>

@@ -16,10 +16,12 @@
 
 package org.ltr4l.trainers;
 
-import java.util.List;
+import java.io.Reader;
 
-import org.ltr4l.Ranker;
-import org.ltr4l.nn.*;
+import org.ltr4l.nn.Activation;
+import org.ltr4l.nn.ListNetMLP;
+import org.ltr4l.nn.NetworkShape;
+import org.ltr4l.nn.Optimizer;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
@@ -32,12 +34,12 @@ import org.ltr4l.tools.Regularization;
  * Despite note extending MLPTrainer, this trainer
  * trains an MLP network.
  */
-public class ListNetTrainer extends LTRTrainer<ListNetMLP> {
+public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
   private double lrRate;
   private double rgRate;
 
-  ListNetTrainer(QuerySet training, QuerySet validation, Config config) {
-    super(training, validation, config);
+  ListNetTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+    super(training, validation, reader, override);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
@@ -60,6 +62,11 @@ public class ListNetTrainer extends LTRTrainer<ListNetMLP> {
   }
 
   @Override
+  public Class<MLPTrainer.MLPConfig> getConfigClass(){
+    return MLPTrainer.MLPConfig.class;
+  }
+
+  @Override
   public void train() {
     for (Query query : trainingSet) {
       for (Document doc : query.getDocList()) {
@@ -69,23 +76,5 @@ public class ListNetTrainer extends LTRTrainer<ListNetMLP> {
       ranker.updateWeights(lrRate, rgRate);
     }
   }
-
-  @Override
-  protected double calculateLoss(List<Query> querySet) {
-    double loss = 0;
-    for (Query query : querySet) {
-      double targetSum = query.getDocList().stream().mapToDouble(i -> Math.exp(i.getLabel())).sum();
-      double outputSum = query.getDocList().stream().mapToDouble(i -> Math.exp(ranker.forwardProp(i))).sum();
-      double qLoss = query.getDocList().stream().mapToDouble(i -> errorFunc.error( //-Py(log(Pfx))
-          Math.exp(ranker.forwardProp(i)) / outputSum, //output: exp(f(x)) / sum(f(x))
-          i.getLabel() / targetSum))                 //target: y / sum(exp(y))
-          .sum(); //sum over all documents                // Should it be exp(y)/sum(exp(y))?
-      loss += qLoss;
-    }
-    return loss / querySet.size();
-  }
-
-
-
 }
 

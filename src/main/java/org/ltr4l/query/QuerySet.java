@@ -111,13 +111,5 @@ public class QuerySet {
     }
   }
 
-/*    public void printQueryDocumentInformation() {
-        for (Query query : queries) {
-            for (Document document : query.getDocList()) {
-                System.out.println("qid: " + query.getQueryId() + " label: " + document.getLabel() + " features: " + document.getFeatures().toString());
-            }
-        }
-    }*/
-
 }
 
