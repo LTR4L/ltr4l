@@ -8,7 +8,7 @@
     </dependency>
     <dependency org="${ivy.jar.jackson-databind.org}" name="${ivy.jar.jackson-databind.name}" rev="${ivy.jar.jackson.rev}">
       <artifact name="${ivy.jar.jackson-databind.name}" type="jar"
-                url="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/${ivy.jar.jackson-databind.name}/${ivy.jar.jackson.rev}/${ivy.jar.jackson-fatabind.name}-${ivy.jar.jackson.rev}.jar"/>
+                url="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/${ivy.jar.jackson-databind.name}/${ivy.jar.jackson.rev}/${ivy.jar.jackson-databind.name}-${ivy.jar.jackson.rev}.jar"/>
     </dependency>
     <dependency org="${ivy.jar.jackson-annotations.org}" name="${ivy.jar.jackson-annotations.name}" rev="${ivy.jar.jackson.rev}">
       <artifact name="${ivy.jar.jackson-annotations.name}" type="jar"

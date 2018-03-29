@@ -23,6 +23,26 @@
         </javac>
     </target>
 
+    <target name="test" depends="compile" description="run all tests">
+        <mkdir dir="${test.result.dir}"/>
+        <junit printsummary="on"
+               haltonfailure="no"
+               errorProperty="tests.failed"
+               failureProperty="tests.failed"
+               dir="${src.dir}/test/resources">
+            <classpath path="${cls.dir}"/>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+            <jvmarg value="-ea"/>
+            <formatter type="plain"/>
+            <batchtest fork="yes" todir="${test.result.dir}">
+                <fileset dir="${src.dir}/test/java" includes="**/*Test.java"/>
+            </batchtest>
+        </junit>
+        <fail if="tests.failed">***** Tests failed! *****</fail>
+    </target>
+
     <target name="jacoco-install" depends="jacoco-check" unless="jacocoant.exists">
         <get src="https://github.com/jacoco/jacoco/releases/download/v${jacoco.version}/jacoco-${jacoco.version}.zip" dest="${lib.dir}"/>
         <unzip src="${lib.dir}/jacoco-${jacoco.version}.zip" dest="${lib.dir}/jacoco-${jacoco.version}"/>
@@ -39,7 +59,7 @@
         <available property = "jacocoant.exists" file = "${lib.dir}/jacocoant.jar"/>
     </target>
 
-    <target name="test" depends="compile,jacoco-install" description="run all tests">
+    <target name="coverage-report" depends="compile,jacoco-install" description="run all tests">
         <mkdir dir="${test.result.dir}"/>
         <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
             <classpath path="${lib.dir}/jacocoant.jar"/>
