@@ -36,10 +36,16 @@ public interface RankEval {
   }
 
   default double calculateAvgAllQueries(Trainer trainer, List<Query> queries, int position){
-    return queries.stream().mapToDouble(query -> calculate(trainer.sortP(query), position)).sum() / queries.size();
-/*    double total = 0;
-    for (Query query : queries) total += calculate(trainer.sortP(query), position);
-    return total / queries.size();*/
+    //return queries.stream().mapToDouble(query -> calculate(trainer.sortP(query), position)).sum() / queries.size();
+    double total = 0;
+    //double processedQ = 0d;
+    for (Query query : queries) {
+      double queryVal = calculate(trainer.sortP(query), position);
+      if (!Double.isFinite(queryVal)) continue;
+      total += calculate(trainer.sortP(query), position);
+      //processedQ++;
+    }
+    return total / queries.size();
   }
 
   default int identity(Document doc){
@@ -51,8 +57,12 @@ public interface RankEval {
   public static class RankEvalFactory {
     public static RankEval get(String eval){
       switch (eval.toLowerCase()){
+        case "dcg":
+          return new DCG();
         case "ndcg":
           return new DCG.NDCG();
+        case "precision":
+          return new Precision();
         case "map":
           return new Precision.AP();
         case "wap":

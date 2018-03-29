@@ -38,7 +38,7 @@ public class RankEvalTest {
   }
 
   @Test
-  public void testCGPerfectMatch(){
+  public void testCG(){
     List<Document> docs = DCGTest.docs(3, 3, 2, 1, 1, 0, 0);
     Assert.assertEquals(3, RankEval.cg(docs, 1), 0.001);
     Assert.assertEquals(6, RankEval.cg(docs, 2), 0.001);
@@ -53,9 +53,10 @@ public class RankEvalTest {
     Assert.assertEquals(10, RankEval.cg(docs, 9), 0.001);
   }
 
-  @Test
+  @Test (expected = AssertionError.class)
   public void testCGInvalidPosition(){
-
+    List<Document> docs = DCGTest.docs(0, 0, 0, 0, 0, 0);
+    RankEval.cg(docs, -1);
   }
 
   @Test
@@ -64,6 +65,8 @@ public class RankEvalTest {
     Assert.assertTrue(RankEvalFactory.get("MAP") instanceof Precision.AP);
     Assert.assertTrue(RankEvalFactory.get("MRR") instanceof MRR);
     Assert.assertTrue(RankEvalFactory.get("WAP") instanceof Precision.WAP);
+    Assert.assertTrue(RankEvalFactory.get("DCG") instanceof DCG);
+    Assert.assertTrue(RankEvalFactory.get("Precision") instanceof Precision);
   }
 
   @Test(expected = IllegalArgumentException.class)

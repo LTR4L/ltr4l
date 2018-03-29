@@ -49,7 +49,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
   protected final C config;
   protected final Error errorFunc;
   protected final int batchSize;
-  protected final int ndcgK;
+  protected final int evalK;
   protected final String modelFile;
   protected final RankEval eval;
 
@@ -64,7 +64,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
     assert(config.batchSize >= 0);
     batchSize = config.batchSize;
     eval = getEvaluator(config);
-    ndcgK  = getEvaluatorAtK(config);
+    evalK = getEvaluatorAtK(config);
     modelFile = getModelFile(config);
     this.report = Report.getReport(getReportFile(config));
     this.errorFunc = makeErrorFunc();
@@ -122,7 +122,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
   public void trainAndValidate() {
     for (int i = 1; i <= epochNum; i++) {
       train();
-      validate(i, ndcgK);
+      validate(i, evalK);
     }
     report.close();
     try {
