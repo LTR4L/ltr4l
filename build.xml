@@ -28,7 +28,8 @@
         <junit printsummary="on"
                haltonfailure="no"
                errorProperty="tests.failed"
-               failureProperty="tests.failed">
+               failureProperty="tests.failed"
+               dir="${src.dir}/test/resources">
             <classpath path="${cls.dir}"/>
             <classpath>
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
