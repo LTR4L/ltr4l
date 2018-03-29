@@ -62,7 +62,7 @@ public class LTRTrainerTest {
         "}\n";
 
     trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON), null);
-    Assert.assertEquals(7, trainer.ndcgK);
+    Assert.assertEquals(7, trainer.evalK);
   }
 
   @Test
@@ -73,7 +73,7 @@ public class LTRTrainerTest {
         "}\n";
 
     trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON), null);
-    Assert.assertEquals(10, trainer.ndcgK);
+    Assert.assertEquals(10, trainer.evalK);
   }
 
   @Test

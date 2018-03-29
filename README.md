@@ -26,6 +26,8 @@ For specific mathematical details and formulation, please see implementation or 
     - LambdaRank
     - SortNet
     - ListNet
+5. Overview of Optimizers
+6. Overview of Evaluation Metrics
     
 ## Introduction
 Ranking models are an essential component of information retrieval systems.  
@@ -887,3 +889,83 @@ for s = 1 until S do:
 end for
 
 ```
+
+## Overview of Optimizers
+This section is a work in progress, and it will be updated when overviews/formulation of each optimizer implementation has been written.
+
+In LTR4L, several different gradient descent optimization algorithms have been implemented.
+The following optimizers have been implemented (and can also be specified by the names below):
+
+SGD
+Momentum  
+Adam  
+Nesterov  
+Adagrad  
+Adamax  
+Nadam  
+AMS  
+
+#### SGD
+
+#### Momentum
+
+#### Adam
+
+#### Nesterov
+
+#### Nesterov
+
+#### Adagrad
+
+#### Nadam
+
+#### AMS
+
+## Overview of Evaluation Metrics
+
+This section is a work in progress, and it will be updated as overviews/formulations of each optimizer has been written.
+
+Evaluation metrics are essential to measure the accuracy of a ranking model. 
+For evaluation metrics with an asterisk, a position value (k) may be be specified as well (and if it is not, the default value of 10 will be used).
+If a specified evaluation metric does not require a position value, "k" will be ignored, even if it is specified.
+If no evaluation metric has been specified, NDCG@10 will be chosen by default.
+The following evaluation metrics can be specified in the config file:
+
+DCG (Discounted Cumulative Gain)*
+NDCG (Normalized Discounted Cumulative Gain)*  
+Precision (P@k)*
+MAP (Mean Average Precision)  
+WAP (Weighted Average Precision)  
+MRR (Mean Reciprocal Rank)  
+
+Note that while DCG is available, NDCG is recommended over DCG, as the latter is not normalized.
+Below is the example of the config file in the execution instructions.
+
+```
+{
+.
+.
+.
+  "evaluation" : {
+    "evaluator" : "NDCG",
+    "params" : {
+      "k" : 10
+    }
+  },
+.
+.
+.
+}
+```
+
+#### DCG@k
+
+#### NDCG@k
+
+#### Precision@k
+
+#### MAP
+
+#### WAP
+
+#### MRR
