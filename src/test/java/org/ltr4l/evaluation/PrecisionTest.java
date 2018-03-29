@@ -111,6 +111,13 @@ public class PrecisionTest {
   }
 
   @Test
+  public void testMAPNoRelevant() throws Exception {
+    List<Document> documents = DCGTest.docs(0, 0, 0, 0, 0, 0);
+    Precision.AP map = new Precision.AP();
+    Assert.assertTrue(!Double.isFinite(map.calculate(documents))); //This includes NaN and infinity.
+  }
+
+  @Test
   public void testWAPPerfectMatch() throws Exception {
     //Perfect match means all relevant documents are ranked higher up.
     List<Document> documents = DCGTest.docs(3, 3, 2, 2, 1, 0, 0);

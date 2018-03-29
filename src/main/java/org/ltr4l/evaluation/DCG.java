@@ -21,7 +21,7 @@ import org.ltr4l.query.Document;
 import java.util.Comparator;
 import java.util.List;
 
-public interface DCG {
+public class DCG implements RankEval {
 
   /**
    * Calculate Discounted Cumulative Gain. DCG is an evaluation measure that can leverage the relevance judgement
@@ -41,7 +41,12 @@ public interface DCG {
     return sum * Math.log(2);  //Change of base
   }
 
-  class NDCG implements RankEval{
+  @Override
+  public double calculate(List<Document> docRanks, int position){
+    return dcg(docRanks, position);
+  }
+
+  public static class NDCG extends DCG{
     /**
      * Calculate Normalized Discounted Cumulative Gain. This is calculated by normalizing {@link DCG#dcg(List, int)}
      * {@literal @}k with its maximum possible value.
