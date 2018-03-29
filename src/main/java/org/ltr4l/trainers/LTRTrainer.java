@@ -74,7 +74,6 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
     if (config.evaluation == null || config.evaluation.evaluator == null || config.evaluation.evaluator.equals(""))
       return new DCG.NDCG();
     final String evaluator = config.evaluation.evaluator;
-    System.out.println("Will use " + evaluator);
     return RankEvalFactory.get(evaluator);
   }
 

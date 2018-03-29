@@ -43,13 +43,13 @@ public class Report {
     this.file = file;
     pw = new PrintWriter(new FileOutputStream(file));
     // TODO: eval method should be mutable
-    pw.println(",NDCG@10,tr_loss,va_loss");  // header for CSV file
+    pw.println(",evaluation,tr_loss,va_loss");  // header for CSV file
   }
 
-  public void log(int iter, double ndcg, double tloss, double vloss){
+  public void log(int iter, double eval, double tloss, double vloss){
     // TODO: eval method should be mutable
-    System.out.printf("%d tr_loss: %f va_loss: %f calculate@10: %f\n", iter, tloss, vloss, ndcg);
-    pw.printf("%d,%f,%f,%f\n", iter, ndcg, tloss, vloss);
+    System.out.printf("%d tr_loss: %f va_loss: %f evaluation: %f\n", iter, tloss, vloss, eval);
+    pw.printf("%d,%f,%f,%f\n", iter, eval, tloss, vloss);
   }
 
   public void close(){
