@@ -38,6 +38,27 @@ public class RankEvalTest {
   }
 
   @Test
+  public void testCGPerfectMatch(){
+    List<Document> docs = DCGTest.docs(3, 3, 2, 1, 1, 0, 0);
+    Assert.assertEquals(3, RankEval.cg(docs, 1), 0.001);
+    Assert.assertEquals(6, RankEval.cg(docs, 2), 0.001);
+    Assert.assertEquals(8, RankEval.cg(docs, 3), 0.001);
+    Assert.assertEquals(9, RankEval.cg(docs, 4), 0.001);
+    Assert.assertEquals(10, RankEval.cg(docs, 5), 0.001);
+    Assert.assertEquals(10, RankEval.cg(docs, 6), 0.001);
+
+    //position greater than docs.size()
+    Assert.assertEquals(10, RankEval.cg(docs, 7), 0.001);
+    Assert.assertEquals(10, RankEval.cg(docs, 8), 0.001);
+    Assert.assertEquals(10, RankEval.cg(docs, 9), 0.001);
+  }
+
+  @Test
+  public void testCGInvalidPosition(){
+
+  }
+
+  @Test
   public void factoryTest() {
     Assert.assertTrue(RankEvalFactory.get("NDCG") instanceof DCG.NDCG);
     Assert.assertTrue(RankEvalFactory.get("MAP") instanceof Precision.AP);
@@ -49,8 +70,5 @@ public class RankEvalTest {
   public void factoryBadOptionTest(){
     RankEvalFactory.get("MyGreatestEvaluator!");
   }
-
-
-
 
 }

@@ -16,13 +16,10 @@
 
 package org.ltr4l.evaluation;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.tools.Config;
 import org.ltr4l.trainers.Trainer;
 
 public interface RankEval {
@@ -30,11 +27,11 @@ public interface RankEval {
     return docRanks.stream().filter(doc -> doc.getLabel() != 0).mapToInt(doc -> 1).sum();
   }
 
-  //TODO: Confirm definition and write test.
   static double cg(List<Document> docRanks, int position){
+    assert(position > 0);
     double cg = 0;
     int pos = Math.min(position, docRanks.size());
-    for (int k = 0; k < pos; k++) cg += Math.pow(2, docRanks.get(k).getLabel()) - 1;
+    for (int k = 0; k < pos; k++) cg += docRanks.get(k).getLabel(); //Modified version: Math.pow(2, docRanks.get(k).getLabel()) - 1;
     return cg;
   }
 
@@ -43,6 +40,10 @@ public interface RankEval {
 /*    double total = 0;
     for (Query query : queries) total += calculate(trainer.sortP(query), position);
     return total / queries.size();*/
+  }
+
+  default int identity(Document doc){
+    return doc.getLabel() > 0 ? 1 : 0;
   }
 
   double calculate(List<Document> docRanks, int position);

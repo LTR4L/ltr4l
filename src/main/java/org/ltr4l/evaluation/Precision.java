@@ -56,17 +56,22 @@ public interface Precision {
     }
   }
 
-  //TODO: Confirm formula and if non-binary relevance can be used, and write test.
-  public static class WAP implements RankEval{
+
+  //Weighted Average Precision.
+  //Reference: https://www.nii.ac.jp/TechReports/public_html/05-014E.pdf
+  static class WAP implements RankEval{
 
     public double calculate(List<Document> docRanks, int position){
+      return calculate(docRanks);
+    }
+    public double calculate(List<Document> docRanks){
       List<Document> idealRanking = new ArrayList<>(docRanks);
       int numRelDocs = RankEval.countNumRelDocs(docRanks);
       idealRanking.sort(Comparator.comparingInt(Document::getLabel).reversed());
-      int pos = Math.min(position, docRanks.size());
+      //int pos = Math.min(position, docRanks.size());
       double total = 0d;
-      for (int k = 0; k < pos; k++){
-        total += docRanks.get(k).getLabel() * precision(docRanks, k) / precision(idealRanking, k);
+      for (int k = 0; k < docRanks.size(); k++){
+        total += identity(docRanks.get(k)) * RankEval.cg(docRanks, k+1) / RankEval.cg(idealRanking, k+1);
       }
       return total / numRelDocs;
     }
