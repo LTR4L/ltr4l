@@ -76,6 +76,10 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
   protected abstract N constructNode(Activation activation);
   protected abstract E constructEdge(N source, N destination, Optimizer opt, double weight);
 
+  public List<List<N>> load(Reader reader) throws IOException {
+    return new ModelReader<N, E>().readModel1(reader, this);
+  }
+
   static class ModelReader <N extends AbstractNode.Node, E extends AbstractEdge.AbstractFFEdge> {
 
     // TODO: use Factory...?
@@ -122,6 +126,26 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
         }
       }
       return network;
+    }
+
+    public List<List<N>> readModel1(Reader reader, AbstractMLP<N, E> dummy) throws IOException{
+      ObjectMapper mapper = new ObjectMapper();
+      SavedModel savedModel = mapper.readValue(reader, SavedModel.class);
+
+       assert(savedModel.weights.size() > 0);
+
+       //final int inputDim = savedModel.getNode(0, 0).size() - 1;
+       for (int layerId = 1; layerId < dummy.network.size(); layerId++){ //Since inputEdges will be looked at, start at 1.
+         List<N> currentLayer = dummy.network.get(layerId);
+         for (int nodeId = 0; nodeId < currentLayer.size(); nodeId++){
+           N currentNode = currentLayer.get(nodeId);
+           for (int edgeId = 0; edgeId < currentNode.getInputEdges().size(); edgeId++ ) {
+             E currentEdge = (E) currentNode.getInputEdge(edgeId);
+             currentEdge.setWeight(savedModel.getWeight(layerId, nodeId, edgeId));
+           }
+         }
+       }
+      return dummy.network;
     }
   }
 }

@@ -94,6 +94,7 @@ public abstract class Ranker<C extends Config> {
         }
         MLPTrainer.MLPConfig config = getConfig(reader, MLPTrainer.MLPConfig.class);
         config.overrideBy(override);
+        AbstractMLP ranker;
         switch (alg) {  //For MLP Rankers
           case "nnrank":
             NetworkShape networkShape = config.getNetworkShape();
@@ -113,12 +114,15 @@ public abstract class Ranker<C extends Config> {
               }
             };
           case "ranknet":
-            return new RankNetMLP(featLength, config);
           case "franknet":
-            return new RankNetMLP(featLength, config);
           case "lambdarank":
-            return new RankNetMLP(featLength, config);
+            ranker = new RankNetMLP(featLength, config);
+            if (config.model == null || config.model.file == null || config.model.file.isEmpty()) {
+              ranker.load(reader);
+            }
+            return ranker;
           case "sortnet":
+            ranker = new SortNetMLP(featLength, config);
             return new SortNetMLP(featLength, config);
           case "listnet":
             return new ListNetMLP(featLength, config);

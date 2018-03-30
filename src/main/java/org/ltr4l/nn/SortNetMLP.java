@@ -16,6 +16,7 @@
 
 package org.ltr4l.nn;
 
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -231,6 +232,10 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
     }
     numAccumulatedDer = 0; //Weights updated, now no derivatives have been accumulated.
     iter++;
+  }
+
+  public List<List<SNode>> load(Reader readModel) { //TODO:
+    return null;
   }
 
   /**
