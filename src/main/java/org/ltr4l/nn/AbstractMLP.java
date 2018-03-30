@@ -39,6 +39,12 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
     super(inputDim, config);
   }
 
+  public AbstractMLP(List<List<N>> network, MLPTrainer.MLPConfig config){
+    super(network, config);
+  }
+
+
+
   protected List<List<N>> constructNetwork(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact){
     List<List<N>> network = new ArrayList<>();
     List<N> currentLayer = new ArrayList<>();
@@ -76,9 +82,9 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
   protected abstract N constructNode(Activation activation);
   protected abstract E constructEdge(N source, N destination, Optimizer opt, double weight);
 
-  public List<List<N>> load(Reader reader) throws IOException {
+/*  public List<List<N>> load(Reader reader) throws IOException {
     return new ModelReader<N, E>().readModel1(reader, this);
-  }
+  }*/
 
   static class ModelReader <N extends AbstractNode.Node, E extends AbstractEdge.AbstractFFEdge> {
 
@@ -128,7 +134,7 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
       return network;
     }
 
-    public List<List<N>> readModel1(Reader reader, AbstractMLP<N, E> dummy) throws IOException{
+/*    public List<List<N>> readModel1(Reader reader, AbstractMLP<N, E> dummy) throws IOException{
       ObjectMapper mapper = new ObjectMapper();
       SavedModel savedModel = mapper.readValue(reader, SavedModel.class);
 
@@ -146,6 +152,6 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
          }
        }
       return dummy.network;
-    }
+    }*/
   }
 }

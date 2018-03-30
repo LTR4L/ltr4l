@@ -16,6 +16,8 @@
 
 package org.ltr4l.nn;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.List;
 
 import org.ltr4l.query.Document;
@@ -45,6 +47,12 @@ public class ListNetMLP extends AbstractMLP<ListNetMLP.LNode, ListNetMLP.LEdge> 
 
   public ListNetMLP(int inputDim, MLPTrainer.MLPConfig config){
     this(inputDim, config.getNetworkShape(), config.getOptFact(), config.getReguFunction(), config.getWeightInit());
+  }
+  public ListNetMLP(Reader reader, MLPTrainer.MLPConfig config) throws IOException{
+    super(new ModelReader<LNode, LEdge>().readModel(reader, createDummy()), config);
+  }
+  private static ListNetMLP createDummy(){
+    return new ListNetMLP(0, null, null, null, null);
   }
 
   protected void addOutputs(NetworkShape ns){

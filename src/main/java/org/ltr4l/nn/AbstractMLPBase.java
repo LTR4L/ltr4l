@@ -72,6 +72,15 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
     this(inputDim, config.getNetworkShape(), config.getOptFact(), config.getReguFunction(), config.getWeightInit());
   }
 
+  public AbstractMLPBase(List<List<N>> network, MLPTrainer.MLPConfig config){
+    this.network = network;
+    //The following assignments are unnecessary for prediction and ranking, if reading a model.
+    iter = 1;
+    numAccumulatedDer = 0;
+    regularization = config.getReguFunction();
+    weightInit = null;
+  }
+
   public double[] getOutputs(){
     return getLayer(network.size() - 1).stream().mapToDouble(node -> node.getOutput()).toArray();
   }

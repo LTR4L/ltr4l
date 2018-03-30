@@ -16,6 +16,8 @@
 
 package org.ltr4l.nn;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.List;
 
 import org.ltr4l.tools.Error;
@@ -35,6 +37,13 @@ public class MLP extends AbstractMLP<MLP.MNode, MLP.Edge> {
 
   public MLP(int inputDim, MLPTrainer.MLPConfig config){
     super(inputDim, config);
+  }
+
+  public MLP(Reader reader, MLPTrainer.MLPConfig config) throws IOException{ //TODO: don't want to use dummy
+    super(new ModelReader<MNode, Edge>().readModel(reader, createDummy()), config);
+  }
+  private static MLP createDummy(){
+    return new MLP(0, null, null, null, null);
   }
 
   protected void addOutputs(NetworkShape ns){

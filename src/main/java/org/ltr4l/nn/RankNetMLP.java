@@ -16,6 +16,8 @@
 
 package org.ltr4l.nn;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.List;
 
 import org.ltr4l.tools.Regularization;
@@ -26,9 +28,11 @@ public class RankNetMLP extends MLP {
   public RankNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
     super(inputDim, networkShape, optFact, regularization, weightModel);
   }
-
   public RankNetMLP(int inputDim, MLPTrainer.MLPConfig config){
     super(inputDim, config);
+  }
+  public RankNetMLP(Reader reader, MLPTrainer.MLPConfig config) throws IOException {
+    super(reader, config);
   }
 
   @Override

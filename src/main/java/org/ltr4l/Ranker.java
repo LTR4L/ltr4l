@@ -79,6 +79,7 @@ public abstract class Ranker<C extends Config> {
       try (Reader reader = new FileReader(configFile)) {
         String alg = algorithm.toLowerCase();
         int featLength = testSet.getFeatureLength();
+
         if (alg.equals("prank")) {
           int maxLabel = QuerySet.findMaxLabel(testSet.getQueries());
           return PRankTrainer.getPRank(featLength, maxLabel);
@@ -92,51 +93,40 @@ public abstract class Ranker<C extends Config> {
           //double bernNum = Config.getDouble(config.params, "bernoulli", 0.03);
           return OAPBPMTrainer.getOAP(featLength, maxLabel, pNum, bernNum);
         }
+
         MLPTrainer.MLPConfig config = getConfig(reader, MLPTrainer.MLPConfig.class);
         config.overrideBy(override);
-        AbstractMLP ranker;
         switch (alg) {  //For MLP Rankers
           case "nnrank":
             NetworkShape networkShape = config.getNetworkShape();
             int outputNodeNumber = QuerySet.findMaxLabel(testSet.getQueries());
             networkShape.add(outputNodeNumber + 1, new Activation.Sigmoid());
-            return new MLP(featLength, config) {
-              @Override
-              public double predict(List<Double> features) {
-                double threshold = 0.5;
-                forwardProp(features);
-                for (int nodeId = 0; nodeId < network.get(network.size() - 1).size(); nodeId++) {
-                  MNode node = network.get(network.size() - 1).get(nodeId);
-                  if (node.getOutput() < threshold)
-                    return nodeId - 1;
-                }
-                return network.get(network.size() - 1).size() - 1;
-              }
-            };
+            if (!(config.model == null || config.model.file == null || config.model.file.isEmpty()))
+              return new NNMLP(reader, config);
+            //TODO: Implement addOutputs correctly...
+            return new NNMLP(featLength, networkShape, config.getOptFact(), config.getReguFunction(), config.getWeightInit());
           case "ranknet":
           case "franknet":
           case "lambdarank":
-            ranker = new RankNetMLP(featLength, config);
-            if (config.model == null || config.model.file == null || config.model.file.isEmpty()) {
-              ranker.load(reader);
+            if (!(config.model == null || config.model.file == null || config.model.file.isEmpty())) {
+              return new RankNetMLP(reader, config);
             }
-            return ranker;
+            return new RankNetMLP(featLength, config);
           case "sortnet":
-            ranker = new SortNetMLP(featLength, config);
-            return new SortNetMLP(featLength, config);
+            return new SortNetMLP(featLength, config); //TODO: add ModelReader to SortNet.
           case "listnet":
+            if (!(config.model == null || config.model.file == null || config.model.file.isEmpty()))
+              return new ListNetMLP(reader, config);
             return new ListNetMLP(featLength, config);
           default:
             throw new IllegalArgumentException("Specified algorithm does not exist.");
         }
-
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         throw new IllegalArgumentException(e);
       }
     }
-
-
-    }
+  }
 
     protected static <C extends Config> C getConfig(Reader reader, Class<C> configClass){
       ObjectMapper mapper = new ObjectMapper();
