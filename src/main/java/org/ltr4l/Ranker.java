@@ -15,16 +15,21 @@
  */
 package org.ltr4l;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ltr4l.nn.*;
+import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
+import org.ltr4l.tools.Regularization;
+import org.ltr4l.trainers.MLPTrainer;
+import org.ltr4l.trainers.OAPBPMTrainer;
+import org.ltr4l.trainers.PRankTrainer;
 
 /**
  * Ranker classes use a model to make predictions for a document.
@@ -69,4 +74,72 @@ public abstract class Ranker<C extends Config> {
     return model;
   }
 
+  public static class RankerFactory {
+    public static Ranker get(String algorithm, QuerySet testSet, String configFile, Config override) {
+      try (Reader reader = new FileReader(configFile)) {
+        String alg = algorithm.toLowerCase();
+        int featLength = testSet.getFeatureLength();
+        if (alg.equals("prank")) {
+          int maxLabel = QuerySet.findMaxLabel(testSet.getQueries());
+          return PRankTrainer.getPRank(featLength, maxLabel);
+        } else if (alg.equals("oap")) { //TODO: Return PRank instead?
+          int maxLabel = QuerySet.findMaxLabel(testSet.getQueries());
+          OAPBPMTrainer.OAPBPMConfig config = getConfig(reader, OAPBPMTrainer.OAPBPMConfig.class);
+          config.overrideBy(override);
+          int pNum = config.getPNum();
+          double bernNum = config.getBernNum();
+          //int pNum = Config.getInt(config.params, "N", 1);
+          //double bernNum = Config.getDouble(config.params, "bernoulli", 0.03);
+          return OAPBPMTrainer.getOAP(featLength, maxLabel, pNum, bernNum);
+        }
+        MLPTrainer.MLPConfig config = getConfig(reader, MLPTrainer.MLPConfig.class);
+        config.overrideBy(override);
+        switch (alg) {  //For MLP Rankers
+          case "nnrank":
+            NetworkShape networkShape = config.getNetworkShape();
+            int outputNodeNumber = QuerySet.findMaxLabel(testSet.getQueries());
+            networkShape.add(outputNodeNumber + 1, new Activation.Sigmoid());
+            return new MLP(featLength, config) {
+              @Override
+              public double predict(List<Double> features) {
+                double threshold = 0.5;
+                forwardProp(features);
+                for (int nodeId = 0; nodeId < network.get(network.size() - 1).size(); nodeId++) {
+                  MNode node = network.get(network.size() - 1).get(nodeId);
+                  if (node.getOutput() < threshold)
+                    return nodeId - 1;
+                }
+                return network.get(network.size() - 1).size() - 1;
+              }
+            };
+          case "ranknet":
+            return new RankNetMLP(featLength, config);
+          case "franknet":
+            return new RankNetMLP(featLength, config);
+          case "lambdarank":
+            return new RankNetMLP(featLength, config);
+          case "sortnet":
+            return new SortNetMLP(featLength, config);
+          case "listnet":
+            return new ListNetMLP(featLength, config);
+          default:
+            throw new IllegalArgumentException("Specified algorithm does not exist.");
+        }
+
+      } catch (IOException e) {
+        throw new IllegalArgumentException(e);
+      }
+    }
+
+
+    }
+
+    protected static <C extends Config> C getConfig(Reader reader, Class<C> configClass){
+      ObjectMapper mapper = new ObjectMapper();
+      try {
+        return mapper.readValue(reader, configClass);
+      } catch (IOException e) {
+        throw new IllegalArgumentException(e);
+      }
+    }
 }
