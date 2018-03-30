@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
+import org.ltr4l.trainers.MLPTrainer;
 
 /**
  *
@@ -30,6 +31,10 @@ public class MLP extends AbstractMLP<MLP.MNode, MLP.Edge> {
 
   public MLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
     super(inputDim, networkShape, optFact, regularization, weightModel);
+  }
+
+  public MLP(int inputDim, MLPTrainer.MLPConfig config){
+    super(inputDim, config);
   }
 
   protected void addOutputs(NetworkShape ns){

@@ -31,6 +31,10 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
     super(inputDim, networkShape, optFact, regularization, weightModel);
   }
 
+  public SortNetMLP(int inputDim, MLPTrainer.MLPConfig config){
+    super(inputDim, config);
+  }
+
   @Override
   protected List<List<SNode>> constructNetwork(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact){
     List<List<SNode>> network = new ArrayList<>();
