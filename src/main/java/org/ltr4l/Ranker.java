@@ -26,10 +26,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.nn.*;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
-import org.ltr4l.tools.Regularization;
-import org.ltr4l.trainers.MLPTrainer;
-import org.ltr4l.trainers.OAPBPMTrainer;
-import org.ltr4l.trainers.PRankTrainer;
+import org.ltr4l.trainers.*;
+import org.ltr4l.trainers.OAPBPMTrainer.*;
+import org.ltr4l.trainers.PRankTrainer.*;
+
 
 /**
  * Ranker classes use a model to make predictions for a document.
@@ -81,17 +81,20 @@ public abstract class Ranker<C extends Config> {
         int featLength = testSet.getFeatureLength();
 
         if (alg.equals("prank")) {
+          Config config = getConfig(reader, Config.class);
           int maxLabel = QuerySet.findMaxLabel(testSet.getQueries());
-          return PRankTrainer.getPRank(featLength, maxLabel);
-        } else if (alg.equals("oap")) { //TODO: Return PRank instead?
+          if (!(config.model == null || config.model.file == null || config.model.file.isEmpty()))
+            return PRank.readModel(reader);
+          return new PRank(featLength, maxLabel);
+        } else if (alg.equals("oap")) {
           int maxLabel = QuerySet.findMaxLabel(testSet.getQueries());
-          OAPBPMTrainer.OAPBPMConfig config = getConfig(reader, OAPBPMTrainer.OAPBPMConfig.class);
+          OAPBPMConfig config = getConfig(reader, OAPBPMTrainer.OAPBPMConfig.class); //TODO: hardcoded...
           config.overrideBy(override);
           int pNum = config.getPNum();
           double bernNum = config.getBernNum();
-          //int pNum = Config.getInt(config.params, "N", 1);
-          //double bernNum = Config.getDouble(config.params, "bernoulli", 0.03);
-          return OAPBPMTrainer.getOAP(featLength, maxLabel, pNum, bernNum);
+          if (!(config.model == null || config.model.file == null || config.model.file.isEmpty()))
+            return OAPBPMRank.readModel(reader);
+          return new OAPBPMRank(featLength, maxLabel, pNum, bernNum);
         }
 
         MLPTrainer.MLPConfig config = getConfig(reader, MLPTrainer.MLPConfig.class);
@@ -128,7 +131,7 @@ public abstract class Ranker<C extends Config> {
     }
   }
 
-    protected static <C extends Config> C getConfig(Reader reader, Class<C> configClass){
+    protected static <C extends Config> C getConfig(Reader reader, Class<C> configClass){ //TODO: Move elsewhere?
       ObjectMapper mapper = new ObjectMapper();
       try {
         return mapper.readValue(reader, configClass);

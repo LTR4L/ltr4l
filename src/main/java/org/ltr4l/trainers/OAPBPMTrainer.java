@@ -33,13 +33,9 @@ import org.ltr4l.tools.Error;
  * OAP-BPM algorithm.
  *
  */
-public class OAPBPMTrainer extends LTRTrainer<OAPBPMRank, OAPBPMTrainer.OAPBPMConfig> {
+public class OAPBPMTrainer extends LTRTrainer<OAPBPMTrainer.OAPBPMRank, OAPBPMTrainer.OAPBPMConfig> {
   private double maxScore;
   private final  List<Document> trainingDocList;
-
-  public static OAPBPMRank getOAP(int featureLength, int maxLabel, int pNumber, double bernNumber){
-    return new OAPBPMRank(featureLength, maxLabel, pNumber, bernNumber);
-  }
 
   OAPBPMTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
     super(training, validation, reader, override);
@@ -93,41 +89,42 @@ public class OAPBPMTrainer extends LTRTrainer<OAPBPMRank, OAPBPMTrainer.OAPBPMCo
       return getDouble(params, "bernoulli", 0.03);
     }
   }
-}
 
-class OAPBPMRank extends PRank {
-  private List<PRank> pRanks;
-  private final double bernProb;
+  public static class OAPBPMRank extends PRankTrainer.PRank {
+    private List<PRankTrainer.PRank> pRanks;
+    private final double bernProb;
 
-  OAPBPMRank(int featureLength, int maxLabel, int pNumber, double bernNumber) {
-    super(featureLength, maxLabel);
-    pRanks = new ArrayList<>();
-    for (int i = 0; i < pNumber; i++)
-      pRanks.add(new PRank(featureLength, maxLabel));
-    bernProb = bernNumber; //Note: must be between 0 and 1.
-  }
-
-  @Override
-  public void updateWeights(Document doc) {
-    for (PRank prank : pRanks) {
-      //Will or will not present document to the perceptron.
-      if (bernoulli() == 1) {
-        double prediction = prank.predict(doc.getFeatures());
-        int label = doc.getLabel();
-        if (label != prediction) { //if the prediction is wrong, update that perceptron's weights
-          prank.updateWeights(doc);
-          for (int i = 0; i < weights.length; i++)
-            weights[i] += prank.getWeights()[i] / (double) pRanks.size(); //and update overall weights
-          for (int i = 0; i < thresholds.length; i++)
-            thresholds[i] += prank.getThresholds()[i] / (double) pRanks.size();
-        }
-      }
-
+    public OAPBPMRank(int featureLength, int maxLabel, int pNumber, double bernNumber) {
+      super(featureLength, maxLabel);
+      pRanks = new ArrayList<>();
+      for (int i = 0; i < pNumber; i++)
+        pRanks.add(new PRankTrainer.PRank(featureLength, maxLabel));
+      bernProb = bernNumber; //Note: must be between 0 and 1.
     }
-  }
 
-  private int bernoulli() {
-    return new Random().nextDouble() < bernProb ? 1 : 0;
-  }
+    @Override
+    public void updateWeights(Document doc) {
+      for (PRankTrainer.PRank prank : pRanks) {
+        //Will or will not present document to the perceptron.
+        if (bernoulli() == 1) {
+          double prediction = prank.predict(doc.getFeatures());
+          int label = doc.getLabel();
+          if (label != prediction) { //if the prediction is wrong, update that perceptron's weights
+            prank.updateWeights(doc);
+            for (int i = 0; i < weights.length; i++)
+              weights[i] += prank.getWeights()[i] / (double) pRanks.size(); //and update overall weights
+            for (int i = 0; i < thresholds.length; i++)
+              thresholds[i] += prank.getThresholds()[i] / (double) pRanks.size();
+          }
+        }
 
+      }
+    }
+
+    private int bernoulli() {
+      return new Random().nextDouble() < bernProb ? 1 : 0;
+    }
+
+  }
 }
+
