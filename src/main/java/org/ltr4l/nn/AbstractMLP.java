@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.tools.Regularization;
+import org.ltr4l.trainers.MLPTrainer;
 
 /**
  * This is the AbstractMLP class for standard Feed-Forward Neural Networks.
@@ -32,6 +33,10 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
 
   public AbstractMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
     super(inputDim, networkShape, optFact, regularization, weightModel);
+  }
+
+  public AbstractMLP(int inputDim, MLPTrainer.MLPConfig config){
+    super(inputDim, config);
   }
 
   protected List<List<N>> constructNetwork(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact){

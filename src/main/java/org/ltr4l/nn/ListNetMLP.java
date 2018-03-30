@@ -21,6 +21,7 @@ import java.util.List;
 import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
+import org.ltr4l.trainers.MLPTrainer;
 
 /**
  * Ranker which holds the model based on a Multi-Layer Perceptron network.
@@ -40,6 +41,10 @@ public class ListNetMLP extends AbstractMLP<ListNetMLP.LNode, ListNetMLP.LEdge> 
     accErrorDer_exSum = 0;
     accErrorDer_ptSum = 0;
     network.get(network.size() - 1).get(0).setOutputDer(1); //Set the last node's output derivative to 1
+  }
+
+  public ListNetMLP(int inputDim, MLPTrainer.MLPConfig config){
+    this(inputDim, config.getNetworkShape(), config.getOptFact(), config.getReguFunction(), config.getWeightInit());
   }
 
   protected void addOutputs(NetworkShape ns){

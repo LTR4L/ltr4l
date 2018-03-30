@@ -68,6 +68,13 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
     network = constructNetwork(inputDim, networkShape, optFact);
   }
 
+  public AbstractMLPBase(int inputDim, MLPTrainer.MLPConfig config){
+    this(inputDim, config.getNetworkShape(), config.getOptFact(), config.getReguFunction(), config.getWeightInit());
+  }
+
+  public double[] getOutputs(){
+    return getLayer(network.size() - 1).stream().mapToDouble(node -> node.getOutput()).toArray();
+  }
   protected abstract List<List<N>> constructNetwork(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact);
   protected abstract void addOutputs(NetworkShape networkShape);
   protected List<N> getLayer(int i){

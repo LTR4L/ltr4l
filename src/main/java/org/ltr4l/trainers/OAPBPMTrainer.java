@@ -37,6 +37,10 @@ public class OAPBPMTrainer extends LTRTrainer<OAPBPMRank, OAPBPMTrainer.OAPBPMCo
   private double maxScore;
   private final  List<Document> trainingDocList;
 
+  public static OAPBPMRank getOAP(int featureLength, int maxLabel, int pNumber, double bernNumber){
+    return new OAPBPMRank(featureLength, maxLabel, pNumber, bernNumber);
+  }
+
   OAPBPMTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
     super(training, validation, reader, override);
     maxScore = 0d;
