@@ -39,7 +39,12 @@ import org.ltr4l.tools.Error;
  *
  */
 public class PRankTrainer extends LTRTrainer<PRank, Config> {
+
   private final  List<Document> trainingDocList;
+
+  public static PRank getPRank(int featureLength, int maxLabel){
+    return new PRank(featureLength, maxLabel);
+  }
 
   PRankTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
     super(training, validation, reader, override);
