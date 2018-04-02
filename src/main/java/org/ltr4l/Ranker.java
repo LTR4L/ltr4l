@@ -15,16 +15,21 @@
  */
 package org.ltr4l;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ltr4l.nn.*;
+import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
+import org.ltr4l.trainers.*;
+import org.ltr4l.trainers.OAPBPMTrainer.*;
+import org.ltr4l.trainers.PRankTrainer.*;
+
 
 /**
  * Ranker classes use a model to make predictions for a document.
@@ -69,4 +74,112 @@ public abstract class Ranker<C extends Config> {
     return model;
   }
 
+  public static class RankerFactory {
+    
+    //For rankers which need information about the max label (needed for structure of network)
+    public static Ranker get(String algorithm, String configFile, Config override, int featLength, int maxLabel){
+      assert(featLength > 0 && maxLabel > 0);
+      try (Reader reader = new FileReader(configFile)) {
+        String alg = algorithm.toLowerCase();
+
+        switch (alg){
+          case "prank":
+            return new PRank(featLength, maxLabel);
+          case "oap":
+            OAPBPMConfig config = getConfig(reader, OAPBPMTrainer.OAPBPMConfig.class); //TODO: hardcoded...
+            config.overrideBy(override);
+            int pNum = config.getPNum();
+            double bernNum = config.getBernNum();
+            return new OAPBPMRank(featLength, maxLabel, pNum, bernNum);
+          case "nnrank":
+            MLPTrainer.MLPConfig mlpConfig = getConfig(reader, MLPTrainer.MLPConfig.class);
+            mlpConfig.overrideBy(override);
+            NetworkShape networkShape = mlpConfig.getNetworkShape();
+            networkShape.add(maxLabel + 1, new Activation.Sigmoid());
+            return new NNMLP(featLength, networkShape, mlpConfig.getOptFact(), mlpConfig.getReguFunction(), mlpConfig.getWeightInit());
+          // The algorithms below do not require max label, however they can still be specified.
+          default:
+            return get(algorithm, configFile, override, featLength);
+        }
+      }
+      catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    public static Ranker get(String algorithm, String configFile, Config override, int featLength) {
+      assert(featLength > 0);
+      try (Reader reader = new FileReader(configFile)) {
+        String alg = algorithm.toLowerCase();
+        MLPTrainer.MLPConfig config = getConfig(reader, MLPTrainer.MLPConfig.class);
+        config.overrideBy(override);
+        switch (alg) {
+          case "prank":
+          case "oap":
+          case "nnrank":
+            throw new IllegalArgumentException("Must must specify max label in dataset! Use get(String algorithm, String configFile, Config override, int featLength, int maxLabel)");
+          case "ranknet":
+          case "franknet":
+          case "lambdarank":
+            return new RankNetMLP(featLength, config);
+          case "sortnet":
+            return new SortNetMLP(featLength, config);
+          case "listnet":
+            return new ListNetMLP(featLength, config);
+          default:
+            throw new IllegalArgumentException("Specified algorithm does not exist.");
+        }
+      }
+      catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    public static Ranker getFromModel(String algorithm, String configFile, Config override) {
+      try (Reader reader = new FileReader(configFile)) {
+        String alg = algorithm.toLowerCase();
+        Config config = getConfig(reader, Config.class);
+
+        if ((config.model == null || config.model.file == null || config.model.file.isEmpty()))
+          throw new IllegalArgumentException("No model specified");
+
+        if (alg.equals("prank")) {
+          return PRank.readModel(reader);
+        }
+        else if (alg.equals("oap")) {
+          return OAPBPMRank.readModel(reader); //This returns PRank (which is fine for predicting model.)
+        }
+
+        MLPTrainer.MLPConfig mlpConfig = getConfig(reader, MLPTrainer.MLPConfig.class); //TODO: Don't make new config...
+        mlpConfig.overrideBy(override);
+        switch (alg) {  //For MLP Rankers
+          case "nnrank":
+            return new NNMLP(reader, mlpConfig);
+          case "ranknet":
+          case "franknet":
+          case "lambdarank":
+            return new RankNetMLP(reader, mlpConfig);
+          case "sortnet":
+            return new SortNetMLP(reader, mlpConfig); //TODO: add ModelReader to SortNet.
+          case "listnet":
+            return new ListNetMLP(reader, mlpConfig);
+          default:
+            throw new IllegalArgumentException("Specified algorithm does not exist.");
+        }
+      }
+      catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+    //TODO: Move elsewhere? Same as LTRTrainer.getConfig
+    protected static <C extends Config> C getConfig(Reader reader, Class<C> configClass){
+      ObjectMapper mapper = new ObjectMapper();
+      try {
+        return mapper.readValue(reader, configClass);
+      } catch (IOException e) {
+        throw new IllegalArgumentException(e);
+      }
+    }
 }
