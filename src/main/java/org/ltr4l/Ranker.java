@@ -124,14 +124,9 @@ public abstract class Ranker<C extends Config> {
       }
     }
 
-    public static Ranker getFromModel(String algorithm, Reader reader, Config override) {
+    public static Ranker getFromModel(String algorithm, Reader reader) {
       try {
         String alg = algorithm.toLowerCase();
-        Config config = getConfig(reader, Config.class);
-
-        if ((config.model == null || config.model.file == null || config.model.file.isEmpty()))
-          throw new IllegalArgumentException("No model specified");
-
         if (alg.equals("prank")) {
           return PRank.readModel(reader);
         }
@@ -139,19 +134,17 @@ public abstract class Ranker<C extends Config> {
           return OAPBPMRank.readModel(reader); //This returns PRank (which is fine for predicting model.)
         }
 
-        MLPTrainer.MLPConfig mlpConfig = getConfig(reader, MLPTrainer.MLPConfig.class); //TODO: Don't make new config...
-        mlpConfig.overrideBy(override);
         switch (alg) {  //For MLP Rankers
           case "nnrank":
-            return new NNMLP(reader, mlpConfig);
+            return new NNMLP(reader);
           case "ranknet":
           case "franknet":
           case "lambdarank":
-            return new RankNetMLP(reader, mlpConfig);
+            return new RankNetMLP(reader);
           case "sortnet":
-            return new SortNetMLP(reader, mlpConfig); //TODO: add ModelReader to SortNet.
+            return new SortNetMLP(reader); //TODO: add ModelReader to SortNet.
           case "listnet":
-            return new ListNetMLP(reader, mlpConfig);
+            return new ListNetMLP(reader);
           default:
             throw new IllegalArgumentException("Specified algorithm does not exist.");
         }

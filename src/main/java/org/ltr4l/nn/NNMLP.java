@@ -15,9 +15,7 @@
  */
 package org.ltr4l.nn;
 
-import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Regularization;
-import org.ltr4l.trainers.MLPTrainer;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -28,13 +26,13 @@ public class NNMLP extends MLP {
     super(featureLength, networkShape, optFact, regularization, weightModel);
   }
 
-  public NNMLP(Reader reader, MLPTrainer.MLPConfig config) throws IOException {
-    super(reader, config);
+  public NNMLP(Reader reader) throws IOException {
+    super(reader);
   }
 
   @Override
-  protected void addOutputs(NetworkShape ns) {
-    return; //TODO: Implement addOutputs...
+  protected void addOutputs(NetworkShape ns){
+    return; //TODO: Implement addOutputs
   }
 
   @Override

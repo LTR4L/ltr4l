@@ -31,9 +31,7 @@ public class RankNetMLP extends MLP {
   public RankNetMLP(int inputDim, MLPTrainer.MLPConfig config){
     super(inputDim, config);
   }
-  public RankNetMLP(Reader reader, MLPTrainer.MLPConfig config) throws IOException {
-    super(reader, config);
-  }
+  public RankNetMLP(Reader reader) throws IOException { super(reader); }
 
   @Override
   protected void addOutputs(NetworkShape ns) {

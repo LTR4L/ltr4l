@@ -39,8 +39,8 @@ public class MLP extends AbstractMLP<MLP.MNode, MLP.Edge> {
     super(inputDim, config);
   }
 
-  public MLP(Reader reader, MLPTrainer.MLPConfig config) throws IOException{ //TODO: don't want to use dummy
-    super(reader, config);
+  public MLP(Reader reader) throws IOException{ //TODO: don't want to use dummy
+    super(reader);
   }
 
   protected void addOutputs(NetworkShape ns){

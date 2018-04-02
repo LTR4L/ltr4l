@@ -48,8 +48,8 @@ public class ListNetMLP extends AbstractMLP<ListNetMLP.LNode, ListNetMLP.LEdge> 
   public ListNetMLP(int inputDim, MLPTrainer.MLPConfig config){
     this(inputDim, config.getNetworkShape(), config.getOptFact(), config.getReguFunction(), config.getWeightInit());
   }
-  public ListNetMLP(Reader reader, MLPTrainer.MLPConfig config) throws IOException{
-    super(reader, config);
+  public ListNetMLP(Reader reader) throws IOException{
+    super(reader);
   }
 
   protected void addOutputs(NetworkShape ns){

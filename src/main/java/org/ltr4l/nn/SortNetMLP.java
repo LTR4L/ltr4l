@@ -35,7 +35,7 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
   public SortNetMLP(int inputDim, MLPTrainer.MLPConfig config){
     super(inputDim, config);
   }
-  public SortNetMLP(Reader reader, MLPTrainer.MLPConfig config){ super(reader, config); }
+  public SortNetMLP(Reader reader){ super(reader); }
 
   @Override
   protected List<List<SNode>> constructNetwork(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact){

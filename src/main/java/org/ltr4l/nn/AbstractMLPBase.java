@@ -73,12 +73,12 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
     this(inputDim, config.getNetworkShape(), config.getOptFact(), config.getReguFunction(), config.getWeightInit());
   }
 
-  public AbstractMLPBase(Reader reader, MLPTrainer.MLPConfig config){
+  public AbstractMLPBase(Reader reader){
     this.network = readModel(reader);
     //The following assignments are unnecessary for prediction and ranking, if reading a model.
     iter = 1;
     numAccumulatedDer = 0;
-    regularization = config.getReguFunction();
+    regularization = null;
     weightInit = null;
   }
 

@@ -35,7 +35,7 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
     super(inputDim, networkShape, optFact, regularization, weightModel);
   }
   public AbstractMLP(int inputDim, MLPTrainer.MLPConfig config){ super(inputDim, config); }
-  public AbstractMLP(Reader reader, MLPTrainer.MLPConfig config){ super(reader, config); }
+  public AbstractMLP(Reader reader){ super(reader); }
 
   protected List<List<N>> constructNetwork(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact){
     List<List<N>> network = new ArrayList<>();
@@ -96,6 +96,7 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
 
       //Construct hidden layers
       NetworkShape networkShape = savedModel.config.getNetworkShape();
+      addOutputs(networkShape);
       Optimizer.OptimizerFactory optFact = savedModel.config.getOptFact();
       for (int layerNum = 0; layerNum < savedModel.weights.size(); layerNum++) {
         currentLayer = new ArrayList<>();
@@ -119,7 +120,7 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
       }
       return network;
     } catch (IOException e) {
-      throw new RuntimeException();
+      throw new RuntimeException(e);
     }
   }
 
