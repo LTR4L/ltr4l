@@ -49,10 +49,7 @@ public class ListNetMLP extends AbstractMLP<ListNetMLP.LNode, ListNetMLP.LEdge> 
     this(inputDim, config.getNetworkShape(), config.getOptFact(), config.getReguFunction(), config.getWeightInit());
   }
   public ListNetMLP(Reader reader, MLPTrainer.MLPConfig config) throws IOException{
-    super(new ModelReader<LNode, LEdge>().readModel(reader, createDummy()), config);
-  }
-  private static ListNetMLP createDummy(){
-    return new ListNetMLP(0, null, null, null, null);
+    super(reader, config);
   }
 
   protected void addOutputs(NetworkShape ns){

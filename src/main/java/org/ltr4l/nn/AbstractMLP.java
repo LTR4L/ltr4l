@@ -35,7 +35,7 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
     super(inputDim, networkShape, optFact, regularization, weightModel);
   }
   public AbstractMLP(int inputDim, MLPTrainer.MLPConfig config){ super(inputDim, config); }
-  public AbstractMLP(List<List<N>> network, MLPTrainer.MLPConfig config){ super(network, config); }
+  public AbstractMLP(Reader reader, MLPTrainer.MLPConfig config){ super(reader, config); }
 
   protected List<List<N>> constructNetwork(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact){
     List<List<N>> network = new ArrayList<>();
@@ -74,15 +74,13 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
   protected abstract N constructNode(Activation activation);
   protected abstract E constructEdge(N source, N destination, Optimizer opt, double weight);
 
-  static class ModelReader <N extends AbstractNode.Node, E extends AbstractEdge.AbstractFFEdge> {
-
-    // TODO: use Factory...?
-    // don't want to have dummy, it is needed to call constructNode & constructEdge
-    public List<List<N>> readModel(Reader reader, AbstractMLP<N, E> dummy) throws IOException {
+  @Override
+  protected List<List<N>> readModel(Reader reader){
+    try {
       ObjectMapper mapper = new ObjectMapper();
       SavedModel savedModel = mapper.readValue(reader, SavedModel.class);
 
-      assert(savedModel.weights.size() > 0);
+      assert (savedModel.weights.size() > 0);
 
       List<List<N>> network = new ArrayList<>();
       List<N> currentLayer = new ArrayList<>();
@@ -92,7 +90,7 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
       final int inputDim = savedModel.getNode(0, 0).size() - 1;
       //Start with constructing the input layer.
       for (int i = 0; i < inputDim; i++) {
-        currentLayer.add(dummy.constructNode(new Activation.Identity()));
+        currentLayer.add(constructNode(new Activation.Identity()));
       }
       network.add(currentLayer);
 
@@ -106,20 +104,23 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
         Activation activation = networkShape.getLayerSetting(layerNum).getActivation();
 
         for (int i = 0; i < nodeNum; i++) {
-          N currentNode = dummy.constructNode(activation);
+          N currentNode = constructNode(activation);
           Optimizer opt = optFact.getOptimizer();
           int k = 0;
-          currentNode.addInputEdge(dummy.constructEdge(null, currentNode, opt, savedModel.getWeight(layerNum, i, k++))); //add bias edge
+          currentNode.addInputEdge(constructEdge(null, currentNode, opt, savedModel.getWeight(layerNum, i, k++))); //add bias edge
           currentLayer.add(currentNode);
 
           for (N previousNode : network.get(layerNum)) {    //Note network.get(layerNum-1) is previous layer!
-            E edge = dummy.constructEdge(previousNode, currentNode, optFact.getOptimizer(), savedModel.getWeight(layerNum, i, k++));
+            E edge = constructEdge(previousNode, currentNode, optFact.getOptimizer(), savedModel.getWeight(layerNum, i, k++));
             currentNode.addInputEdge(edge);
             previousNode.addOutputEdge(edge);
           }
         }
       }
       return network;
+    } catch (IOException e) {
+      throw new RuntimeException();
     }
   }
+
 }

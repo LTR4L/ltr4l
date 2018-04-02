@@ -40,10 +40,7 @@ public class MLP extends AbstractMLP<MLP.MNode, MLP.Edge> {
   }
 
   public MLP(Reader reader, MLPTrainer.MLPConfig config) throws IOException{ //TODO: don't want to use dummy
-    super(new ModelReader<MNode, Edge>().readModel(reader, createDummy()), config);
-  }
-  private static MLP createDummy(){
-    return new MLP(0, null, null, null, null);
+    super(reader, config);
   }
 
   protected void addOutputs(NetworkShape ns){
