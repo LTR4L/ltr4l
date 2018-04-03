@@ -16,6 +16,7 @@
 
 package org.ltr4l.nn;
 
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,11 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
   public SortNetMLP(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
     super(inputDim, networkShape, optFact, regularization, weightModel);
   }
+
+  public SortNetMLP(int inputDim, MLPTrainer.MLPConfig config){
+    super(inputDim, config);
+  }
+  public SortNetMLP(Reader reader){ super(reader); }
 
   @Override
   protected List<List<SNode>> constructNetwork(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact){
@@ -94,6 +100,11 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
       currentLayer.addAll(layerPrime);
     }
     return network;
+  }
+
+  @Override
+  protected List<List<SNode>> readModel(Reader reader){
+    throw new UnsupportedOperationException(); //TODO: Implement readModel for SortNet.
   }
 
   @Override

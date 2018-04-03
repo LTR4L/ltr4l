@@ -59,14 +59,14 @@ public class PRankTest {
     ObjectMapper mapper = new ObjectMapper();
     Config config = mapper.readValue(new StringReader(JSON_CONFIG), Config.class);
 
-    PRank prankW = new PRank(6, 3);
+    PRankTrainer.PRank prankW = new PRankTrainer.PRank(6, 3);
     prankW.weights = new double[]{1.1, 2.2, 3.3, 4.4, 5.5, 6.6};
     prankW.thresholds = new double[]{-10.5, 0.123, 34.5};
 
     StringWriter savedModel = new StringWriter();
     prankW.writeModel(config, savedModel);
 
-    PRank prankR = PRank.readModel(new StringReader(savedModel.toString()));
+    PRankTrainer.PRank prankR = PRankTrainer.PRank.readModel(new StringReader(savedModel.toString()));
 
     Assert.assertEquals(6, prankR.weights.length);
     Assert.assertEquals(1.1, prankR.weights[0], 0.001);

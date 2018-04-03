@@ -17,6 +17,7 @@
 package org.ltr4l.nn;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,6 +69,22 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
     network = constructNetwork(inputDim, networkShape, optFact);
   }
 
+  public AbstractMLPBase(int inputDim, MLPTrainer.MLPConfig config){
+    this(inputDim, config.getNetworkShape(), config.getOptFact(), config.getReguFunction(), config.getWeightInit());
+  }
+
+  public AbstractMLPBase(Reader reader){
+    this.network = readModel(reader);
+    //The following assignments are unnecessary for prediction and ranking, if reading a model.
+    iter = 1;
+    numAccumulatedDer = 0;
+    regularization = null;
+    weightInit = null;
+  }
+
+  public double[] getOutputs(){
+    return getLayer(network.size() - 1).stream().mapToDouble(node -> node.getOutput()).toArray();
+  }
   protected abstract List<List<N>> constructNetwork(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact);
   protected abstract void addOutputs(NetworkShape networkShape);
   protected List<N> getLayer(int i){
@@ -76,6 +93,7 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
   protected N getNode(int i, int j){
     return network.get(i).get(j);
   }
+  protected abstract List<List<N>> readModel(Reader reader);
 
   /**
    * Weights are held by the edges. Lists of edges are stored in nodes.
