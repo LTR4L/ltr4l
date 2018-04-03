@@ -35,8 +35,6 @@ public interface Trainer {
 
   double[] calculateLoss();
 
-  List<Document> sortP(Query query);
-
   void trainAndValidate();
 
   class TrainerFactory {

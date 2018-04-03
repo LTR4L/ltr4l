@@ -122,22 +122,5 @@ public class SortNetTrainer extends LTRTrainer<SortNetMLP, MLPTrainer.MLPConfig>
   public Class<MLPTrainer.MLPConfig> getConfigClass() {
     return MLPTrainer.MLPConfig.class;
   }
-
-  @Override
-  public List<Document> sortP(Query query) {
-    List<Document> ranks = new ArrayList<>(query.getDocList());
-    //Reverse order to go from highest to lowest instead of lowest to highest.
-    ranks.sort((docA, docB) -> Double.compare(0, ranker.predict(docA, docB)));
-/*        ranks.sort(new Comparator<Document>() {
-            @Override
-            public int compare(Document o1, Document o2) {
-                double prediction = smlp.predict(o1, o2);
-                if (prediction > 0) return -1; //-1 because it should not be changed; higher is earlier
-                if (prediction < 0) return 1;
-                return 0;
-            }
-        });*/
-    return ranks;
-  }
 }
 
