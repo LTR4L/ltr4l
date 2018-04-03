@@ -19,14 +19,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.*;
 import org.ltr4l.Ranker;
 import org.ltr4l.Version;
+import org.ltr4l.evaluation.RankEval;
 import org.ltr4l.nn.MLP;
 import org.ltr4l.nn.RankNetMLP;
 import org.ltr4l.query.Document;
+import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
+import org.ltr4l.tools.Report;
 import org.ltr4l.trainers.MLPTrainer;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.invoke.MethodHandles;
@@ -60,11 +64,12 @@ public class Predict {
       printUsage(options);
     }
 
-    String configPath = getModelPath(line, params);
-    Config optionalConfig = createOptionalConfig(configPath, line);
-
+    String modelPath = getModelPath(line, params);
+    Config optionalConfig = createOptionalConfig(modelPath, line);
     QuerySet testSet = QuerySet.create(optionalConfig.dataSet.test);
+    Ranker ranker = getRanker(modelPath, params);
 
+    evaluate(ranker, testSet.getQueries(), optionalConfig);
 
   }
 
@@ -76,6 +81,10 @@ public class Predict {
         .desc("use given file for testing the model").build();
     Option reportFile = Option.builder("report").argName("file").hasArg()
         .desc("specify report file name").build();
+    Option evalType = Option.builder("eval").argName("evalType").hasArg()
+        .desc("specify type of evaluator").build();
+    Option k = Option.builder("k").argName("k").hasArg()
+        .desc("specify k-value for evaluators which use @k").build();
     Option version = new Option( "version", "print the version information and exit" );
     Option verbose = new Option( "verbose", "be extra verbose" );
     Option debug = new Option( "debug", "print debugging information" );
@@ -85,6 +94,8 @@ public class Predict {
         .addOption(modelFile)
         .addOption(testDataSet)
         .addOption(reportFile)
+        .addOption(evalType)
+        .addOption(k)
         .addOption(version)
         .addOption(verbose)
         .addOption(debug);
@@ -123,16 +134,46 @@ public class Predict {
     return line.hasOption("model") ? line.getOptionValue("model") : String.format("model/%s-model.json", params[0]);
   }
 
+  public static Ranker getRanker(String modelPath, String[] params) throws IOException{
+    assert(params.length == 1);
+    Reader reader = new FileReader(modelPath);
+    return Ranker.RankerFactory.getFromModel(params[0], reader) ;
+  }
+
   public static Config createOptionalConfig(String configPath, CommandLine line) throws IOException{
     ObjectMapper mapper = new ObjectMapper();
-    Config optionalConfig = mapper.readValue(new File(configPath), Config.class);
+    Config optionalConfig = mapper.readValue(new File(configPath), SavedModel.class).config;
 
     if(line.hasOption("test"))
       optionalConfig.dataSet.test = line.getOptionValue("training");
     if(line.hasOption("report"))
       optionalConfig.report.file = line.getOptionValue("report");
+    if(line.hasOption("evalType"))
+      optionalConfig.evaluation.evaluator = line.getOptionValue("eval");
+    if(line.hasOption("k"))
+      optionalConfig.evaluation.params.put("k", Integer.parseInt(line.getOptionValue("k")));
 
     return optionalConfig;
+  }
+
+  public static void evaluate(Ranker ranker, List<Query> testSet, Config optionalConfig){
+    RankEval eval = RankEval.RankEvalFactory.get(optionalConfig.evaluation.evaluator);
+    double score = eval.calculateAvgAllQueries(ranker, testSet, (int) optionalConfig.evaluation.params.get("k"));
+    String header = optionalConfig.evaluation.evaluator + "@" + optionalConfig.evaluation.params.get("k") + " for " + optionalConfig.algorithm;
+    Report report = Report.getReport((optionalConfig.report == null) ? null : optionalConfig.report.file, header);
+    report.log(score);
+    report.close();
+  }
+
+  private static class SavedModel { //TODO: Don't want to create another Saved Model...
+    public Config config;
+    public Object weights;    //These will not be used...
+    public Object thresholds; //Will not be used...
+    SavedModel(){  // this is needed for Jackson...
+    }
+    SavedModel(Config config){
+      this.config = config;
+    }
   }
 
 }

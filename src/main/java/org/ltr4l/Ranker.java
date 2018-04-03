@@ -132,8 +132,9 @@ public abstract class Ranker<C extends Config> {
     }
 
     public static Ranker getFromModel(String algorithm, Reader reader) {
+      String alg = algorithm.toLowerCase();
       try {
-        String alg = algorithm.toLowerCase();
+
         if (alg.equals("prank")) {
           return PRank.readModel(reader);
         }

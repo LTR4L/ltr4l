@@ -69,8 +69,8 @@ public class Report {
   }
 
   public void log(double eval){
-    System.out.printf("Evaluation score: %f", eval);
-    pw.printf("Evaluation score: %f", eval);
+    System.out.printf("Evaluation score: %f\n", eval);
+    pw.printf("%f", eval);
   }
 
   public void close(){

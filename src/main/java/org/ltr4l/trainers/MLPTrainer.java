@@ -75,7 +75,6 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends LTRTrainer<M, ML
   }
 
   protected double calculateLoss(List<Query> queries) {
-    // Default square error.
     double loss = 0d;
     for (Query query : queries) {
       List<Document> docList = query.getDocList();
