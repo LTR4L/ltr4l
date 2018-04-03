@@ -20,22 +20,16 @@ import org.apache.commons.cli.*;
 import org.ltr4l.Ranker;
 import org.ltr4l.Version;
 import org.ltr4l.evaluation.RankEval;
-import org.ltr4l.nn.MLP;
-import org.ltr4l.nn.RankNetMLP;
-import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Report;
-import org.ltr4l.trainers.MLPTrainer;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class Predict {
