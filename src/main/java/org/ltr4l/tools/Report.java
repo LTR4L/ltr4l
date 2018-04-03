@@ -39,6 +39,22 @@ public class Report {
     }
   }
 
+  public static Report getReport(String file, String header){
+    file = (file == null || file.isEmpty()) ? DEFAULT_REPORT_FILE : file;
+    try {
+      return new Report(file, header);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private Report(String file, String header) throws IOException{ //TODO: eval method should be mutable
+    this.file = file;
+    pw = new PrintWriter(new FileOutputStream(file));
+    // TODO: eval method should be mutable
+    pw.println(header);  // header for CSV file
+  }
+
   private Report(String file) throws IOException {
     this.file = file;
     pw = new PrintWriter(new FileOutputStream(file));
@@ -50,6 +66,11 @@ public class Report {
     // TODO: eval method should be mutable
     System.out.printf("%d tr_loss: %f va_loss: %f evaluation: %f\n", iter, tloss, vloss, eval);
     pw.printf("%d,%f,%f,%f\n", iter, eval, tloss, vloss);
+  }
+
+  public void log(double eval){
+    System.out.printf("Evaluation score: %f", eval);
+    pw.printf("Evaluation score: %f", eval);
   }
 
   public void close(){
