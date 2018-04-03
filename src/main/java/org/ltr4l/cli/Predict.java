@@ -145,10 +145,10 @@ public class Predict {
     Config optionalConfig = mapper.readValue(new File(configPath), SavedModel.class).config;
 
     if(line.hasOption("test"))
-      optionalConfig.dataSet.test = line.getOptionValue("training");
+      optionalConfig.dataSet.test = line.getOptionValue("test");
     if(line.hasOption("report"))
       optionalConfig.report.file = line.getOptionValue("report");
-    if(line.hasOption("evalType"))
+    if(line.hasOption("eval"))
       optionalConfig.evaluation.evaluator = line.getOptionValue("eval");
     if(line.hasOption("k"))
       optionalConfig.evaluation.params.put("k", Integer.parseInt(line.getOptionValue("k")));
