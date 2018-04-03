@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.nn.*;
+import org.ltr4l.query.Document;
+import org.ltr4l.query.Query;
 import org.ltr4l.tools.Config;
 import org.ltr4l.trainers.*;
 import org.ltr4l.trainers.OAPBPMTrainer.*;
@@ -46,8 +48,13 @@ public abstract class Ranker<C extends Config> {
   }
 
   public abstract void writeModel(C config, Writer writer) throws IOException;
-
   public abstract double predict(List<Double> features);
+
+  public List<Document> sort(Query query) {
+    List<Document> ranks = new ArrayList<>(query.getDocList());
+    ranks.sort((docA, docB) -> Double.compare(predict(docB.getFeatures()), predict(docA.getFeatures()))); //reversed for high to low.
+    return ranks;
+  }
 
   private static String makeRegex(String regex, int num){
     StringBuilder splitter = new StringBuilder();

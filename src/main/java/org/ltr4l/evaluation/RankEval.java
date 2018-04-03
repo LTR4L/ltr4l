@@ -18,6 +18,7 @@ package org.ltr4l.evaluation;
 
 import java.util.List;
 
+import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.trainers.Trainer;
@@ -35,15 +36,12 @@ public interface RankEval {
     return cg;
   }
 
-  default double calculateAvgAllQueries(Trainer trainer, List<Query> queries, int position){
-    //return queries.stream().mapToDouble(query -> calculate(trainer.sortP(query), position)).sum() / queries.size();
+  default double calculateAvgAllQueries(Ranker ranker, List<Query> queries, int position){
     double total = 0;
-    //double processedQ = 0d;
     for (Query query : queries) {
-      double queryVal = calculate(trainer.sortP(query), position);
+      double queryVal = calculate(ranker.sort(query), position);
       if (!Double.isFinite(queryVal)) continue;
-      total += calculate(trainer.sortP(query), position);
-      //processedQ++;
+      total += queryVal;
     }
     return total / queries.size();
   }

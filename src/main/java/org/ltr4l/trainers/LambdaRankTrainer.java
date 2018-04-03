@@ -55,7 +55,7 @@ public class LambdaRankTrainer extends RankNetTrainer {
       double N = idcg(query.getDocList(), query.getDocList().size());
 
 
-      List<Document> sorted = sortP(query);
+      List<Document> sorted = ranker.sort(query);
 
       for (int i = 0; i < sorted.size(); i++) {
         Document doc = sorted.get(i);

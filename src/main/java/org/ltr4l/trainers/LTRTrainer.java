@@ -80,7 +80,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
   private static int getEvaluatorAtK(Config config){
     final int K_DEFAULT = 10;
     if(config.evaluation == null || config.evaluation.params == null) return K_DEFAULT;
-    return Config.getInt(config.evaluation.params, "k", K_DEFAULT);   // TODO: allow users to specify another evaluator
+    return Config.getInt(config.evaluation.params, "k", K_DEFAULT);
   }
 
   private static String getModelFile(Config config){
@@ -109,7 +109,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
 
   @Override
   public void validate(int iter, int pos) {
-    double newScore = eval.calculateAvgAllQueries(this, validationSet, pos);
+    double newScore = eval.calculateAvgAllQueries(ranker, validationSet, pos);
     if (newScore > maxScore) {
       maxScore = newScore;
     }
@@ -142,28 +142,6 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     }
-  }
-
-  /**
-   * Sorts the associated documents in a  query according to the ranker's model via predict method, from highest score to lowest.
-   * For example, if a query has the following associated document list:
-   * {(2)docA, (3)docB, (1)docC}
-   * where the numbers in the parentheses are predicted scores,
-   * sortP will return the following new list:
-   * {docB, docA, docC}
-   *
-   * A new list is made in order to preserve the order of the original document list.
-   *
-   * sortP is currently also used to calculate NDCG, and thus a new sorted list should be used to avoid calculation errors.
-   *
-   * @param query
-   * @return new sorted document list.
-   */
-  @Override
-  public List<Document> sortP(Query query){
-    List<Document> ranks = new ArrayList<>(query.getDocList());
-    ranks.sort((docA, docB) -> Double.compare(ranker.predict(docB.getFeatures()), ranker.predict(docA.getFeatures()))); //reversed for high to low.
-    return ranks;
   }
 
 }

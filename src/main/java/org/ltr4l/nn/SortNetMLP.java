@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ltr4l.query.Document;
+import org.ltr4l.query.Query;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 import org.ltr4l.trainers.MLPTrainer;
@@ -238,6 +239,13 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
     }
     numAccumulatedDer = 0; //Weights updated, now no derivatives have been accumulated.
     iter++;
+  }
+
+  @Override
+  public List<Document> sort(Query query) {
+    List<Document> ranks = new ArrayList<>(query.getDocList());
+    ranks.sort((docA, docB) -> Double.compare(0, predict(docA, docB)));
+    return ranks;
   }
 
   /**
