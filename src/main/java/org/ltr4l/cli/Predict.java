@@ -66,7 +66,6 @@ public class Predict {
     QuerySet testSet = QuerySet.create(optionalConfig.dataSet.test);
 
 
-
   }
 
   public static Options createOptions(){
