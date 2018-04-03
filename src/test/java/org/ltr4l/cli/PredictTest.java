@@ -22,8 +22,7 @@ public class PredictTest {
   @Test
   public void testOptionalConfigNoOverride() throws Exception {
     CommandLine line = Predict.getCommandLine(Predict.createOptions(),
-        new String[]{"franknet",
-        "-model", "test-model/franknet-model.json"});
+        new String[]{"franknet",});
     String modelPath = Predict.getModelPath(line, line.getArgs());
     Config config = Predict.createOptionalConfig(modelPath, line);
     Assert.assertEquals(100, config.numIterations);
@@ -36,7 +35,6 @@ public class PredictTest {
   public void testOptionalConfigOverride() throws Exception {
     CommandLine line = Predict.getCommandLine(Predict.createOptions(),
         new String[]{"franknet",
-            "-model", "test-model/franknet-model.json",
             "-test", "myTest.txt",
             "-report", "myreport.csv",
             "-eval", "myEvaluator",
