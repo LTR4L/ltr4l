@@ -13,7 +13,8 @@ For specific mathematical details and formulation, please see implementation or 
 2. Execution Instructions
     - Requirements
     - Data
-    - How to Execute Program
+    - How to Execute Training Program
+    - How to Execute Prediction Program
     - Changing Parameters
     
 3. Experiments
@@ -77,7 +78,7 @@ Each row is a query-document pair. The first column is relevance label of this p
 ====================================================
 ```
 
-#### How to Execute Program
+#### How to Execute Training Program
 
 1- Download the project from Github
 
@@ -134,6 +135,49 @@ the existing settings in the config file.
 
 ```
 open report/ranknet-report.csv
+```
+
+#### How to Execute Prediction Program
+If you have a model JSON file (for example, the model saved from running the training program),
+you can run the prediction program using that model file.
+
+Assuming the default parameters (using the default location models are saved to by the training program),
+the execution instructions are as follows:
+
+1- go to the project folder
+
+```
+cd ltr4l
+```
+
+2- run the following command (if jar file is not packaged, do step 3 in the previous section):
+
+```
+./predict ranknet
+```
+
+To see help for the predict command, use the -help option:
+
+```
+usage: predict <LTR-algorithm-name> [-debug] [-eval <evalType>] [-help]
+       [-k <k>] [-model <file>] [-report <file>] [-test <file>] [-verbose]
+       [-version]
+
+Execute Learning-to-Rank predicting algorithm. The algorithm is specified
+by the required argument <LTR-algorithm-name>. The program will look for
+the model file "model/<LTR-algorithm-name>-model.json" unless model option
+is specified. The following options can be specified in order to override
+the existing settings in the config file.
+
+ -debug             print debugging information
+ -eval <evalType>   specify type of evaluator
+ -help              print this message
+ -k <k>             specify k-value for evaluators which use @k
+ -model <file>      use given file for configuration and model
+ -report <file>     specify report file name
+ -test <file>       use given file for testing the model
+ -verbose           be extra verbose
+ -version           print the version information and exit
 ```
 
 #### Changing Parameters
