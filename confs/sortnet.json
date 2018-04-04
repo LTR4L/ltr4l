@@ -3,7 +3,7 @@
   "numIterations" : 100,
   "params" : {
     "learningRate" : 0.01,
-    "optimizer" : "momentum",
+    "optimizer" : "adam",
     "weightInit" : "xavier",
     "regularization" : {
       "regularizer" : "L2",
