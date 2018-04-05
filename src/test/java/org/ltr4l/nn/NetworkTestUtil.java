@@ -46,4 +46,25 @@ public class NetworkTestUtil<N extends AbstractNode> {
       }
     }
   }
+
+  public void assertCmpLayer(List<List<N>> model, int layerIdx, String expected) throws Exception {
+    List<N> layer = model.get(layerIdx);
+    int prevLayerSize = layerIdx <= 0 ? 0 : model.get(layerIdx - 1).size();
+    String[] nodes = expected.split("\\|", -1);
+    Assert.assertEquals(nodes.length, layer.size());
+    for(int i = 0; i < nodes.length; i++){
+      assertCmpNodeInputEdges(layer, i, nodes[i], prevLayerSize);
+    }
+  }
+
+  public void assertCmpNodeInputEdges(List<N> layerModel, int nodeIdx, String expected, int prevLayerSize) throws Exception {
+    N node = layerModel.get(nodeIdx);
+    if (expected.isEmpty()){
+      Assert.assertEquals(0, node.getInputEdges().size());
+    }
+    else{
+      String[] edges = expected.split(",", -1);
+      Assert.assertEquals(edges.length, node.getInputEdges().size() - prevLayerSize/2);
+    }
+  }
 }

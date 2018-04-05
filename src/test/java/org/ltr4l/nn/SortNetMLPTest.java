@@ -18,6 +18,7 @@ package org.ltr4l.nn;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
@@ -458,25 +459,17 @@ public class SortNetMLPTest {
     ObjectMapper mapper = new ObjectMapper();
     MLPTrainer.MLPConfig config = mapper.readValue(new StringReader(JSON_CONFIG), MLPTrainer.MLPConfig.class);
 
-    SortNetMLP mlpW = new SortNetMLP(2, NetworkShape.parseSetting("2,ReLU"),
+    SortNetMLP sortNW = new SortNetMLP(2, config.getNetworkShape(),
         new Optimizer.SGDFactory(), new Regularization.L2(), WeightInitializer.Type.sequence.name());
 
     StringWriter savedModel = new StringWriter();
-    mlpW.writeModel(config, savedModel);
+    sortNW.writeModel(config, savedModel);
+    //System.out.println(savedModel.toString());
+    List<List<SortNetMLP.SNode>> modelR = sortNW.readModel(new StringReader(savedModel.toString()));
+    NetworkTestUtil<SortNetMLP.SNode> ntu = new NetworkTestUtil<>();
 
-    System.out.println(savedModel.toString());
-    /* TODO: implement
-    AbstractMLP.ModelReader modelReader = new AbstractMLP.ModelReader<MLP.MNode, MLP.Edge>();
-    MyMLP dummy = new MyMLP(0, NetworkShape.parseSetting("1,Identity"), Optimizer.getFactory(Optimizer.DEFAULT),
-        Regularization.RegularizationFactory.getRegularization(Regularization.DEFAULT), WeightInitializer.DEFAULT.name());
-    List<List<MLP.MNode>> modelR = modelReader.readModel(new StringReader(savedModel.toString()), dummy);
-    NetworkTestUtil ntu = new NetworkTestUtil<MLP.MNode>();
-
-    Assert.assertEquals(4, modelR.size());
-    ntu.assertLayer(modelR, 0, "|");    // inputLayer must have two nodes that don't have any inputEdges
-    ntu.assertLayer(modelR, 1, "0,1,2|0,3,4|0,5,6");
-    ntu.assertLayer(modelR, 2, "0,7,8,9|0,10,11,12");
-    ntu.assertLayer(modelR, 3, "0,13,14|0,15,16|0,17,18|0,19,20");
-    */
+    Assert.assertEquals(3, modelR.size());
+    ntu.assertCmpLayer(modelR, 0, "|||"); //Input layer should have 4 layers that don't have any input edges
+    ntu.assertCmpLayer(modelR, 1, "0,1,3|0,5,7|0,9,11|0,2,4|0,6,8|0,10,12");
   }
 }
