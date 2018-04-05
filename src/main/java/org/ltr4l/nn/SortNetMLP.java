@@ -148,8 +148,7 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
           double bias = model.getWeight(layerId, i, 0);
           SEdge biasEdge = new SEdge(null, sNodePair, optFact.getOptimizer(), bias);
           sNode0.addInputEdge(biasEdge);
-          int primeIndex = model.weights.get(layerId).get(i).size()/2;
-          bias = model.getWeight(layerId, i, primeIndex - 1);
+          bias = model.getWeight(layerId, i + numNodes, 0);
           biasEdge = new SEdge(null, sNodePair, optFact.getOptimizer(), bias); //Biases may be different now...?
           sNode1.addInputEdge(biasEdge);
 
@@ -158,7 +157,7 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
           for (int nodeId = 0; nodeId < prevLayer.size() / 2; nodeId++) {
             SNode prevSNode0 = prevLayer.get(nodeId);
             SNode prevSNode1 = prevLayer.get(nodeId + prevLayer.size() / 2);
-            double weight = model.getWeight(layerId, (2 * i) , nodeId + 1);  //Note that layerId in model.weights == layerId in network + 1
+            double weight = model.getWeight(layerId,   i , nodeId + 1);  //Note that layerId in model.weights == layerId in network + 1
             SNode[] prevNodePair = {prevSNode0, prevSNode1};
             SEdge sEdge = new SEdge(prevNodePair, sNodePair, optFact.getOptimizer(), weight);
 
@@ -168,7 +167,7 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
             sNode1.addInputEdge(sEdge);
 
             //Get another weight, and set up an edge for reversed pair.
-            weight = model.getWeight(layerId, (2 * i + 1), nodeId + 1);
+            weight = model.getWeight(layerId, i + numNodes , nodeId + 1);
             prevNodePair = new SNode[]{prevSNode1, prevSNode0};
             sEdge = new SEdge(prevNodePair, sNodePair, optFact.getOptimizer(), weight);
             prevSNode1.addOutputEdge(sEdge);
@@ -195,7 +194,7 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
       for (SNode node : layer){
         List<Double> nodeWeights = new ArrayList<>();
         wlayer.add(nodeWeights);
-        nodeWeights.add(node.getInputEdge(0).getWeight()); //Add bias once per pair.
+        nodeWeights.add(node.getInputEdge(0).getWeight()); //Add bias.
         for (int i = 0; i < node.getInputEdges().size()/2; i++){
           int group = node.getGroup();
           nodeWeights.add(node.getInputEdge((group + 2 * i) + 1).getWeight()); //for SortNet... +1 for bias
