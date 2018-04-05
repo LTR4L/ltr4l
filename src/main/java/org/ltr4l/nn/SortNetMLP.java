@@ -16,10 +16,13 @@
 
 package org.ltr4l.nn;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.tools.Error;
@@ -105,7 +108,100 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
 
   @Override
   protected List<List<SNode>> readModel(Reader reader){
-    throw new UnsupportedOperationException(); //TODO: Implement readModel for SortNet.
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      SavedModel model = mapper.readValue(reader, SavedModel.class);
+      assert(model.weights.size() > 0);
+
+      List<List<SNode>> network = new ArrayList<>();
+
+      //Construct the initial layer:
+      List<SNode> inputLayer = new ArrayList<>();
+      List<SNode> inputLayerPrime = new ArrayList<>();
+      network.add(inputLayer);
+      for (int i = 0; i < model.getNode(0, 0).size() - 1; i++) { // -1 for bias, -1 for index...
+        inputLayer.add(new SNode(0, new Activation.Identity()));
+        inputLayerPrime.add(new SNode(1, new Activation.Identity()));
+      }
+      inputLayer.addAll(inputLayerPrime);
+
+      //Construct the rest of the layers and edges:
+      NetworkShape networkShape = model.config.getNetworkShape();
+      addOutputs(networkShape);
+      Optimizer.OptimizerFactory optFact = model.config.getOptFact();
+      for (int layerId = 0; layerId < model.weights.size(); layerId++) {
+        int numNodes = networkShape.getLayerSetting(layerId).getNum();
+        Activation activation = networkShape.getLayerSetting(layerId).getActivation();
+
+        List<SNode> currentLayer = new ArrayList<>();
+        List<SNode> layerPrime = new ArrayList<>();
+        network.add(currentLayer);
+
+        for (int i = 0; i < numNodes; i++) {
+          SNode sNode0 = new SNode(0, activation);
+          SNode sNode1 = new SNode(1, activation);
+          currentLayer.add(sNode0);
+          layerPrime.add(sNode1);
+          SNode[] sNodePair = {sNode0, sNode1};
+
+          //Add bias
+          double bias = model.getWeight(layerId, i, 0);
+          SEdge biasEdge = new SEdge(null, sNodePair, optFact.getOptimizer(), bias);
+          sNode0.addInputEdge(biasEdge);
+          bias = model.getWeight(layerId, i + numNodes, 0);
+          biasEdge = new SEdge(null, sNodePair, optFact.getOptimizer(), bias); //Biases may be different now...?
+          sNode1.addInputEdge(biasEdge);
+
+          //Add edges with previous layer.
+          List<SNode> prevLayer = network.get(layerId);
+          for (int nodeId = 0; nodeId < prevLayer.size() / 2; nodeId++) {
+            SNode prevSNode0 = prevLayer.get(nodeId);
+            SNode prevSNode1 = prevLayer.get(nodeId + prevLayer.size() / 2);
+            double weight = model.getWeight(layerId,   i , nodeId + 1);  //Note that layerId in model.weights == layerId in network + 1
+            SNode[] prevNodePair = {prevSNode0, prevSNode1};
+            SEdge sEdge = new SEdge(prevNodePair, sNodePair, optFact.getOptimizer(), weight);
+
+            prevSNode0.addOutputEdge(sEdge);
+            prevSNode1.addOutputEdge(sEdge);
+            sNode0.addInputEdge(sEdge);
+            sNode1.addInputEdge(sEdge);
+
+            //Get another weight, and set up an edge for reversed pair.
+            weight = model.getWeight(layerId, i + numNodes , nodeId + 1);
+            prevNodePair = new SNode[]{prevSNode1, prevSNode0};
+            sEdge = new SEdge(prevNodePair, sNodePair, optFact.getOptimizer(), weight);
+            prevSNode1.addOutputEdge(sEdge);
+            prevSNode0.addOutputEdge(sEdge);
+            sNode0.addInputEdge(sEdge);
+            sNode1.addInputEdge(sEdge);
+          }
+        }
+        currentLayer.addAll(layerPrime);
+      }
+      return network;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  protected List<List<List<Double>>> obtainWeights(){
+    List<List<List<Double>>> weights = new ArrayList<>();
+    for (List<SNode> layer : network) {
+      if (layer.get(0).getInputEdges().isEmpty()) continue; //Skip if no input edges... or start at index 1
+      List<List<Double>> wlayer = new ArrayList<>();
+      weights.add(wlayer);
+      for (SNode node : layer){
+        List<Double> nodeWeights = new ArrayList<>();
+        wlayer.add(nodeWeights);
+        nodeWeights.add(node.getInputEdge(0).getWeight()); //Add bias.
+        for (int i = 0; i < node.getInputEdges().size()/2; i++){
+          int group = node.getGroup();
+          nodeWeights.add(node.getInputEdge((group + 2 * i) + 1).getWeight()); //for SortNet... +1 for bias
+        }
+      }
+    }
+    return weights;
   }
 
   @Override

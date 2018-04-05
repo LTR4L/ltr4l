@@ -90,10 +90,6 @@ public class AbstractMLPTest {
     StringWriter savedModel = new StringWriter();
     mlpW.writeModel(config, savedModel);
 
-    //AbstractMLP.ModelReader modelReader = new AbstractMLP.ModelReader<MLP.MNode, MLP.Edge>();
-/*    MyMLP dummy = new MyMLP(0, NetworkShape.parseSetting("1,Identity"), Optimizer.getFactory(Optimizer.DEFAULT),
-        Regularization.RegularizationFactory.getRegularization(Regularization.DEFAULT), WeightInitializer.DEFAULT.name());*/
-
     List<List<MLP.MNode>> modelR = mlpW.readModel(new StringReader(savedModel.toString()));
     NetworkTestUtil ntu = new NetworkTestUtil<MLP.MNode>();
 
