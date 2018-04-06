@@ -24,7 +24,7 @@ public class Query {
   private int queryId;
   private int featureLength;
 
-  Query() {
+  public Query() {
     docList = new ArrayList<>();
     queryId = -1;
     featureLength = 0;
