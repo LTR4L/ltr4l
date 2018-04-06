@@ -33,6 +33,10 @@ public class QuerySet {
     queries = new ArrayList<>();
   }
 
+  public void addQuery(Query query){
+    queries.add(query);
+  }
+
   public static QuerySet create(String file){
     try(InputStream is = new FileInputStream(file)){
       try(Reader reader = new InputStreamReader(is)){
