@@ -18,20 +18,13 @@ package org.ltr4l.tools;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.PrintStream;
 
 public class Report {
 
-  private static final String DEFAULT_REPORT_FILE = "report/report.csv";
-  private final PrintWriter pw;
+  private final PrintStream ps;
   private final String file;
   private final boolean verbose;
-
-  /* TODO: remove this later
-  public static Report getReport(){
-    return getReport(DEFAULT_REPORT_FILE);
-  }
-  */
 
   public static Report getReport(Config config){
     try {
@@ -50,35 +43,41 @@ public class Report {
   }
 
   private Report(Config config, String header) throws IOException{ //TODO: eval method should be mutable
-    String file = config.report == null ? null : config.report.file;
-    this.file = (file == null || file.isEmpty()) ? DEFAULT_REPORT_FILE : file;;
-    this.verbose = config.verbose;
-    pw = new PrintWriter(new FileOutputStream(this.file));
-    pw.println(header);  // header for CSV file
+    file = getReportFile(config);
+    verbose = config.verbose;
+    ps = getReportPrintStream(file);
+    ps.println(header);  // header for CSV file
   }
 
   private Report(Config config) throws IOException {
-    String file = config.report == null ? null : config.report.file;
-    this.file = (file == null || file.isEmpty()) ? DEFAULT_REPORT_FILE : file;;
-    this.verbose = config.verbose;
-    pw = new PrintWriter(new FileOutputStream(this.file));
-    pw.println(",evaluation,tr_loss,va_loss");  // header for CSV file
+    file = getReportFile(config);
+    verbose = config.verbose;
+    ps = getReportPrintStream(file);
+    ps.println(",evaluation,tr_loss,va_loss");  // header for CSV file
   }
 
   public void log(int iter, double eval, double tloss, double vloss){
     if(verbose)
       System.out.printf("%d tr_loss: %f va_loss: %f evaluation: %f\n", iter, tloss, vloss, eval);
-    pw.printf("%d,%f,%f,%f\n", iter, eval, tloss, vloss);
+    ps.printf("%d,%f,%f,%f\n", iter, eval, tloss, vloss);
   }
 
   public void log(double eval){
     if(verbose)
       System.out.printf("Evaluation score: %f\n", eval);
-    pw.printf("%f", eval);
+    ps.printf("%f", eval);
   }
 
   public void close(){
-    if(pw != null) pw.close();
+    if(ps != null) ps.close();
+  }
+
+  public static String getReportFile(Config config){
+    return config.report == null ? null : config.report.file;
+  }
+
+  public static PrintStream getReportPrintStream(String file) throws IOException {
+    return file == null ? System.out : new PrintStream(new FileOutputStream(file));
   }
 
   public String getReportFile(){

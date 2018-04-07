@@ -119,17 +119,6 @@ public class LTRTrainerTest {
     Assert.assertEquals("report/franknet-report.csv", trainer.report.getReportFile());
   }
 
-  @Test
-  public void testDefaultReportFile() throws Exception {
-    final String JSON = "{\n" +
-        "  \"algorithm\" : \"FRankNet\",\n" +
-        "  \"numIterations\" : 100\n" +
-        "}\n";
-
-    trainer = new NullLTRTrainer(new QuerySet(), new QuerySet(), new StringReader(JSON), null);
-    Assert.assertEquals("report/report.csv", trainer.report.getReportFile());
-  }
-
   private static class NullRanker extends Ranker<Config> {
 
     @Override
