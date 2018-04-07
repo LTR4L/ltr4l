@@ -1,0 +1,22 @@
+{
+  "algorithm" : "PRank",
+  "numIterations" : 100,
+
+  "dataSet" : {
+    "training" : "data/MQ2008/Fold1/train.txt",
+    "validation" : "data/MQ2008/Fold1/vali.txt",
+    "test" : "data/MQ2008/Fold1/test.txt"
+  },
+
+  "model" : {
+    "format" : "json",
+    "file" : "model/prank-model.json"
+  },
+
+  "evaluation" : {
+    "evaluator" : "NDCG",
+    "params" : {
+      "k" : 10
+    }
+  }
+}
