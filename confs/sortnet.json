@@ -1,6 +1,7 @@
 {
   "algorithm" : "SortNet",
   "numIterations" : 100,
+  "verbose": true,
   "params" : {
     "learningRate" : 0.01,
     "optimizer" : "adam",

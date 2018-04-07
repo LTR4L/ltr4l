@@ -145,7 +145,7 @@
     <target name="package" depends="jar" description="make package"/>
 
     <target name="train" depends="compile" description="run Train program">
-        <property name="algo" value="ranknet"/>
+        <property name="algo" value="franknet"/>
         <java classname="org.ltr4l.cli.Train">
             <arg line="${algo}"/>
             <classpath path="${cls.dir}"/>

@@ -1,6 +1,7 @@
 {
   "algorithm" : "PRank",
   "numIterations" : 100,
+  "verbose": true,
 
   "dataSet" : {
     "training" : "data/MQ2008/Fold1/train.txt",

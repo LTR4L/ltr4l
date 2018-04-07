@@ -1,6 +1,7 @@
 {
   "algorithm" : "FRankNet",
   "numIterations" : 100,
+  "verbose": true,
   "params" : {
     "learningRate" : 0.001,
     "optimizer" : "momentum",
