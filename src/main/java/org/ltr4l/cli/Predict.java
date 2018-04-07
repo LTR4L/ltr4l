@@ -15,8 +15,21 @@
  */
 package org.ltr4l.cli;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.lang.invoke.MethodHandles;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.ltr4l.Ranker;
 import org.ltr4l.Version;
 import org.ltr4l.evaluation.RankEval;
@@ -24,13 +37,6 @@ import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Report;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 public class Predict {
 
@@ -81,6 +87,7 @@ public class Predict {
         .desc("specify k-value for evaluators which use @k").build();
     Option version = new Option( "version", "print the version information and exit" );
     Option verbose = new Option( "verbose", "be extra verbose" );
+    Option noverbose = new Option( "noverbose", "override verboseness" );
     Option debug = new Option( "debug", "print debugging information" );
 
     Options options = new Options();
@@ -92,6 +99,7 @@ public class Predict {
         .addOption(k)
         .addOption(version)
         .addOption(verbose)
+        .addOption(noverbose)
         .addOption(debug);
     return options;
   }
@@ -138,6 +146,10 @@ public class Predict {
     ObjectMapper mapper = new ObjectMapper();
     Config optionalConfig = mapper.readValue(new File(configPath), SavedModel.class).config;
 
+    if(line.hasOption("verbose"))
+      optionalConfig.verbose = true;
+    if(line.hasOption("noverbose"))
+      optionalConfig.verbose = false;    // noverbose overrides verboseness
     if(line.hasOption("test"))
       optionalConfig.dataSet.test = line.getOptionValue("test");
     if(line.hasOption("report"))
@@ -154,7 +166,7 @@ public class Predict {
     RankEval eval = RankEval.RankEvalFactory.get(optionalConfig.evaluation.evaluator);
     double score = eval.calculateAvgAllQueries(ranker, testSet, (int) optionalConfig.evaluation.params.get("k"));
     String header = optionalConfig.evaluation.evaluator + "@" + optionalConfig.evaluation.params.get("k") + " for " + optionalConfig.algorithm;
-    Report report = Report.getReport((optionalConfig.report == null) ? null : optionalConfig.report.file, header);
+    Report report = Report.getReport(optionalConfig, header);
     report.log(score);
     report.close();
   }

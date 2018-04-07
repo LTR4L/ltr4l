@@ -89,6 +89,7 @@ public class Train {
         .desc("specify report file name").build();
     Option version = new Option( "version", "print the version information and exit" );
     Option verbose = new Option( "verbose", "be extra verbose" );
+    Option noverbose = new Option( "noverbose", "override verboseness" );
     Option debug = new Option( "debug", "print debugging information" );
 
     Options options = new Options();
@@ -101,6 +102,7 @@ public class Train {
         .addOption(reportFile)
         .addOption(version)
         .addOption(verbose)
+        .addOption(noverbose)
         .addOption(debug);
     return options;
   }
@@ -143,6 +145,10 @@ public class Train {
 
     if(line.hasOption("iterations"))
       optionalConfig.numIterations = Integer.parseInt(line.getOptionValue("iterations"));
+    if(line.hasOption("verbose"))
+      optionalConfig.verbose = true;
+    if(line.hasOption("noverbose"))
+      optionalConfig.verbose = false;    // noverbose overrides verboseness
     if(line.hasOption("training"))
       optionalConfig.dataSet.training = line.getOptionValue("training");
     if(line.hasOption("validation"))
