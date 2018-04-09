@@ -91,6 +91,10 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> implements 
     return (config.report == null) ? null : config.report.file;
   }
 
+  public R getRanker() {
+    return ranker;
+  }
+
   abstract double calculateLoss(List<Query> queries);
 
   /**
