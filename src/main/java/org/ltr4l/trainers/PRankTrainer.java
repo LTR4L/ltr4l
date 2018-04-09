@@ -34,11 +34,11 @@ import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 
 /**
- * The implementation of LTRTrainer which uses the
+ * The implementation of AbstractTrainer which uses the
  * PRank(Perceptron Ranking) algorithm.
  *
  */
-public class PRankTrainer extends LTRTrainer<PRankTrainer.PRank, Config> {
+public class PRankTrainer extends AbstractTrainer<PRankTrainer.PRank, Config> {
 
   private final  List<Document> trainingDocList;
 

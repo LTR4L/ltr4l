@@ -163,7 +163,7 @@ public abstract class Ranker<C extends Config> {
     }
   }
 
-    //TODO: Move elsewhere? Same as LTRTrainer.getConfig
+    //TODO: Move elsewhere? Same as AbstractTrainer.getConfig
     protected static <C extends Config> C getConfig(Reader reader, Class<C> configClass){
       ObjectMapper mapper = new ObjectMapper();
       try {

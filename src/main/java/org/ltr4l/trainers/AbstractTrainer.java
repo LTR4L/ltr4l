@@ -38,7 +38,7 @@ import org.ltr4l.tools.Report;
  *
  * train() must be implemented based on algorithm used.
  */
-public abstract class LTRTrainer<R extends Ranker, C extends Config> {
+public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
   protected final int epochNum;
   protected final List<Query> trainingSet;
   protected final List<Query> validationSet;
@@ -52,7 +52,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> {
   protected final String modelFile;
   protected final RankEval eval;
 
-  LTRTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+  AbstractTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
     this.config = getConfig(reader);
     config.overrideBy(override);     // TODO: want to use generic C instead of Config
     epochNum = config.numIterations;
@@ -156,7 +156,7 @@ public abstract class LTRTrainer<R extends Ranker, C extends Config> {
      * @param configFile The Config file containing parameters needed for Ranker class.
      * @return new class which implements trainer.
      */
-    public static LTRTrainer getTrainer(String algorithm, QuerySet trainingSet, QuerySet validationSet, String configFile, Config override) {
+    public static AbstractTrainer getTrainer(String algorithm, QuerySet trainingSet, QuerySet validationSet, String configFile, Config override) {
       try(Reader reader = new FileReader(configFile)){
         switch (algorithm.toLowerCase()) {
           case "prank":

@@ -29,11 +29,11 @@ import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 
 /**
- * The implementation of LTRTrainer which uses the
+ * The implementation of AbstractTrainer which uses the
  * OAP-BPM algorithm.
  *
  */
-public class OAPBPMTrainer extends LTRTrainer<OAPBPMTrainer.OAPBPMRank, OAPBPMTrainer.OAPBPMConfig> {
+public class OAPBPMTrainer extends AbstractTrainer<OAPBPMTrainer.OAPBPMRank, OAPBPMTrainer.OAPBPMConfig> {
   private double maxScore;
   private final  List<Document> trainingDocList;
 

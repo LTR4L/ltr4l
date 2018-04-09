@@ -36,11 +36,11 @@ import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
 /**
- * The basic implementation of LTRTrainer for classes which use Multi-Layer Perceptron rankers.
+ * The basic implementation of AbstractTrainer for classes which use Multi-Layer Perceptron rankers.
  * As the training method can be different depending on the algorithm used,
  * the method train() must be implemented by child classes.
  */
-public abstract class MLPTrainer<M extends AbstractMLP> extends LTRTrainer<M, MLPTrainer.MLPConfig> {
+public abstract class MLPTrainer<M extends AbstractMLP> extends AbstractTrainer<M, MLPTrainer.MLPConfig> {
   protected double maxScore;
   protected double lrRate;
   protected double rgRate;
