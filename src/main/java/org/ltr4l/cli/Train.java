@@ -31,7 +31,7 @@ import org.apache.commons.cli.ParseException;
 import org.ltr4l.Version;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
-import org.ltr4l.trainers.Trainer;
+import org.ltr4l.trainers.LTRTrainer;
 
 public class Train {
 
@@ -66,7 +66,7 @@ public class Train {
     QuerySet trainingSet = QuerySet.create(optionalConfig.dataSet.training);
     QuerySet validationSet = QuerySet.create(optionalConfig.dataSet.validation);
 
-    Trainer trainer = Trainer.TrainerFactory.getTrainer(params[0], trainingSet, validationSet, configPath, optionalConfig);
+    LTRTrainer trainer = LTRTrainer.TrainerFactory.getTrainer(params[0], trainingSet, validationSet, configPath, optionalConfig);
     long startTime = System.currentTimeMillis();
     trainer.trainAndValidate();
     long endTime = System.currentTimeMillis();
