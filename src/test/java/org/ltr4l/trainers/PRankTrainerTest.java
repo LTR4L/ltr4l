@@ -47,7 +47,7 @@ public class PRankTrainerTest {
       "}\n";
 
   @Test
-  public void testD1S2() throws Exception {
+  public void testTrainingD1S2() throws Exception {
     RandomDataGenerator rdg = new RandomDataGenerator(1, 2);
 
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
@@ -76,7 +76,7 @@ public class PRankTrainerTest {
   }
 
   @Test
-  public void testD1S3() throws Exception {
+  public void testTrainingD1S3() throws Exception {
     RandomDataGenerator rdg = new RandomDataGenerator(1, 3);
 
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
@@ -105,7 +105,7 @@ public class PRankTrainerTest {
   }
 
   @Test
-  public void testD2S2() throws Exception {
+  public void testTrainingD2S2() throws Exception {
     RandomDataGenerator rdg = new RandomDataGenerator(2, 2);
 
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
@@ -134,7 +134,7 @@ public class PRankTrainerTest {
   }
 
   @Test
-  public void testD2S3() throws Exception {
+  public void testTrainingD2S3() throws Exception {
     RandomDataGenerator rdg = new RandomDataGenerator(2, 3);
 
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
