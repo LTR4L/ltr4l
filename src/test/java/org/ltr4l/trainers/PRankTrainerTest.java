@@ -31,6 +31,7 @@ public class PRankTrainerTest {
       "  \"algorithm\" : \"PRank\",\n" +
       "  \"numIterations\" : 100,\n" +
       "  \"verbose\": false,\n" +
+      "  \"nomodel\": true,\n" +
       "\n" +
       "  \"model\" : {\n" +
       "    \"format\" : \"json\",\n" +
