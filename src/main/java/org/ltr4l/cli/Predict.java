@@ -106,7 +106,7 @@ public class Predict {
 
   public static void printUsage(Options options){
     HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp( "predict " + REQUIRED_ARG,
+    formatter.printHelp( "score " + REQUIRED_ARG,
         "\nExecute Learning-to-Rank predicting algorithm. The algorithm is specified by the required argument <LTR-algorithm-name>." +
             " The program will look for the model file \"model/<LTR-algorithm-name>-model.json\"" +
             " unless model option is specified." +

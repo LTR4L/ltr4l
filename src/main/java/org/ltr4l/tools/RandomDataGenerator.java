@@ -43,18 +43,9 @@ public class RandomDataGenerator {
     final int numStars = 4;
     final int dim = 4;
     final double alpha = alpha(dim, numStars);
-    final double b1 = 0;
 
-    // generate boundaries
-    List<LinearModel> linearModels = new ArrayList<>();
-    LinearModel y = LinearModel.generate(dim, b1);
+    LinearModel y = LinearModel.generate(dim, numStars, alpha);
     System.out.println(y.toString());
-    linearModels.add(y);
-    for(int i = 1; i < numStars - 1; i++){
-      y = y.nextBoundary(alpha);
-      System.out.println(y.toString());
-      linearModels.add(y);
-    }
 
     // generate data
     final int numData = 100;
@@ -62,11 +53,11 @@ public class RandomDataGenerator {
       double[] sample = generateSample(dim);
       int star;
       for(star = 0; star < numStars - 1; star++){
-        if(linearModels.get(star).predict(sample)){
+        if(y.score(sample) < y.thresholds[star]){
           break;
         }
       }
-      System.out.printf("%f => %d\n", sample[0], star);
+      System.out.printf("%f => %d , threshold: %f \n", y.score(sample), star, y.thresholds[star]);
     }
   }
 
@@ -74,29 +65,15 @@ public class RandomDataGenerator {
   private final int dim;
   private final int numStars;
   private final double alpha;
-  private List<LinearModel> linearModels;
+  private LinearModel linearModel;
 
   public RandomDataGenerator(int dim, int numStars){
     this.dim = dim;
     this.numStars = numStars;
     this.alpha  = alpha(dim, numStars);
-    this.linearModels = generateBoundaries(dim, numStars, alpha);
+    this.linearModel = LinearModel.generate(dim, numStars, alpha);
   }
 
-  public static List<LinearModel> generateBoundaries(int dim, int numStars, double alpha){
-    List<LinearModel> linearModels = new ArrayList<>();
-    final double b1 = 0;
-    LinearModel y = LinearModel.generate(dim, b1);
-    System.out.println(y.toString());
-    linearModels.add(y);
-    for(int i = 1; i < numStars - 1; i++){
-      y = y.nextBoundary(alpha);
-      System.out.println(y.toString());
-      linearModels.add(y);
-    }
-
-    return linearModels;
-  }
 
   public QuerySet getRandomQuerySet(int numQueries, int numSamplesPerQuery, int minSamples){
     QuerySet querySet = new QuerySet();
@@ -134,7 +111,7 @@ public class RandomDataGenerator {
       }
       else if(triedPerModel == MAX_TRY){
         System.err.println("WARNING: The built model is not good. Will create another one.");
-        linearModels = generateBoundaries(dim, numStars, alpha);
+        linearModel = LinearModel.generate(dim, numStars, alpha);
         querySet = new QuerySet();
         triedPerModel = 0;
         qId = 0;
@@ -176,7 +153,7 @@ public class RandomDataGenerator {
 
     int star;
     for(star = 0; star < numStars - 1; star++){
-      if(linearModels.get(star).predict(sample)){
+      if(linearModel.score(sample) < linearModel.thresholds[star]){
         break;
       }
     }
@@ -191,40 +168,31 @@ public class RandomDataGenerator {
     private final int d;
     private final double[] weights;
     private final double b;
+    private final double[] thresholds;
 
-    public static LinearModel generate(int d, double b){
-      LinearModel linearModel = new LinearModel(d, b);
+    public static LinearModel generate(int d, int numStars, double alpha){
+      LinearModel linearModel = new LinearModel(d, numStars);
       setRandomWeights(linearModel.weights);
+      setThresholds(linearModel.thresholds, alpha);
       return linearModel;
     }
 
-    private LinearModel(int d, double b){
+    private LinearModel(int d, int numStars){
       assert(d > 0);
       this.d = d;
-      this.b = b;
-      weights = new double[d];
+      this.weights = new double[d];
+      this.thresholds = new double[numStars];
+      this.b = r.nextDouble();
     }
 
-    private LinearModel(double[] weights, double b){
-      assert(weights.length > 0);
-      this.d = weights.length;
-      this.weights = weights;
-      this.b = b;
-    }
-
-    public LinearModel nextBoundary(double alpha){
-      return new LinearModel(weights, b + alpha);
-    }
-
-    public boolean predict(double[] x){
+    public double score(double[] x){
       assert(weights.length == x.length);
       double y = 0;
       for( int i = 0; i < weights.length; i++){
         y += weights[i] * x[i];
       }
       y += b;
-
-      return y > 0 ? true : false;
+      return y;
     }
 
     @Override
@@ -244,5 +212,12 @@ public class RandomDataGenerator {
         weights[i] = r.nextDouble() - 0.5;
       }
     }
+
+    static void setThresholds(double[] thresholds, double alpha){
+      thresholds[0] = r.nextDouble();
+      for(int i = 1; i < thresholds.length; i++)
+        thresholds[i] = thresholds[i - 1] + alpha;
+    }
+
   }
 }
