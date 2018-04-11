@@ -155,10 +155,30 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
      * @param trainingSet The QuerySet containing the data to be used for training.
      * @param validationSet The QuerySet containing the data to be used for validation.
      * @param configFile The Config file containing parameters needed for Ranker class.
+     * @param override Set another Config that overrides configFile.
      * @return new class which implements trainer.
      */
     public static AbstractTrainer getTrainer(String algorithm, QuerySet trainingSet, QuerySet validationSet, String configFile, Config override) {
-      try(Reader reader = new FileReader(configFile)){
+      try{
+        Reader reader = new FileReader(configFile);
+        return getTrainer(algorithm, trainingSet, validationSet, reader, override);
+      }
+      catch (IOException e){
+        throw new IllegalArgumentException(e);
+      }
+    }
+
+    /**
+     * This returns the appropriate implementation of Trainer depending on the algorithm.
+     * @param algorithm Algorithm/implementation to be used.
+     * @param trainingSet The QuerySet containing the data to be used for training.
+     * @param validationSet The QuerySet containing the data to be used for validation.
+     * @param reader The Config Reader containing parameters needed for Ranker class.
+     * @param override Set another Config that overrides reader Config.
+     * @return new class which implements trainer.
+     */
+    public static AbstractTrainer getTrainer(String algorithm, QuerySet trainingSet, QuerySet validationSet, Reader reader, Config override) {
+      try{
         switch (algorithm.toLowerCase()) {
           case "prank":
             return new PRankTrainer(trainingSet, validationSet, reader, override);
@@ -180,8 +200,11 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
             return null;
         }
       }
-      catch (IOException e){
-        throw new IllegalArgumentException(e);
+      finally {
+        try {
+          if(reader != null) reader.close();
+        } catch (IOException ignored) {
+        }
       }
     }
   }
