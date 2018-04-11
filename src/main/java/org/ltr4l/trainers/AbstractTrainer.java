@@ -127,7 +127,8 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
     }
     report.close();
     try {
-      ranker.writeModel(config, modelFile);
+      if(!config.nomodel)
+        ranker.writeModel(config, modelFile);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

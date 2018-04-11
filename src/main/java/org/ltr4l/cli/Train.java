@@ -90,6 +90,7 @@ public class Train {
     Option version = new Option( "version", "print the version information and exit" );
     Option verbose = new Option( "verbose", "be extra verbose" );
     Option noverbose = new Option( "noverbose", "override verboseness" );
+    Option nomodel = new Option( "nomodel", "restrain model output" );
     Option debug = new Option( "debug", "print debugging information" );
 
     Options options = new Options();
@@ -103,6 +104,7 @@ public class Train {
         .addOption(version)
         .addOption(verbose)
         .addOption(noverbose)
+        .addOption(nomodel)
         .addOption(debug);
     return options;
   }
@@ -148,13 +150,18 @@ public class Train {
     if(line.hasOption("verbose"))
       optionalConfig.verbose = true;
     if(line.hasOption("noverbose"))
-      optionalConfig.verbose = false;    // noverbose overrides verboseness
+      optionalConfig.verbose = false;    // noverbose always overrides verboseness
     if(line.hasOption("training"))
       optionalConfig.dataSet.training = line.getOptionValue("training");
     if(line.hasOption("validation"))
       optionalConfig.dataSet.validation = line.getOptionValue("validation");
-    if(line.hasOption("model"))
+    if(line.hasOption("model")) {
+      if(optionalConfig.model == null)
+        optionalConfig.model = new Config.Model();
       optionalConfig.model.file = line.getOptionValue("model");
+    }
+    if(line.hasOption("nomodel"))
+      optionalConfig.nomodel = true;
     if(line.hasOption("report"))
       optionalConfig.report.file = line.getOptionValue("report");
 
