@@ -69,7 +69,7 @@ public class Report {
   }
 
   public void close(){
-    if(ps != null) ps.close();
+    if(ps != null && ps != System.out) ps.close();
   }
 
   public static String getReportFile(Config config){
