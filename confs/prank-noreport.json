@@ -1,7 +1,6 @@
 {
   "algorithm" : "PRank",
   "numIterations" : 100,
-  "verbose": true,
 
   "dataSet" : {
     "training" : "data/MQ2008/Fold1/train.txt",
@@ -19,10 +18,5 @@
     "params" : {
       "k" : 10
     }
-  },
-
-  "report" : {
-    "format" : "csv",
-    "file" : "report/prank-report.csv"
   }
 }

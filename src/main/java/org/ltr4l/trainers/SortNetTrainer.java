@@ -35,7 +35,7 @@ import org.ltr4l.tools.Regularization;
  * This network trains an MLP network.
  *
  */
-public class SortNetTrainer extends LTRTrainer<SortNetMLP, MLPTrainer.MLPConfig> {
+public class SortNetTrainer extends AbstractTrainer<SortNetMLP, MLPTrainer.MLPConfig> {
   protected double maxScore;
   protected double lrRate;
   protected double rgRate;

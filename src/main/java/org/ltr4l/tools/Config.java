@@ -29,6 +29,8 @@ public class Config {
   public String algorithm;
   public int numIterations = 100;
   public int batchSize;
+  public boolean verbose;
+  public boolean nomodel;
 
   public Map<String, Object> params;
   public Config.DataSet dataSet;
@@ -41,6 +43,8 @@ public class Config {
       this.algorithm = override.algorithm;
       this.numIterations = override.numIterations;
       this.batchSize = override.batchSize;
+      this.verbose = override.verbose;
+      this.nomodel = override.nomodel;
       this.params = override.params;
       this.dataSet = override.dataSet;
       this.model = override.model;

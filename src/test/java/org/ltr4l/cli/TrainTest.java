@@ -56,6 +56,7 @@ public class TrainTest {
             "-training", "mytrain.txt",
             "-validation", "myvali.txt",
             "-model", "mymodel.json",
+            "-nomodel",
             "-report", "myreport.csv"});
     String configPath = Train.getConfigPath(line, line.getArgs());
     Config config = Train.createOptionalConfig(configPath, line);
@@ -63,6 +64,7 @@ public class TrainTest {
     Assert.assertEquals("mytrain.txt", config.dataSet.training);
     Assert.assertEquals("myvali.txt", config.dataSet.validation);
     Assert.assertEquals("mymodel.json", config.model.file);
+    Assert.assertTrue(config.nomodel);
     Assert.assertEquals("myreport.csv", config.report.file);
   }
 }

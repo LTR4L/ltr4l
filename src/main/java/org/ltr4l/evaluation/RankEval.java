@@ -21,7 +21,6 @@ import java.util.List;
 import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.trainers.Trainer;
 
 public interface RankEval {
   static int countNumRelDocs(List<Document> docRanks){

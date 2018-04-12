@@ -18,63 +18,66 @@ package org.ltr4l.tools;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.PrintStream;
 
 public class Report {
 
-  private static final String DEFAULT_REPORT_FILE = "report/report.csv";
-  private final PrintWriter pw;
+  private final PrintStream ps;
   private final String file;
+  private final boolean verbose;
 
-  public static Report getReport(){
-    return getReport(DEFAULT_REPORT_FILE);
-  }
-
-  public static Report getReport(String file){
-    file = (file == null || file.isEmpty()) ? DEFAULT_REPORT_FILE : file;
+  public static Report getReport(Config config){
     try {
-      return new Report(file);
+      return new Report(config);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  public static Report getReport(String file, String header){
-    file = (file == null || file.isEmpty()) ? DEFAULT_REPORT_FILE : file;
+  public static Report getReport(Config config, String header){
     try {
-      return new Report(file, header);
+      return new Report(config, header);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private Report(String file, String header) throws IOException{ //TODO: eval method should be mutable
-    this.file = file;
-    pw = new PrintWriter(new FileOutputStream(file));
-    // TODO: eval method should be mutable
-    pw.println(header);  // header for CSV file
+  private Report(Config config, String header) throws IOException{ //TODO: eval method should be mutable
+    file = getReportFile(config);
+    verbose = config.verbose;
+    ps = getReportPrintStream(file);
+    ps.println(header);  // header for CSV file
   }
 
-  private Report(String file) throws IOException {
-    this.file = file;
-    pw = new PrintWriter(new FileOutputStream(file));
-    // TODO: eval method should be mutable
-    pw.println(",evaluation,tr_loss,va_loss");  // header for CSV file
+  private Report(Config config) throws IOException {
+    file = getReportFile(config);
+    verbose = config.verbose;
+    ps = getReportPrintStream(file);
+    ps.println(",evaluation,tr_loss,va_loss");  // header for CSV file
   }
 
   public void log(int iter, double eval, double tloss, double vloss){
-    // TODO: eval method should be mutable
-    System.out.printf("%d tr_loss: %f va_loss: %f evaluation: %f\n", iter, tloss, vloss, eval);
-    pw.printf("%d,%f,%f,%f\n", iter, eval, tloss, vloss);
+    if(verbose)
+      System.out.printf("%d tr_loss: %f va_loss: %f evaluation: %f\n", iter, tloss, vloss, eval);
+    ps.printf("%d,%f,%f,%f\n", iter, eval, tloss, vloss);
   }
 
   public void log(double eval){
-    System.out.printf("Evaluation score: %f\n", eval);
-    pw.printf("%f", eval);
+    if(verbose)
+      System.out.printf("Evaluation score: %f\n", eval);
+    ps.printf("%f", eval);
   }
 
   public void close(){
-    if(pw != null) pw.close();
+    if(ps != null && ps != System.out) ps.close();
+  }
+
+  public static String getReportFile(Config config){
+    return config.report == null ? null : config.report.file;
+  }
+
+  public static PrintStream getReportPrintStream(String file) throws IOException {
+    return file == null ? System.out : new PrintStream(new FileOutputStream(file));
   }
 
   public String getReportFile(){

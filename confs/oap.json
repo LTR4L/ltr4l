@@ -1,6 +1,7 @@
 {
   "algorithm" : "OAP",
   "numIterations" : 100,
+  "verbose": true,
   "params" : {
     "bernoulli" : 0.03,
     "N" : 100

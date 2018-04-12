@@ -2,6 +2,7 @@
   "algorithm" : "RankNet",
   "numIterations" : 100,
   "batchSize" : 10,
+  "verbose": true,
   "params" : {
     "learningRate" : 0.00001,
     "optimizer" : "adam",

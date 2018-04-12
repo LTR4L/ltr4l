@@ -31,7 +31,7 @@ import org.ltr4l.tools.Error;
 import org.ltr4l.tools.Regularization;
 
 /**
- * ListNetTrainer is an extension of LTRTrainer.
+ * ListNetTrainer is an extension of AbstractTrainer.
  * Despite note extending MLPTrainer, this trainer
  * trains an MLP network.
  */

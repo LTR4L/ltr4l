@@ -36,8 +36,11 @@
             </classpath>
             <jvmarg value="-ea"/>
             <formatter type="plain"/>
-            <batchtest fork="yes" todir="${test.result.dir}">
+            <batchtest fork="yes" todir="${test.result.dir}" unless="testcase">
                 <fileset dir="${src.dir}/test/java" includes="**/*Test.java"/>
+            </batchtest>
+            <batchtest fork="yes" todir="${test.result.dir}" if="testcase">
+                <fileset dir="${src.dir}/test/java" includes="**/${testcase}.java"/>
             </batchtest>
         </junit>
         <fail if="tests.failed">***** Tests failed! *****</fail>
@@ -145,7 +148,7 @@
     <target name="package" depends="jar" description="make package"/>
 
     <target name="train" depends="compile" description="run Train program">
-        <property name="algo" value="ranknet"/>
+        <property name="algo" value="franknet"/>
         <java classname="org.ltr4l.cli.Train">
             <arg line="${algo}"/>
             <classpath path="${cls.dir}"/>

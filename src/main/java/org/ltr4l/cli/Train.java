@@ -31,7 +31,7 @@ import org.apache.commons.cli.ParseException;
 import org.ltr4l.Version;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
-import org.ltr4l.trainers.Trainer;
+import org.ltr4l.trainers.AbstractTrainer;
 
 public class Train {
 
@@ -66,7 +66,7 @@ public class Train {
     QuerySet trainingSet = QuerySet.create(optionalConfig.dataSet.training);
     QuerySet validationSet = QuerySet.create(optionalConfig.dataSet.validation);
 
-    Trainer trainer = Trainer.TrainerFactory.getTrainer(params[0], trainingSet, validationSet, configPath, optionalConfig);
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(params[0], trainingSet, validationSet, configPath, optionalConfig);
     long startTime = System.currentTimeMillis();
     trainer.trainAndValidate();
     long endTime = System.currentTimeMillis();
@@ -89,6 +89,8 @@ public class Train {
         .desc("specify report file name").build();
     Option version = new Option( "version", "print the version information and exit" );
     Option verbose = new Option( "verbose", "be extra verbose" );
+    Option noverbose = new Option( "noverbose", "override verboseness" );
+    Option nomodel = new Option( "nomodel", "restrain model output" );
     Option debug = new Option( "debug", "print debugging information" );
 
     Options options = new Options();
@@ -101,6 +103,8 @@ public class Train {
         .addOption(reportFile)
         .addOption(version)
         .addOption(verbose)
+        .addOption(noverbose)
+        .addOption(nomodel)
         .addOption(debug);
     return options;
   }
@@ -143,12 +147,21 @@ public class Train {
 
     if(line.hasOption("iterations"))
       optionalConfig.numIterations = Integer.parseInt(line.getOptionValue("iterations"));
+    if(line.hasOption("verbose"))
+      optionalConfig.verbose = true;
+    if(line.hasOption("noverbose"))
+      optionalConfig.verbose = false;    // noverbose always overrides verboseness
     if(line.hasOption("training"))
       optionalConfig.dataSet.training = line.getOptionValue("training");
     if(line.hasOption("validation"))
       optionalConfig.dataSet.validation = line.getOptionValue("validation");
-    if(line.hasOption("model"))
+    if(line.hasOption("model")) {
+      if(optionalConfig.model == null)
+        optionalConfig.model = new Config.Model();
       optionalConfig.model.file = line.getOptionValue("model");
+    }
+    if(line.hasOption("nomodel"))
+      optionalConfig.nomodel = true;
     if(line.hasOption("report"))
       optionalConfig.report.file = line.getOptionValue("report");
 
