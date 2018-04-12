@@ -46,11 +46,11 @@ public class NNRankTrainer extends MLPTrainer<MLP> {
     //Add an output layer with number of nodes equal to number of classes/relevance categories.
     NetworkShape networkShape = config.getNetworkShape();
     int outputNodeNumber = QuerySet.findMaxLabel(trainingSet);
+    networkShape.add(outputNodeNumber + 1, new Activation.Sigmoid());
     Optimizer.OptimizerFactory optFact = config.getOptFact();
     Regularization regularization = config.getReguFunction();
     String weightModel = config.getWeightInit();
     return new NNMLP(featureLength, networkShape, optFact, regularization, weightModel);
-
   }
 
   private double[] targetLabel(int label) {
