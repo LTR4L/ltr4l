@@ -52,7 +52,7 @@ public class RankNetTrainerTest {
       "  \"evaluation\" : {\n" +
       "    \"evaluator\" : \"map\",\n" +
       "    \"params\" : {\n" +
-      "      \"k\" : 10\n" +
+      "      \"k\" : 3\n" +
       "    }\n" +
       "  }\n" +
       "}\n";

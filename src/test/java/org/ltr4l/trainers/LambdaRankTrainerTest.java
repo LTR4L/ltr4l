@@ -51,7 +51,7 @@ public class LambdaRankTrainerTest {
       "  \"evaluation\" : {\n" +
       "    \"evaluator\" : \"NDCG\",\n" +
       "    \"params\" : {\n" +
-      "      \"k\" : 10\n" +
+      "      \"k\" : 3\n" +
       "    }\n" +
       "  }\n" +
       "}\n";

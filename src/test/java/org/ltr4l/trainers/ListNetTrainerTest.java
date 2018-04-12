@@ -25,26 +25,25 @@ import org.ltr4l.evaluation.RankEval;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.RandomDataGenerator;
 
-public class NNRankTrainerTest {
+public class ListNetTrainerTest {
 
   private static final String JSON_CONFIG = "{\n" +
-      "  \"algorithm\" : \"NNRank\",\n" +
+      "  \"algorithm\" : \"ListNet\",\n" +
       "  \"numIterations\" : 30,\n" +
-      "  \"batchSize\" : 10,\n" +
       "  \"verbose\": false,\n" +
       "  \"nomodel\": true,\n" +
       "  \"params\" : {\n" +
-      "    \"learningRate\" : 0.00001,\n" +
+      "    \"learningRate\" : 0.001,\n" +
       "    \"optimizer\" : \"adam\",\n" +
       "    \"weightInit\" : \"xavier\",\n" +
       "    \"regularization\" : {\n" +
-      "      \"regularizer\" : \"L1\",\n" +
+      "      \"regularizer\" : \"L2\",\n" +
       "      \"rate\" : 0.01\n" +
       "    },\n" +
       "    \"layers\" : [\n" +
       "      {\n" +
-      "        \"activator\" : \"Sigmoid\",\n" +
-      "        \"num\" : 15\n" +
+      "        \"activator\" : \"Identity\",\n" +
+      "        \"num\" : 10\n" +
       "      }\n" +
       "    ]\n" +
       "  },\n" +
@@ -64,7 +63,7 @@ public class NNRankTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
     QuerySet validSet = rdg.getRandomQuerySet(2, 10, 2);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("nnrank", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("listnet", trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 
@@ -94,7 +93,7 @@ public class NNRankTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
     QuerySet validSet = rdg.getRandomQuerySet(2, 10, 2);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("nnrank", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("listnet", trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 
@@ -124,7 +123,7 @@ public class NNRankTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
     QuerySet validSet = rdg.getRandomQuerySet(2, 10, 2);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("nnrank", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("listnet", trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 
@@ -154,7 +153,7 @@ public class NNRankTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
     QuerySet validSet = rdg.getRandomQuerySet(2, 10, 2);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("nnrank", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("listnet", trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 
