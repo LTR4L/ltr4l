@@ -31,7 +31,7 @@ public class ClickModelsDaoTest {
 
     InputStream inputStream = new ByteArrayInputStream(testJson.getBytes("utf-8"));
 
-    List<ImpressionLog> impressionLogList = ClickModels.getInstance().parseImpressionLog(inputStream);
+    List<ImpressionLog> impressionLogList = ClickModelsDao.getInstance().parseImpressionLog(inputStream);
     Assert.assertEquals("",impressionLogList.get(0).getQuery(), "iPhone");
     Assert.assertEquals("",impressionLogList.get(1).getQuery(), "Android");
     Assert.assertEquals("",impressionLogList.get(0).getImpressions(), Arrays.asList(new String[]{ "docA", "docB", "docC", "docD", "docE"}));
@@ -43,7 +43,7 @@ public class ClickModelsDaoTest {
   @Test
   public void testParseImpressionLogFile() throws Exception {
     File file = new File("clickmodel/test.json");
-    List<ImpressionLog> impressionLogList = ClickModels.getInstance().parseImpressionLog(file);
+    List<ImpressionLog> impressionLogList = ClickModelsDao.getInstance().parseImpressionLog(file);
     Assert.assertEquals("",impressionLogList.get(0).getQuery(), "iPhone");
     Assert.assertEquals("",impressionLogList.get(4).getQuery(), "Android");
     Assert.assertEquals("",impressionLogList.get(0).getImpressions(), Arrays.asList(new String[]{ "docA", "docB", "docC", "docD", "docE"}));
