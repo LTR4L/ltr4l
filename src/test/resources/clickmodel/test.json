@@ -1,0 +1,29 @@
+{
+ "data": [
+   {
+     "query": "iPhone",
+     "impressions": [ "docA", "docB", "docC", "docD", "docE" ],
+     "clicks": [ "docA", "docC" ]
+   },
+   {
+     "query": "iPhone",
+     "impressions": [ "docA", "docB", "docC", "docD", "docE" ],
+     "clicks": [ "docA" ]
+   },
+   {
+     "query": "Android",
+     "impressions": [ "docA", "docB", "docC", "docD", "docE" ],
+     "clicks": [ "docD", "docC", "docD" ]
+   },
+   {
+     "query": "Android",
+     "impressions": [ "docA", "docB", "docC", "docD", "docE" ],
+     "clicks": [ "docA" ]
+   },
+   {
+     "query": "Android",
+     "impressions": [ "docA", "docB", "docC", "docD", "docE" ],
+     "clicks": []
+   }
+ ]
+}
