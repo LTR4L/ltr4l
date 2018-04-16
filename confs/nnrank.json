@@ -1,10 +1,10 @@
 {
   "algorithm" : "NNRank",
   "numIterations" : 100,
-  "batchSize" : 10,
+  "batchSize" : 15,
   "verbose": true,
   "params" : {
-    "learningRate" : 0.00001,
+    "learningRate" : 0.001,
     "optimizer" : "adam",
     "weightInit" : "xavier",
     "regularization" : {
