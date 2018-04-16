@@ -315,21 +315,24 @@ Note: N is the number of PRanks used.
 |Parameter|Value|
 |:-:|:-:|
 |Algorithm|NNRank|
-|Dataset|LETOR:MQ2007 Fold 1|
+|Dataset|LETOR:MQ2008 Fold 1|
 |Optimizer|Momentum|
+|Batch Size|15|
 |Weights Initialization|Gaussian|
 |Bias Initialization|Constant (0.1)|
 |Layers|[46, 15, 3]|
-|Hidden Activation|Identity|
+|Hidden Activation|Sigmoid|
 |Output Activation|Sigmoid|
 |Loss Function|Square Error|
 |Epochs|100|
 |Learning Rate|0.01|
 |Regularization|L1|
 |Regularization Rate|0.01|
-|Time Elapsed| s|
+|Threshold|0.8 (Currently Hardcoded)|
+|Time Elapsed| 12.539s|
 
-work in progress.
+![Alt Text](figures/NNRankNDCG2008.jpg)
+![Alt Text](figures/NNRankError2008.jpg)
 
 #### RankNet
 
