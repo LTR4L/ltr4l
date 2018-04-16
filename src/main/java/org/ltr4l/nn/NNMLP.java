@@ -39,14 +39,15 @@ public class NNMLP extends MLP {
 
   @Override
   public double predict(List<Double> features) {
-    double threshold = 0.5;
+    double threshold = 0.8;
     forwardProp(features);
-    for (int nodeId = 0; nodeId < network.get(network.size() - 1).size(); nodeId++) {
+    int nodeId;
+    for (nodeId = 0; nodeId < network.get(network.size() - 1).size(); nodeId++) {
       MNode node = network.get(network.size() - 1).get(nodeId);
       if (node.getOutput() < threshold)
-        return nodeId - 1;
+        break;
     }
-    return network.get(network.size() - 1).size() - 1;
+    return nodeId;
   }
 
   @Override

@@ -32,12 +32,16 @@ import org.ltr4l.tools.Regularization;
  */
 public class NNRankTrainer extends MLPTrainer<MLP> {
   private final int outputNodeNumber;
+  private final double[][] targets;
 
   //Last layer of the network has a number of nodes equal to the number of categories.
   //That layer is created in the constructor, so it is not necessary to specify last layer in config file.
   NNRankTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
     super(training, validation, reader, override, true);
-    outputNodeNumber = QuerySet.findMaxLabel(trainingSet) + 1;
+    outputNodeNumber = QuerySet.findMaxLabel(trainingSet);
+    targets = new double[outputNodeNumber + 1][outputNodeNumber]; //For 2 output nodes, there should be 3 targets
+    for(int i = 0; i < outputNodeNumber + 1; i++)
+      targets[i] = makeTarget(i, outputNodeNumber);
   }
 
   @Override
@@ -46,18 +50,11 @@ public class NNRankTrainer extends MLPTrainer<MLP> {
     //Add an output layer with number of nodes equal to number of classes/relevance categories.
     NetworkShape networkShape = config.getNetworkShape();
     int outputNodeNumber = QuerySet.findMaxLabel(trainingSet);
-    networkShape.add(outputNodeNumber + 1, new Activation.Sigmoid());
+    networkShape.add(outputNodeNumber, new Activation.Sigmoid());
     Optimizer.OptimizerFactory optFact = config.getOptFact();
     Regularization regularization = config.getReguFunction();
     String weightModel = config.getWeightInit();
     return new NNMLP(featureLength, networkShape, optFact, regularization, weightModel);
-  }
-
-  private double[] targetLabel(int label) {
-    double[] targets = new double[outputNodeNumber]; //initialized with 0.
-    for (int index = 0; index <= label; index++)
-      targets[index] = 1;
-    return targets;
   }
 
   @Override
@@ -68,13 +65,20 @@ public class NNRankTrainer extends MLPTrainer<MLP> {
         int output = (int) ranker.predict(doc.getFeatures());
         int label = doc.getLabel();
         if (output != label) {
-          ranker.backProp(errorFunc, targetLabel(label));
+          ranker.backProp(errorFunc, targets[label]);
           numTrained++;
           if (batchSize == 0 || numTrained % batchSize == 0) ranker.updateWeights(lrRate, rgRate);
         }
       }
     }
     if (batchSize != 0) ranker.updateWeights(lrRate, rgRate);
+  }
+
+  private static double[] makeTarget(int label, int outputNodeNumber){
+    double[] targets = new double[outputNodeNumber]; //initialized with 0.
+    for (int index = 0; index < label; index++)
+      targets[index] = 1;
+    return targets;
   }
 
 }
