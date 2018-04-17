@@ -56,11 +56,11 @@ public class Predict {
     // get LTR-algorithm-name
     String[] params = line.getArgs();
     if(params == null || params.length == 0){
-      System.err.printf("No required argument %s specified", REQUIRED_ARG);
+      System.err.printf("No required argument %s specified\n", REQUIRED_ARG);
       printUsage(options);
     }
     else if(params.length > 1){
-      System.err.printf("Too many argument is specified: %s", params[1]);
+      System.err.printf("Too many argument is specified: %s\n", params[1]);
       printUsage(options);
     }
 

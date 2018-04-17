@@ -175,6 +175,17 @@
         </java>
     </target>
 
+    <target name="predict" depends="compile" description="run Predict program">
+        <property name="algo" value="franknet"/>
+        <java classname="org.ltr4l.cli.Predict">
+            <arg line="${algo}"/>
+            <classpath path="${cls.dir}"/>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+        </java>
+    </target>
+
     <target name="clean" description="clean all">
         <delete dir="${cls.dir}"/>
         <delete dir="${test.result.dir}"/>
