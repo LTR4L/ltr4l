@@ -3,7 +3,7 @@
   "numIterations" : 100,
   "verbose": true,
   "params" : {
-    "learningRate" : 0.001,
+    "learningRate" : 0.1,
     "optimizer" : "adam",
     "weightInit" : "xavier",
     "regularization" : {

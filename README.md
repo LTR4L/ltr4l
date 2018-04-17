@@ -262,6 +262,7 @@ java -jar LTR4L-X.X.X.jar ranknet data/MQ2007/Fold1/train.txt data/MQ2007/Fold1/
 
 In this section, first we provide barcharts which show NDCG@10 for each algorithm, across different datasets.
 Then we provide some graphs of NDCG and Loss, as well as the parameters used and elapsed time.
+If batch size is not included in the table, default batch size was used (i.e. weights were updated according to original papers).
 Note that elapsed time can vary quite a bit depending on the parameters (especially on the number of hidden layers, activation, etc...),
 and is only provided to give a general idea of the speed of the algorithm. Even with no change in parameters, the elapsed time can vary.
 Note that this is the time required for all epochs to finish: i.e. for all training and validation to complete.
@@ -401,10 +402,10 @@ Note: FRankNet is still work in progress.
 |Output Activation|Sigmoid|
 |Loss Function|Cross Entropy|
 |Epochs|100|
-|Learning Rate|0.001|
+|Learning Rate|0.0001|
 |Regularization|L2|
 |Regularization Rate|0.01|
-|Time Elapsed| 16.0s|
+|Time Elapsed| 15.0s|
 
 ![Alt Text](figures/FRankNetNDCG2008.jpg)
 ![Alt Text](figures/FRankNetError2008.jpg)
@@ -424,10 +425,10 @@ Note: FRankNet is still work in progress.
 |Output Activation|Sigmoid|
 |Loss Function|Cross Entropy|
 |Epochs|100|
-|Learning Rate|0.001|
+|Learning Rate|0.1|
 |Regularization|L2|
-|Regularization Rate|0.01|
-|Time Elapsed| 42.1s|
+|Regularization Rate|0.1|
+|Time Elapsed| 38.1s|
 
 ![Alt Text](figures/LambdaRankNDCG2008.jpg)
 ![Alt Text](figures/LambdaRankError2008.jpg)
