@@ -8,12 +8,12 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-public class ClickModelsDao {
-  private static ClickModelsDao singleton = new ClickModelsDao();
+public class ClickModels {
+  private static ClickModels singleton = new ClickModels();
 
-  private ClickModelsDao() { }
+  private ClickModels() { }
 
-  public static ClickModelsDao getInstance() {
+  public static ClickModels getInstance() {
     return singleton;
   }
 

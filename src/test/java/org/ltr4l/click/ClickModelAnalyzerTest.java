@@ -34,7 +34,7 @@ public class ClickModelAnalyzerTest {
 
     InputStream inputStream = new ByteArrayInputStream(testJson.getBytes("utf-8"));
 
-    List<ImpressionLog> impressionLogList = ClickModelsDao.getInstance().parseImpressionLog(inputStream);
+    List<ImpressionLog> impressionLogList = ClickModels.getInstance().parseImpressionLog(inputStream);
     ClickModelAnalyzer clickModelAnalyzer = new ClickModelAnalyzer();
     Map<String, Map<String, Float>> clickRates = clickModelAnalyzer.calcClickRate(impressionLogList);
 
