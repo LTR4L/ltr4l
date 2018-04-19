@@ -26,21 +26,18 @@ import java.util.List;
 
 public class TreeEnsemble extends Ranker<TreeEnsemble.TreeConfig> {
   private final List<Tree> trees;
-  private final HashMap<Integer, Tree> featureTreeMap;
-  private final int numTrees;
-  private final int numLeaves;
 
-  public TreeEnsemble(TreeConfig config, int startingFeature){
-    this(config.getNumTrees(), config.getNumLeaves(), startingFeature);
+  public TreeEnsemble(List<Tree> initialTrees){
+    trees = initialTrees;
   }
 
-  public TreeEnsemble(int numTrees, int numLeaves, int startingFeature){
+  public TreeEnsemble(){
     trees = new ArrayList<>();
-    featureTreeMap = new HashMap<>();
-    this.numTrees = numTrees;
-    this.numLeaves = numLeaves;
-    Tree initialTree = new Tree(startingFeature);
-    trees.add(initialTree);
+  }
+
+  public void addTree(Tree tree){
+    assert(tree.isRoot());
+    trees.add(tree);
   }
 
   @Override
@@ -49,17 +46,17 @@ public class TreeEnsemble extends Ranker<TreeEnsemble.TreeConfig> {
   }
 
   @Override
-  public double predict(List<Double> features) { //TODO: Add weights to trees? Return class? Or score?
-    if (featureTreeMap.isEmpty()) return 0d;
-    return features.stream().mapToDouble(feature -> featureTreeMap.get(feature).score(features)).sum();
+  public double predict(List<Double> features) { //TODO: Add weights to trees?
+    return trees.isEmpty() ? 0 : trees.stream().mapToDouble(tree -> tree.score(features)).sum();
   }
 
   public static class TreeConfig extends Config {
-    int getNumTrees(){
+    public int getNumTrees(){
       return getReqInt(params, "NumTrees");
     }
-    int getNumLeaves(){
+    public int getNumLeaves(){
       return getReqInt(params, "NumLeaves");
     }
   }
+
 }

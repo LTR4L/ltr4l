@@ -15,36 +15,23 @@
  */
 package org.ltr4l.boosting;
 
+import org.ltr4l.query.Document;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Tree {
   private Leaf sourceLeaf;
-  private final List<Leaf> destinations;
+  private final List<Leaf> destinations; //index 0 = left, index 1 = right
   private double threshold;
   private int featureId;
-  private static double DEFAULT_THRESHOLD = 5;
 
-
-  public Tree(int featureId){
+  public Tree(int featureId, double threshold){
     sourceLeaf = null;
     this.featureId = featureId;
     destinations = new ArrayList<>();
-    Leaf leaf1 = new Leaf(this, 0);
-    Leaf leaf2 = new Leaf(this, 0);
-    destinations.add(leaf1);
-    destinations.add(leaf2);
-    threshold = DEFAULT_THRESHOLD;
-  }
-
-  public Tree(int featureId, double threshold, double... destinationScores){
-    assert(destinationScores.length == 2); //TODO: For now, limit to 2.
-    sourceLeaf = null;
-    this.featureId = featureId;
-    destinations = new ArrayList<>();
-
-    for(int i = 0; i < destinationScores.length; i++)
-      destinations.add(new Leaf(this, destinationScores[i]));
+    destinations.add(new Leaf(this)); //Left
+    destinations.add(new Leaf(this)); //Right
     this.threshold = threshold;
   }
 
@@ -65,6 +52,14 @@ public class Tree {
     return destinations;
   }
 
+  public Leaf getLeftLeaf(){
+    return destinations.get(0);
+  }
+
+  public Leaf getRightLeaf(){
+    return destinations.get(1);
+  }
+
   public Leaf getDestinationLeaf(int i){
     return destinations.get(i);
   }
@@ -74,20 +69,32 @@ public class Tree {
     return sourceLeaf.getSourceTree().getRootTree();
   }
 
+  public boolean isRoot(){
+    return sourceLeaf == null;
+  }
+
+  public List<Leaf> getOutputs(){
+    return null; //TODO: IMPLEMENT
+  }
+
   public static class Leaf { //Node
     private final Tree sourceTree;
     private Tree destination;
     private double score;
+    private List<Document> results;
 
-    public Leaf(Tree sourceTree, double score){
+    public Leaf(Tree sourceTree){
       this.sourceTree = sourceTree;
-      this.score = score;
       destination = null;
+      results = new ArrayList<>();
     }
 
 
     public double score(List<Double> features) {
-      if (destination == null) return score;
+      if (destination == null){
+        assert(results != null);
+        return score;
+      }
       else return destination.score(features);
     }
 
@@ -97,6 +104,7 @@ public class Tree {
       if(this.destination != null)  this.destination.setSourceLeaf(null); //Separate current destination reference to this leaf
       if(destination != null) destination.setSourceLeaf(this);
       this.destination = destination;
+      results = null; //Documents can no longer land on this leaf.
     }
 
     public double getScore() {

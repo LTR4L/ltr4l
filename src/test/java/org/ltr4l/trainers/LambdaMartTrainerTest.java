@@ -24,24 +24,24 @@ public class LambdaMartTrainerTest {
     Assert.assertEquals(2, docs.get(4).getLabel());
     Assert.assertEquals(3, docs.get(5).getLabel());
 
-    Assert.assertEquals(0, (double) docs.get(0).getFeatures().get(0), 0.01);
-    Assert.assertEquals(1, (double) docs.get(0).getFeatures().get(1), 0.01);
-    Assert.assertEquals(2, (double) docs.get(0).getFeatures().get(2), 0.01);
-    Assert.assertEquals(1, (double) docs.get(1).getFeatures().get(0), 0.01);
-    Assert.assertEquals(2, (double) docs.get(1).getFeatures().get(1), 0.01);
-    Assert.assertEquals(3, (double) docs.get(1).getFeatures().get(2), 0.01);
-    Assert.assertEquals(1, (double) docs.get(2).getFeatures().get(0), 0.01);
-    Assert.assertEquals(2, (double) docs.get(2).getFeatures().get(1), 0.01);
-    Assert.assertEquals(3, (double) docs.get(2).getFeatures().get(2), 0.01);
-    Assert.assertEquals(2, (double) docs.get(3).getFeatures().get(0), 0.01);
-    Assert.assertEquals(3, (double) docs.get(3).getFeatures().get(1), 0.01);
-    Assert.assertEquals(4, (double) docs.get(3).getFeatures().get(2), 0.01);
-    Assert.assertEquals(2, (double) docs.get(4).getFeatures().get(0), 0.01);
-    Assert.assertEquals(3, (double) docs.get(4).getFeatures().get(1), 0.01);
-    Assert.assertEquals(4, (double) docs.get(4).getFeatures().get(2), 0.01);
-    Assert.assertEquals(3, (double) docs.get(5).getFeatures().get(0), 0.01);
-    Assert.assertEquals(4, (double) docs.get(5).getFeatures().get(1), 0.01);
-    Assert.assertEquals(5, (double) docs.get(5).getFeatures().get(2), 0.01);
+    Assert.assertEquals(0, (double) docs.get(0).getFeature(0), 0.01);
+    Assert.assertEquals(1, (double) docs.get(0).getFeature(1), 0.01);
+    Assert.assertEquals(2, (double) docs.get(0).getFeature(2), 0.01);
+    Assert.assertEquals(1, (double) docs.get(1).getFeature(0), 0.01);
+    Assert.assertEquals(2, (double) docs.get(1).getFeature(1), 0.01);
+    Assert.assertEquals(3, (double) docs.get(1).getFeature(2), 0.01);
+    Assert.assertEquals(1, (double) docs.get(2).getFeature(0), 0.01);
+    Assert.assertEquals(2, (double) docs.get(2).getFeature(1), 0.01);
+    Assert.assertEquals(3, (double) docs.get(2).getFeature(2), 0.01);
+    Assert.assertEquals(2, (double) docs.get(3).getFeature(0), 0.01);
+    Assert.assertEquals(3, (double) docs.get(3).getFeature(1), 0.01);
+    Assert.assertEquals(4, (double) docs.get(3).getFeature(2), 0.01);
+    Assert.assertEquals(2, (double) docs.get(4).getFeature(0), 0.01);
+    Assert.assertEquals(3, (double) docs.get(4).getFeature(1), 0.01);
+    Assert.assertEquals(4, (double) docs.get(4).getFeature(2), 0.01);
+    Assert.assertEquals(3, (double) docs.get(5).getFeature(0), 0.01);
+    Assert.assertEquals(4, (double) docs.get(5).getFeature(1), 0.01);
+    Assert.assertEquals(5, (double) docs.get(5).getFeature(2), 0.01);
   }
 
   static Document createDoc( int docNum, int numFeatures){
