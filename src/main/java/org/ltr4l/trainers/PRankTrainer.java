@@ -143,7 +143,7 @@ public class PRankTrainer extends AbstractTrainer<PRankTrainer.PRank, Config> {
       }
       int T = IntStream.of(tau).sum();
       for (int i = 0; i <= weights.length - 1; i++) {
-        weights[i] += T * doc.getFeatures().get(i);
+        weights[i] += T * doc.getFeature(i);
       }
       for (int r = 0; r <= thresholds.length - 1; r++) {
         thresholds[r] -= tau[r];

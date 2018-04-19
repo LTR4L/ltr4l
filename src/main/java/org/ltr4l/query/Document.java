@@ -39,6 +39,14 @@ public class Document {
     return features;
   }
 
+  public double getFeature(int i){
+    return features.get(i);
+  }
+
+  public int getFeatureLength(){
+    return features.size();
+  }
+
   public void addFeature(double feature) {
     features.add(feature);
   }
