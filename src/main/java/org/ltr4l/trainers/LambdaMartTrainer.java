@@ -15,8 +15,11 @@
  */
 package org.ltr4l.trainers;
 
-import org.ltr4l.boosting.Tree;
+import org.ltr4l.boosting.Ensemble;
+import org.ltr4l.boosting.RegressionTree;
+import org.ltr4l.boosting.RegressionTree.Split;
 import org.ltr4l.boosting.TreeEnsemble;
+import org.ltr4l.boosting.TreeTools;
 import org.ltr4l.nn.Activation;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
@@ -25,19 +28,22 @@ import org.ltr4l.tools.Config;
 import org.ltr4l.tools.DataProcessor;
 import org.ltr4l.tools.Error;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class LambdaMartTrainer extends AbstractTrainer<TreeEnsemble, TreeEnsemble.TreeConfig> {
+import static org.ltr4l.boosting.TreeTools.findMinLossFeat;
+import static org.ltr4l.boosting.TreeTools.orderByFeature;
+
+public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeConfig> {
   private final List<Document> trainingDocs;
   private final List<Document> validationDocs;
   private final List<Document[][]> trainingPairs;
-  private final Document[][] featureSortedDocs;
+  private final List<List<Document>> featureSortedDocs;
   private final double[][] thresholds;
   private final int numTrees;
   private final int numLeaves;
+  private final double lrRate;
 
   private static final double DEFAULT_VARIANCE_TOLERANCE = 0;
 
@@ -49,8 +55,9 @@ public class LambdaMartTrainer extends AbstractTrainer<TreeEnsemble, TreeEnsembl
 
     numTrees = config.getNumTrees();
     numLeaves = config.getNumLeaves();
+    lrRate = config.getLearningRate();
 
-    featureSortedDocs = new Document[training.getFeatureLength()][trainingDocs.size()];
+    featureSortedDocs = new ArrayList<>();
     //{
     // {threshold, calculateScore}, //Feature 0
     // {threshold, calculateScore}, //Feature 1
@@ -58,17 +65,16 @@ public class LambdaMartTrainer extends AbstractTrainer<TreeEnsemble, TreeEnsembl
     //}
     thresholds = new double[training.getFeatureLength()][2];
     for (int feat = 0; feat < training.getFeatureLength(); feat++) {
-      featureSortedDocs[feat] = orderByFeature(trainingDocs, feat);
-      thresholds[feat] = findThreshold(featureSortedDocs[feat], feat);
+      featureSortedDocs.add(orderByFeature(trainingDocs, feat));
+      thresholds[feat] = TreeTools.findThreshold(featureSortedDocs.get(feat), feat);
     }
-
   }
 
 
 
   @Override
-  protected TreeEnsemble constructRanker() {
-    return new TreeEnsemble();
+  protected Ensemble constructRanker() {
+    return new Ensemble();
   }
 
   @Override
@@ -83,17 +89,7 @@ public class LambdaMartTrainer extends AbstractTrainer<TreeEnsemble, TreeEnsembl
 
   @Override
   public void trainAndValidate(){
-    for (int t = 1; t <= numTrees; t++) {
-      train();
-      validate(t, evalK);
-    }
-    report.close();
-    try {
-      if(!config.nomodel)
-        ranker.writeModel(config, modelFile);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -107,7 +103,10 @@ public class LambdaMartTrainer extends AbstractTrainer<TreeEnsemble, TreeEnsembl
     HashMap<Document, Double> logs = new HashMap<>();
     HashMap<Document, Double> lambdaDers = new HashMap<>();
 
+    int minLossFeat = findMinLossFeat(thresholds);
+
     for (int t = 1; t <= numTrees; t++){
+      //First, calculate lambdas for this iteration.
       for (int iq = 0; iq < trainingSet.size(); iq++) {
         if (trainingPairs.get(iq) == null)
           continue;
@@ -124,8 +123,8 @@ public class LambdaMartTrainer extends AbstractTrainer<TreeEnsemble, TreeEnsembl
         }
 
         for (Document[] pair : trainingPairs.get(iq)) {
-          double dNCG = N * (pws.get(pair[0]) - pws.get(pair[1])) * (logs.get(pair[0]) - logs.get(pair[1]));
-          double diff = ranks.get(pair[1]) - ranks.get(pair[0]);  //- (si - sj)
+          double dNCG = (pws.get(pair[0]) - pws.get(pair[1])) * (logs.get(pair[0]) - logs.get(pair[1])) / N;
+          double diff = ranks.get(pair[1]) - ranks.get(pair[0]);  //- (si - sj) ; sigmoid has minus sign
           double lambda = Math.abs(new Activation.Sigmoid().output(diff) * dNCG); //TODO: Make static method or class variable
           double lambdaDer = lambda * (1 - Math.abs(new Activation.Sigmoid().output(diff)));
           lambdas.put(pair[0], lambdas.get(pair[0]) - lambda); //λ1 = λ1 - dλ
@@ -133,70 +132,23 @@ public class LambdaMartTrainer extends AbstractTrainer<TreeEnsemble, TreeEnsembl
           lambdaDers.put(pair[0], lambdaDers.get(pair[0]) - lambdaDer);
           lambdaDers.put(pair[1], lambdaDers.get(pair[1]) + lambdaDer);
         }
-
-
-
+        //Then create tree
+        double[] minThresholdLoss = thresholds[minLossFeat];
+        double minThreshold = minThresholdLoss[0];
+        double minLoss = minThresholdLoss[1];
+        RegressionTree tree = new RegressionTree(numLeaves, minLossFeat, minThreshold, trainingDocs);
+        tree.setWeight(lrRate);
+        ranker.addTree(tree);
+        List<Split> terminalLeaves = tree.getTerminalLeaves();
+        //Assign lambdas as leaf scores
+        for(Split leaf : terminalLeaves){
+          double y = leaf.getScoredDocs().stream().mapToDouble(doc -> lambdas.get(doc)).sum();
+          double w = leaf.getScoredDocs().stream().mapToDouble(doc -> lambdaDers.get(doc)).sum();
+          if(w == 0) w += 1e-8; //To avoid dividing by zero
+          leaf.setScore(y / w);
+        }
       }
     }
-  }
-
-  //Build tree using all of the data. The initial feature will determine which feature
-  //from thresholds to use for the initialization.
-/*  protected Tree makeTree(int feature){
-    //Make root
-    double threshold = thresholds[feature][0];
-    Tree tree = new Tree(feature, threshold);
-    for(int lId = 0; lId < numLeaves - 2; lId++){ //Add leaves
-      Document[] lDocs = Arrays.stream(featureSortedDocs[feature])
-          .filter(doc -> doc.getFeature(feature) <= threshold)
-          .toArray(Document[]::new);
-      Document[] rDocs = Arrays.stream(featureSortedDocs[feature])
-          .filter(doc -> doc.getFeature(feature) > threshold)
-          .toArray(Document[]::new);
-
-
-    }
-  }*/
-
-
-  protected static double[] findThreshold(Document[] fSortedDocs, int feat){
-    int numDocs = fSortedDocs.length;
-    double threshold = fSortedDocs[0].getFeature(feat);
-    double minLoss = Double.POSITIVE_INFINITY;
-    for(int threshId = 0; threshId < numDocs; threshId++ ){
-      //Consider cases where feature values are the same!
-      if (fSortedDocs[threshId].getFeature(feat) == fSortedDocs[threshId + 1].getFeature(feat)) continue;
-      Document[] lDocs = Arrays.copyOfRange(fSortedDocs, 0, threshId + 1);
-      Document[] rDocs = Arrays.copyOfRange(fSortedDocs, threshId, numDocs + 1);
-      double loss = calcThresholdLoss(lDocs) + calcThresholdLoss(rDocs);
-      if(loss < minLoss){
-        threshold = threshId;
-        minLoss = loss;
-      }
-    }
-    return new double[] {threshold, minLoss};
-  }
-
-  protected static double calcThresholdLoss(Document[] subData){
-    if (subData.length == 0) return 0;
-    double avg = Arrays.stream(subData).mapToDouble(doc -> doc.getLabel()).sum() / subData.length;
-    return Arrays.stream(subData).mapToDouble(doc -> Math.pow(doc.getLabel() - avg, 2)).sum();
-  }
-
-  protected static int findMinLossFeat(double[][] thresholds){
-    return findMinLossFeat(thresholds, 0.0d);
-  }
-
-  protected static int findMinLossFeat(double[][] thresholds, double minLoss){
-    int feat = 0;
-    double loss = Double.POSITIVE_INFINITY;
-    for (int fid  = 0; feat < thresholds.length; feat++){
-      if(thresholds[feat][1] < loss && thresholds[feat][1] > minLoss){
-        loss = thresholds[feat][1];
-        feat = fid;
-      }
-    }
-    return feat;
   }
 
   @Override
@@ -206,10 +158,6 @@ public class LambdaMartTrainer extends AbstractTrainer<TreeEnsemble, TreeEnsembl
 
   public static Class<TreeEnsemble.TreeConfig> getCC(){
     return TreeEnsemble.TreeConfig.class;
-  }
-
-  protected static Document[] orderByFeature(List<Document> documents, int feature){
-    return documents.stream().sorted(Comparator.comparingDouble(doc -> doc.getFeature(feature))).toArray(Document[]::new);
   }
 
 }

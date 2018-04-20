@@ -21,81 +21,30 @@ import org.ltr4l.query.Document;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class RegressionTree extends Ranker<TreeEnsemble.TreeConfig>{
-  protected static List<Document> orderByFeature(List<Document> documents, int feature){
-    return documents.stream().sorted(Comparator.comparingDouble(doc -> doc.getFeature(feature))).collect(Collectors.toCollection(ArrayList::new));
-  }
-
-  protected static Split findOptimalLeaf(Map<Split, double[]> leafThresholdMap){
-    Iterator<Map.Entry<Split, double[]>> iterator = leafThresholdMap.entrySet().iterator();
-    Map.Entry<Split, double[]> optimalEntry = iterator.next();
-    while(iterator.hasNext()){
-      Map.Entry<Split, double[]> nextEntry = iterator.next();
-      if(nextEntry.getValue()[1] < optimalEntry.getValue()[1])
-        optimalEntry = nextEntry;
-    }
-    return optimalEntry.getKey();
-  }
-
-  protected static double[] findMinThreshold(Split leaf){ //TODO: Faster code
-    int featureToSplit = 0;
-    List<Document> sortedDocs = orderByFeature(leaf.getScoredDocs(), 0);
-    double[] featLoss = findThreshold(sortedDocs, 0);
-    for(int featId = 1; featId < sortedDocs.get(0).getFeatureLength(); featId++){
-      double[] error = findThreshold(orderByFeature(sortedDocs, featId), featId);
-      if(error[1] < featLoss[1]){
-        featLoss = error;
-        featureToSplit = featId;
-      }
-    }
-    double loss = featLoss[1];
-    double threshold = featLoss[0];
-    return new double[] {featureToSplit, loss, threshold};
-  }
-
-  protected static double[] findThreshold(List<Document> fSortedDocs, int feat){
-    int numDocs = fSortedDocs.size();
-    double threshold = fSortedDocs.get(0).getFeature(feat);
-    double minLoss = Double.POSITIVE_INFINITY;
-    for(int threshId = 0; threshId < numDocs; threshId++ ){
-      //Consider cases where feature values are the same!
-      if (fSortedDocs.get(threshId).getFeature(feat) == fSortedDocs.get(threshId + 1).getFeature(feat)) continue;
-      List<Document> lDocs = new ArrayList<>(fSortedDocs.subList(0, threshId));
-      List<Document> rDocs = new ArrayList<>(fSortedDocs.subList(threshId, numDocs + 1));
-      double loss = calcThresholdLoss(lDocs) + calcThresholdLoss(rDocs);
-      if(loss < minLoss){
-        threshold = threshId;
-        minLoss = loss;
-      }
-    }
-    return new double[] {threshold, minLoss};
-  }
-
-  protected static double calcThresholdLoss(List<Document> subData){
-    if (subData.size() == 0) return 0;
-    double avg = subData.stream().mapToDouble(doc -> doc.getLabel()).sum() / subData.size();
-    return subData.stream().mapToDouble(doc -> Math.pow(doc.getLabel() - avg, 2)).sum();
-  }
-
   private final Split root;
   private double weight;
 
   public RegressionTree(int numLeaves, int initFeat, double initThreshold, List<Document> docs){
     assert(numLeaves >= 2);
+    weight = 0.0d;
     root = new Split(null, initFeat, initThreshold, docs);
     Map<Split, double[]> splitErrorMap = new HashMap<>();
     for(int l = 2; l < numLeaves; l++) {
       for (Split leaf : root.getTerminalLeaves()) {
-        splitErrorMap.put(leaf, findMinThreshold(leaf));
+        splitErrorMap.put(leaf, TreeTools.findMinThreshold(leaf));
       }
-      Split optimalLeaf = findOptimalLeaf(splitErrorMap);
+      Split optimalLeaf = TreeTools.findOptimalLeaf(splitErrorMap);
       int feature = (int) splitErrorMap.get(optimalLeaf)[0];
       double threshold = splitErrorMap.get(optimalLeaf)[2];
       optimalLeaf.addSplit(feature, threshold);
       splitErrorMap.remove(optimalLeaf);
     }
+  }
+
+  public List<Split> getTerminalLeaves(){
+    return root.getTerminalLeaves();
   }
 
   @Override
@@ -106,6 +55,10 @@ public class RegressionTree extends Ranker<TreeEnsemble.TreeConfig>{
   @Override
   public void writeModel(TreeEnsemble.TreeConfig config, Writer writer) throws IOException {
     //TODO: Implement
+  }
+
+  public void setWeight(double weight) {
+    this.weight = weight;
   }
 
   public static class Split { //Node for trees
