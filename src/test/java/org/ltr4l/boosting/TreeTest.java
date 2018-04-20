@@ -13,8 +13,8 @@ public class TreeTest {
     List<Double> features = new ArrayList<>();
     features.add(0.09);
     features.add(0.11);
-    Tree tree1 = new Tree(1, 0.1 , 0.01, 0.02);
-    Tree tree2 = new Tree(0, 0.1, 0.01, 0.02);
+    Tree tree1 = makeTree(1, 0.1 , 0.01, 0.02);
+    Tree tree2 = makeTree(0, 0.1, 0.01, 0.02);
 
     Assert.assertEquals(0.02, tree1.score(features), 0.001);
     Assert.assertEquals(0.01, tree2.score(features), 0.001);
@@ -38,18 +38,18 @@ public class TreeTest {
 
   @Test (expected = AssertionError.class)
   public void testInfiniteTree() throws Exception{
-    Tree tree1 = new Tree(1, 0.1 , 0.01, 0.02);
-    Tree tree2 = new Tree(0, 0.1, 0.01, 0.02);
+    Tree tree1 = makeTree(1, 0.1 , 0.01, 0.02);
+    Tree tree2 = makeTree(0, 0.1, 0.01, 0.02);
     setLeafDestination(tree1, tree2, 1);
     setLeafDestination(tree2, tree1, 0); //Assertions.assertThrows JUnit5
   }
 
   @Test
   public void testIsLinkedTo() throws Exception{
-    Tree tree1 = new Tree(1, 2, 3, 4);
-    Tree tree2 = new Tree(2, 3, 4, 5);
-    Tree tree3 = new Tree(3, 4, 5, 6);
-    Tree tree4 = new Tree(4, 5, 6, 7);
+    Tree tree1 = makeTree(1, 2, 3, 4);
+    Tree tree2 = makeTree(2, 3, 4, 5);
+    Tree tree3 = makeTree(3, 4, 5, 6);
+    Tree tree4 = makeTree(4, 5, 6, 7);
 
     setLeafDestination(tree1, tree2, 1);
     setLeafDestination(tree2, tree3, 1);
@@ -77,10 +77,10 @@ public class TreeTest {
 
   @Test
   public void testSameRoots() throws Exception {
-    Tree tree1 = new Tree(1, 2, 3, 4);
-    Tree tree2 = new Tree(2, 3, 4, 5);
-    Tree tree3 = new Tree(3, 4, 5, 6);
-    Tree tree4 = new Tree(4, 5, 6, 7);
+    Tree tree1 = makeTree(1, 2, 3, 4);
+    Tree tree2 = makeTree(2, 3, 4, 5);
+    Tree tree3 = makeTree(3, 4, 5, 6);
+    Tree tree4 = makeTree(4, 5, 6, 7);
 
     setLeafDestination(tree1, tree2, 1);
     setLeafDestination(tree2, tree3, 1);
@@ -89,6 +89,13 @@ public class TreeTest {
     Assert.assertTrue(tree3.getRootTree() == tree2.getRootTree()
         && tree2.getRootTree() == tree1.getRootTree()
         && tree3.getRootTree() == tree4.getRootTree());
+  }
+
+  private static Tree makeTree(int featureId, double threshold, double score1, double score2){
+    Tree tree = new Tree(featureId, threshold);
+    tree.getLeftLeaf().setScore(score1);
+    tree.getRightLeaf().setScore(score2);
+    return tree;
   }
 
   private static void resetLeafDestination(Tree tree, int leaf){

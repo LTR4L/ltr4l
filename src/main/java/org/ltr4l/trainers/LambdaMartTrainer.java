@@ -52,8 +52,8 @@ public class LambdaMartTrainer extends AbstractTrainer<TreeEnsemble, TreeEnsembl
 
     featureSortedDocs = new Document[training.getFeatureLength()][trainingDocs.size()];
     //{
-    // {threshold, score}, //Feature 0
-    // {threshold, score}, //Feature 1
+    // {threshold, calculateScore}, //Feature 0
+    // {threshold, calculateScore}, //Feature 1
     // ...
     //}
     thresholds = new double[training.getFeatureLength()][2];
@@ -142,7 +142,7 @@ public class LambdaMartTrainer extends AbstractTrainer<TreeEnsemble, TreeEnsembl
 
   //Build tree using all of the data. The initial feature will determine which feature
   //from thresholds to use for the initialization.
-  protected Tree makeTree(int feature){
+/*  protected Tree makeTree(int feature){
     //Make root
     double threshold = thresholds[feature][0];
     Tree tree = new Tree(feature, threshold);
@@ -156,7 +156,7 @@ public class LambdaMartTrainer extends AbstractTrainer<TreeEnsemble, TreeEnsembl
 
 
     }
-  }
+  }*/
 
 
   protected static double[] findThreshold(Document[] fSortedDocs, int feat){

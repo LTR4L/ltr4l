@@ -44,7 +44,7 @@ public class Tree {
   }
 
   public double score(List<Double> features){
-    Leaf target = features.get(featureId) < threshold ? destinations.get(0) : destinations.get(1);
+    Leaf target = features.get(featureId) <= threshold ? destinations.get(0) : destinations.get(1);
     return target.score(features);
   }
 
@@ -104,7 +104,6 @@ public class Tree {
       if(this.destination != null)  this.destination.setSourceLeaf(null); //Separate current destination reference to this leaf
       if(destination != null) destination.setSourceLeaf(this);
       this.destination = destination;
-      results = null; //Documents can no longer land on this leaf.
     }
 
     public double getScore() {
