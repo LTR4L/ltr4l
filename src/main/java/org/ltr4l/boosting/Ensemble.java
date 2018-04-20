@@ -50,17 +50,17 @@ public class Ensemble extends Ranker<Ensemble.TreeConfig> {
 
   @Override
   public double predict(List<Double> features) {
-    return trees.stream().mapToDouble(tree -> predict(features)).sum();
+    return trees.stream().mapToDouble(tree -> tree.predict(features)).sum();
   }
 
   public static class TreeConfig extends Config {
     @JsonIgnore
     public int getNumTrees(){
-      return getReqInt(params, "NumTrees");
+      return getReqInt(params, "numTrees");
     }
     @JsonIgnore
     public int getNumLeaves(){
-      return getReqInt(params, "NumLeaves");
+      return getReqInt(params, "numLeaves");
     }
     @JsonIgnore
     public double getLearningRate(){

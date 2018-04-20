@@ -28,6 +28,7 @@ import org.ltr4l.tools.Config;
 import org.ltr4l.tools.DataProcessor;
 import org.ltr4l.tools.Error;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,7 +53,6 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
     trainingDocs = DataProcessor.makeDocList(trainingSet);
     validationDocs = DataProcessor.makeDocList(validationSet);
     trainingPairs = trainingSet.stream().map(query -> query.orderDocPairs()).collect(Collectors.toList());
-
     numTrees = config.getNumTrees();
     numLeaves = config.getNumLeaves();
     lrRate = config.getLearningRate();
@@ -79,7 +79,12 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
 
   @Override
   double calculateLoss(List<Query> queries) { //TODO: Implement
-    return 0;
+    double loss = 0d;
+    for (Query query : queries) {
+      List<Document> docList = query.getDocList();
+      loss += docList.stream().mapToDouble(doc -> errorFunc.error(ranker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
+    }
+    return loss / queries.size();
   }
 
   @Override
@@ -88,27 +93,37 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
   }
 
   @Override
-  public void trainAndValidate(){
-    throw new UnsupportedOperationException();
+  public void trainAndValidate() {
+    train();
+    validate(numTrees, evalK);
+    report.close();
+/*    try {
+      if(!config.nomodel)
+        ranker.writeModel(config, modelFile);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }*/
   }
 
   @Override
   public void train() {
 
     Map<Document, Double> pws = new HashMap<>();
-    trainingDocs.forEach(doc -> pws.put(doc, pws.put(doc, Math.pow(2, doc.getLabel()) - 1)));
+    double minLoss = 0;
+    for(Document doc : trainingDocs) pws.put(doc,Math.pow(2, doc.getLabel()) - 1 );
+    //trainingDocs.forEach(doc -> pws.put(doc, pws.put(doc, Math.pow(2, doc.getLabel()) - 1)));
 
     HashMap<Document, Double> ranks = new HashMap<>(); //TODO: More efficient way?
     HashMap<Document, Double> lambdas = new HashMap<>();
     HashMap<Document, Double> logs = new HashMap<>();
     HashMap<Document, Double> lambdaDers = new HashMap<>();
 
-    int minLossFeat = findMinLossFeat(thresholds);
+    int minLossFeat = findMinLossFeat(thresholds, minLoss);
 
     for (int t = 1; t <= numTrees; t++){
       //First, calculate lambdas for this iteration.
       for (int iq = 0; iq < trainingSet.size(); iq++) {
-        if (trainingPairs.get(iq) == null)
+        if (trainingPairs.get(iq) == null) //As we are skipping these, they must not influence leaf scores.
           continue;
 
         Query query = trainingSet.get(iq);
@@ -132,32 +147,35 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
           lambdaDers.put(pair[0], lambdaDers.get(pair[0]) - lambdaDer);
           lambdaDers.put(pair[1], lambdaDers.get(pair[1]) + lambdaDer);
         }
-        //Then create tree
-        double[] minThresholdLoss = thresholds[minLossFeat];
-        double minThreshold = minThresholdLoss[0];
-        double minLoss = minThresholdLoss[1];
-        RegressionTree tree = new RegressionTree(numLeaves, minLossFeat, minThreshold, trainingDocs);
-        tree.setWeight(lrRate);
-        ranker.addTree(tree);
-        List<Split> terminalLeaves = tree.getTerminalLeaves();
-        //Assign lambdas as leaf scores
-        for(Split leaf : terminalLeaves){
-          double y = leaf.getScoredDocs().stream().mapToDouble(doc -> lambdas.get(doc)).sum();
-          double w = leaf.getScoredDocs().stream().mapToDouble(doc -> lambdaDers.get(doc)).sum();
-          if(w == 0) w += 1e-8; //To avoid dividing by zero
-          leaf.setScore(y / w);
-        }
       }
+      //Then create tree
+      double[] minThresholdLoss = thresholds[minLossFeat];
+      double minThreshold = minThresholdLoss[0];
+      RegressionTree tree = new RegressionTree(numLeaves, minLossFeat, minThreshold, trainingDocs);
+      tree.setWeight(lrRate);
+      ranker.addTree(tree);
+      minLoss = minThresholdLoss[1]; //For the next tree.
+
+      List<Split> terminalLeaves = tree.getTerminalLeaves();
+      //Assign lambdas as leaf scores
+      for(Split leaf : terminalLeaves){
+        double y = leaf.getScoredDocs().stream().filter(doc -> lambdas.containsKey(doc)).mapToDouble(doc -> lambdas.get(doc)).sum();
+        double w = leaf.getScoredDocs().stream().filter(doc -> lambdas.containsKey(doc)).mapToDouble(doc -> lambdaDers.get(doc)).sum();
+        if(w == 0) w += 1e-8; //To avoid dividing by zero
+        leaf.setScore(y / w);
+      }
+      System.out.printf("Tree number %d completed \n", t);
+      validate(t, evalK);
     }
   }
 
   @Override
-  public Class<TreeEnsemble.TreeConfig> getConfigClass() {
+  public Class<Ensemble.TreeConfig> getConfigClass() {
     return getCC();
   }
 
-  public static Class<TreeEnsemble.TreeConfig> getCC(){
-    return TreeEnsemble.TreeConfig.class;
+  public static Class<Ensemble.TreeConfig> getCC(){
+    return Ensemble.TreeConfig.class;
   }
 
 }

@@ -52,10 +52,10 @@ public class TreeEnsemble extends Ranker<TreeEnsemble.TreeConfig> {
 
   public static class TreeConfig extends Config {
     public int getNumTrees(){
-      return getReqInt(params, "NumTrees");
+      return getReqInt(params, "numTrees");
     }
     public int getNumLeaves(){
-      return getReqInt(params, "NumLeaves");
+      return getReqInt(params, "numLeaves");
     }
   }
 

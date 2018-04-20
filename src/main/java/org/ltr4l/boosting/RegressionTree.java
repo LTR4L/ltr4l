@@ -79,7 +79,7 @@ public class RegressionTree extends Ranker<TreeEnsemble.TreeConfig>{
       List<Document> leftDocs = new ArrayList<>();
       List<Document> rightDocs = new ArrayList<>();
       for(Document doc : this.scoredDocs){
-        if(doc.getFeature(featureId) <= threshold) leftDocs.add(doc);
+        if(doc.getFeature(featureId) < threshold) leftDocs.add(doc);
         else rightDocs.add(doc);
       }
       leftLeaf = new Split(this, leftDocs);
@@ -102,7 +102,7 @@ public class RegressionTree extends Ranker<TreeEnsemble.TreeConfig>{
       List<Document> leftDocs = new ArrayList<>();
       List<Document> rightDocs = new ArrayList<>();
       for(Document doc : this.scoredDocs){
-        if(doc.getFeature(featureId) <= threshold) leftDocs.add(doc);
+        if(doc.getFeature(featureId) < threshold) leftDocs.add(doc);
         else rightDocs.add(doc);
       }
       leftLeaf = new Split(this, leftDocs);
@@ -122,7 +122,7 @@ public class RegressionTree extends Ranker<TreeEnsemble.TreeConfig>{
     public double calculateScore(List<Double> features){
       assert(leavesProperlySet());
       if(!hasDestinations()) return score;
-      Split destination = features.get(featureId) <= threshold ? leftLeaf : rightLeaf;
+      Split destination = features.get(featureId) < threshold ? leftLeaf : rightLeaf;
       return destination.calculateScore(features);
     }
 

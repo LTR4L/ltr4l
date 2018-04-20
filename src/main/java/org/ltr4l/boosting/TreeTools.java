@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class TreeTools {
   private TreeTools(){}
   public static List<Document> orderByFeature(List<Document> documents, int feature){
+    assert(feature >= 0 && feature < documents.get(0).getFeatureLength());
     return documents.stream().sorted(Comparator.comparingDouble(doc -> doc.getFeature(feature))).collect(Collectors.toCollection(ArrayList::new));
   }
 
@@ -59,12 +60,12 @@ public class TreeTools {
     double minLoss = Double.POSITIVE_INFINITY;
     for(int threshId = 0; threshId < numDocs; threshId++ ){
       //Consider cases where feature values are the same!
-      if (fSortedDocs.get(threshId).getFeature(feat) == fSortedDocs.get(threshId + 1).getFeature(feat)) continue;
-      List<Document> lDocs = new ArrayList<>(fSortedDocs.subList(0, threshId));
-      List<Document> rDocs = new ArrayList<>(fSortedDocs.subList(threshId, numDocs + 1));
+      if (threshId != numDocs -1 && fSortedDocs.get(threshId).getFeature(feat) == fSortedDocs.get(threshId + 1).getFeature(feat)) continue;
+      List<Document> lDocs = new ArrayList<>(fSortedDocs.subList(0, threshId + 1));
+      List<Document> rDocs = new ArrayList<>(fSortedDocs.subList(threshId + 1, numDocs));
       double loss = calcThresholdLoss(lDocs) + calcThresholdLoss(rDocs);
       if(loss < minLoss){
-        threshold = threshId;
+        threshold = !rDocs.isEmpty() ? rDocs.get(0).getFeature(feat) : lDocs.get(lDocs.size() - 1).getFeature(feat);
         minLoss = loss;
       }
     }
@@ -81,12 +82,12 @@ public class TreeTools {
     return findMinLossFeat(thresholds, 0.0d);
   }
 
-  //TODO: Faster code
+  //TODO: Faster code?
   public static int findMinLossFeat(double[][] thresholds, double minLoss){
     int feat = 0;
     double loss = Double.POSITIVE_INFINITY;
-    for (int fid  = 0; feat < thresholds.length; feat++){
-      if(thresholds[feat][1] < loss && thresholds[feat][1] > minLoss){
+    for (int fid  = 0; fid < thresholds.length; fid++){
+      if(thresholds[fid][1] < loss && thresholds[fid][1] > minLoss){
         loss = thresholds[feat][1];
         feat = fid;
       }
