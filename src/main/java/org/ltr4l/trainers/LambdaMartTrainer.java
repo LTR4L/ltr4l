@@ -38,6 +38,7 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
   private final List<Document> trainingDocs;
   private final List<Document> validationDocs;
   private final List<Document[][]> trainingPairs;
+  private final List<Document[][]> validationPairs;
   private final List<FeatureSortedDocs> featureSortedDocs;
   private final double[][] thresholds;
   private final int numTrees;
@@ -51,6 +52,7 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
     trainingDocs = DataProcessor.makeDocList(trainingSet);
     validationDocs = DataProcessor.makeDocList(validationSet);
     trainingPairs = trainingSet.stream().map(query -> query.orderDocPairs()).collect(Collectors.toList());
+    validationPairs = validationSet.stream().map(query -> query.orderDocPairs()).collect(Collectors.toList());
     numTrees = config.getNumTrees();
     numLeaves = config.getNumLeaves();
     lrRate = config.getLearningRate();
@@ -77,17 +79,34 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
 
   @Override
   double calculateLoss(List<Query> queries) { //TODO: Implement
+    List<Document[][]> docPairs;
+    if (queries == trainingSet)
+      docPairs = trainingPairs;
+    else if (queries == validationSet)
+      docPairs = validationPairs;
+    else
+      return -1d;
     double loss = 0d;
-    for (Query query : queries) {
-      List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> errorFunc.error(ranker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
+    int processedQueryNum = 0;
+    for (Document[][] query : docPairs) {
+      if (query == null)
+        continue;
+      processedQueryNum++;
+      double queryLoss = 0d;
+      for (Document[] pair : query) {
+        double s1 = ranker.predict(pair[0].getFeatures());
+        double s2 = ranker.predict(pair[1].getFeatures());
+        double output = Math.pow(1 + Math.exp(s2 - s1), -1); //double output = new Activation.Sigmoid().output(s1 - s2);
+        queryLoss += errorFunc.error(output, 1d);
+      }
+      loss += queryLoss / query.length;
     }
-    return loss / queries.size();
+    return loss / processedQueryNum;
   }
 
   @Override
   protected Error makeErrorFunc() {
-    return new Error.Square();
+    return new Error.Entropy();
   }
 
   @Override
@@ -116,9 +135,8 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
     HashMap<Document, Double> logs = new HashMap<>();
     HashMap<Document, Double> lambdaDers = new HashMap<>();
 
-    int minLossFeat = findMinLossFeat(thresholds, minLoss);
-
     for (int t = 1; t <= numTrees; t++){
+      int minLossFeat = findMinLossFeat(thresholds, minLoss);
       //First, calculate lambdas for this iteration.
       for (int iq = 0; iq < trainingSet.size(); iq++) {
         if (trainingPairs.get(iq) == null) //As we are skipping these, they must not influence leaf scores.
@@ -139,7 +157,7 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
           double dNCG = (pws.get(pair[0]) - pws.get(pair[1])) * (logs.get(pair[0]) - logs.get(pair[1])) / N;
           double diff = ranks.get(pair[1]) - ranks.get(pair[0]);  //- (si - sj) ; sigmoid has minus sign
           double lambda = Math.abs(new Activation.Sigmoid().output(diff) * dNCG); //TODO: Make static method or class variable
-          double lambdaDer = lambda * (1 - Math.abs(new Activation.Sigmoid().output(diff)));
+          double lambdaDer = lambda * (1 - (lambda/dNCG));
           lambdas.put(pair[0], lambdas.get(pair[0]) - lambda); //λ1 = λ1 - dλ
           lambdas.put(pair[1], lambdas.get(pair[1]) + lambda); //λ2 = λ2 - dλ
           lambdaDers.put(pair[0], lambdaDers.get(pair[0]) - lambdaDer);
@@ -150,7 +168,6 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
       double[] minThresholdLoss = thresholds[minLossFeat];
       double minThreshold = minThresholdLoss[0];
       RegressionTree tree = new RegressionTree(numLeaves, minLossFeat, minThreshold, trainingDocs);
-      tree.setWeight(lrRate);
       ranker.addTree(tree);
       minLoss = minThresholdLoss[1]; //For the next tree.
 
@@ -158,9 +175,9 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
       //Assign lambdas as leaf scores
       for(Split leaf : terminalLeaves){
         double y = leaf.getScoredDocs().stream().filter(doc -> lambdas.containsKey(doc)).mapToDouble(doc -> lambdas.get(doc)).sum();
-        double w = leaf.getScoredDocs().stream().filter(doc -> lambdas.containsKey(doc)).mapToDouble(doc -> lambdaDers.get(doc)).sum();
-        if(w == 0) w += 1e-8; //To avoid dividing by zero
-        leaf.setScore(y / w);
+        double w = leaf.getScoredDocs().stream().filter(doc -> lambdaDers.containsKey(doc)).mapToDouble(doc -> lambdaDers.get(doc)).sum();
+        //if(w == 0) w += 1e-8; //To avoid dividing by zero
+        leaf.setScore(lrRate * y / w);
       }
       validate(t, evalK);
     }

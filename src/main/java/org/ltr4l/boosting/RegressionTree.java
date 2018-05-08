@@ -24,11 +24,9 @@ import java.util.*;
 
 public class RegressionTree extends Ranker<TreeEnsemble.TreeConfig>{
   private final Split root;
-  private double weight;
 
   public RegressionTree(int numLeaves, int initFeat, double initThreshold, List<Document> docs){
     assert(numLeaves >= 2);
-    weight = 0.0d;
     root = new Split(null, initFeat, initThreshold, docs);
     Map<Split, double[]> splitErrorMap = new HashMap<>();
     for(int l = 2; l < numLeaves; l++) {
@@ -49,16 +47,12 @@ public class RegressionTree extends Ranker<TreeEnsemble.TreeConfig>{
 
   @Override
   public double predict(List<Double> features) {
-    return weight * root.calculateScore(features);
+    return root.calculateScore(features);
   }
 
   @Override
   public void writeModel(TreeEnsemble.TreeConfig config, Writer writer) throws IOException {
     //TODO: Implement
-  }
-
-  public void setWeight(double weight) {
-    this.weight = weight;
   }
 
   public static class Split { //Node for trees
