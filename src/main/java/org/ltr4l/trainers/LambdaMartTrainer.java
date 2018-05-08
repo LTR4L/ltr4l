@@ -18,8 +18,8 @@ package org.ltr4l.trainers;
 import org.ltr4l.boosting.Ensemble;
 import org.ltr4l.boosting.RegressionTree;
 import org.ltr4l.boosting.RegressionTree.Split;
-import org.ltr4l.boosting.TreeEnsemble;
 import org.ltr4l.boosting.TreeTools;
+import org.ltr4l.boosting.FeatureSortedDocs;
 import org.ltr4l.nn.Activation;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
@@ -28,19 +28,17 @@ import org.ltr4l.tools.Config;
 import org.ltr4l.tools.DataProcessor;
 import org.ltr4l.tools.Error;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.ltr4l.boosting.TreeTools.findMinLossFeat;
-import static org.ltr4l.boosting.TreeTools.orderByFeature;
 
 public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeConfig> {
   private final List<Document> trainingDocs;
   private final List<Document> validationDocs;
   private final List<Document[][]> trainingPairs;
-  private final List<List<Document>> featureSortedDocs;
+  private final List<FeatureSortedDocs> featureSortedDocs;
   private final double[][] thresholds;
   private final int numTrees;
   private final int numLeaves;
@@ -65,8 +63,8 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
     //}
     thresholds = new double[training.getFeatureLength()][2];
     for (int feat = 0; feat < training.getFeatureLength(); feat++) {
-      featureSortedDocs.add(orderByFeature(trainingDocs, feat));
-      thresholds[feat] = TreeTools.findThreshold(featureSortedDocs.get(feat), feat);
+      featureSortedDocs.add(FeatureSortedDocs.get(trainingDocs, feat));
+      thresholds[feat] = TreeTools.findThreshold(featureSortedDocs.get(feat));
     }
   }
 
@@ -164,7 +162,6 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
         if(w == 0) w += 1e-8; //To avoid dividing by zero
         leaf.setScore(y / w);
       }
-      System.out.printf("Tree number %d completed \n", t);
       validate(t, evalK);
     }
   }

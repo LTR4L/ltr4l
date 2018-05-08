@@ -40,10 +40,11 @@ public class TreeTools {
 
   public static double[] findMinThreshold(RegressionTree.Split leaf){ //TODO: Faster code
     int featureToSplit = 0;
-    List<Document> sortedDocs = orderByFeature(leaf.getScoredDocs(), 0);
+    List<Document> leafDocs = leaf.getScoredDocs();
+    FeatureSortedDocs sortedDocs = FeatureSortedDocs.get(leafDocs, 0);
     double[] featLoss = findThreshold(sortedDocs, 0);
-    for(int featId = 1; featId < sortedDocs.get(0).getFeatureLength(); featId++){
-      double[] error = findThreshold(orderByFeature(sortedDocs, featId), featId);
+    for(int featId = 1; featId < sortedDocs.getFeatureLength(); featId++){
+      double[] error = findThreshold(FeatureSortedDocs.get(leafDocs, featId));
       if(error[1] < featLoss[1]){
         featLoss = error;
         featureToSplit = featId;
@@ -54,12 +55,47 @@ public class TreeTools {
     return new double[] {featureToSplit, loss, threshold};
   }
 
-  public static double[] findThreshold(List<Document> fSortedDocs, int feat){
+  //For using a statistical method to find thresholds, rather than checking all possible values.
+  //This will be used for speedup.
+  public static double[] findThreshold(FeatureSortedDocs fSortedDocs, int numSteps){
+    if(numSteps <= 0) return findThreshold(fSortedDocs);
+    double fmin = fSortedDocs.getMinFeature();
+    double fmax = fSortedDocs.getMaxFeature();
+    double step = Math.abs(fmax - fmin) / numSteps;
+    double[] thresholds = new double[numSteps];
+    thresholds[0] = fmin;
+    for(int i = 1; i < numSteps; i++)
+      thresholds[i] = thresholds[i - 1] + step;
+
+    List<Document> samples = fSortedDocs.getFeatureSortedDocs();
+    int feat = fSortedDocs.getSortedFeature();
+    double[] featureSamples = fSortedDocs.getFeatureSamples();
+
+    double finalThreshold = fmin;
+    double minLoss = Double.POSITIVE_INFINITY;
+
+    for(double threshold : thresholds){
+      int idx = binaryThresholdSearch(featureSamples, threshold);
+      List<Document> lDocs = new ArrayList<>(samples.subList(0, idx));
+      List<Document> rDocs = new ArrayList<>(samples.subList(idx, samples.size()));
+      double loss = calcThresholdLoss(lDocs) + calcThresholdLoss(rDocs);
+      if(loss < minLoss){
+        finalThreshold = !rDocs.isEmpty() ? rDocs.get(0).getFeature(feat) : lDocs.get(lDocs.size() - 1).getFeature(feat);
+        minLoss = loss;
+      }
+    }
+    return new double[] {finalThreshold, minLoss};
+  }
+
+  public static double[] findThreshold(FeatureSortedDocs featureSortedDocs){
+    List<Document> fSortedDocs = featureSortedDocs.getFeatureSortedDocs();
+    int feat = featureSortedDocs.getSortedFeature();
+
     int numDocs = fSortedDocs.size();
     double threshold = fSortedDocs.get(0).getFeature(feat);
     double minLoss = Double.POSITIVE_INFINITY;
     for(int threshId = 0; threshId < numDocs; threshId++ ){
-      //Consider cases where feature values are the same!
+      //Consider cases where sortedFeature values are the same!
       if (threshId != numDocs -1 && fSortedDocs.get(threshId).getFeature(feat) == fSortedDocs.get(threshId + 1).getFeature(feat)) continue;
       List<Document> lDocs = new ArrayList<>(fSortedDocs.subList(0, threshId + 1));
       List<Document> rDocs = new ArrayList<>(fSortedDocs.subList(threshId + 1, numDocs));
@@ -94,4 +130,31 @@ public class TreeTools {
     }
     return feat;
   }
+
+  //Initialize with initial midpoint.
+  private static int binaryThresholdSearch(double[] featSamples, double threshold){
+    int lo = 0;
+    int hi = featSamples.length;
+    int mid = findMid(lo, hi);
+    while(lo < hi){
+      if(hi - lo == 1) return hi;
+      if(featSamples[mid] <= threshold){
+        lo = mid;
+        mid = findMid(lo, hi);
+      }
+      else {
+        hi = mid;
+        mid = findMid(lo, hi);
+      }
+    }
+    return mid;
+  }
+
+  private static int findMid(int lo, int hi){
+    int diff = hi - lo;
+    int dHalf = (hi - lo) % 2 == 1 ? ((hi - lo) / 2) + 1 : (hi - lo) / 2;
+    return lo + dHalf;
+  }
+
+
 }

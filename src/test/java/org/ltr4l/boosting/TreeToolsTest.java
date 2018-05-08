@@ -82,39 +82,38 @@ public class TreeToolsTest {
     docList.get(3).setLabel(1);
     docList.get(4).setLabel(0);
 
-
-    List<Document> sortedDocs = TreeTools.orderByFeature(docList, 4);
-    double[] threshLoss = TreeTools.findThreshold(sortedDocs, 4);
+    FeatureSortedDocs sortedDocs = FeatureSortedDocs.get(docList, 4);
+    double[] threshLoss = TreeTools.findThreshold(sortedDocs);
     Assert.assertEquals(threshLoss[0], 10, 0.001);
     Assert.assertEquals(threshLoss[1], 0, 0.01);
 
-    sortedDocs = TreeTools.orderByFeature(docList, 0);
-    threshLoss = TreeTools.findThreshold(sortedDocs, 0);
+    sortedDocs = FeatureSortedDocs.get(docList, 0);
+    threshLoss = TreeTools.findThreshold(sortedDocs);
     Assert.assertEquals(threshLoss[0],  -1.0, 0.01);
     Assert.assertEquals(threshLoss[1], 0.75, 0.01);
 
-    sortedDocs = TreeTools.orderByFeature(docList, 1);
-    threshLoss = TreeTools.findThreshold(sortedDocs, 1);
+    sortedDocs = FeatureSortedDocs.get(docList, 1);
+    threshLoss = TreeTools.findThreshold(sortedDocs);
     Assert.assertEquals(threshLoss[0],  40.0, 0.01);
     Assert.assertEquals(threshLoss[1], 0.75, 0.01);
 
-    sortedDocs = TreeTools.orderByFeature(docList, 2);
-    threshLoss = TreeTools.findThreshold(sortedDocs, 2);
+    sortedDocs = FeatureSortedDocs.get(docList, 2);
+    threshLoss = TreeTools.findThreshold(sortedDocs);
     Assert.assertEquals(threshLoss[0],  10.0, 0.01);
     Assert.assertEquals(threshLoss[1], 0, 0.01);
 
-    sortedDocs = TreeTools.orderByFeature(docList, 3);
-    threshLoss = TreeTools.findThreshold(sortedDocs, 3);
+    sortedDocs = FeatureSortedDocs.get(docList, 3);
+    threshLoss = TreeTools.findThreshold(sortedDocs);
     Assert.assertEquals(threshLoss[0],  20.0, 0.01);
     Assert.assertEquals(threshLoss[1], 0, 0.01);
 
-    sortedDocs = TreeTools.orderByFeature(docList, 5);
-    threshLoss = TreeTools.findThreshold(sortedDocs, 5);
+    sortedDocs = FeatureSortedDocs.get(docList, 5);
+    threshLoss = TreeTools.findThreshold(sortedDocs);
     Assert.assertEquals(threshLoss[0],  40.0, 0.01);
     Assert.assertEquals(threshLoss[1], 0.75, 0.01);
 
-    sortedDocs = TreeTools.orderByFeature(docList, 6);
-    threshLoss = TreeTools.findThreshold(sortedDocs, 6);
+    sortedDocs = FeatureSortedDocs.get(docList, 6);
+    threshLoss = TreeTools.findThreshold(sortedDocs);
     Assert.assertEquals(threshLoss[0],  -1.0, 0.01);
     Assert.assertEquals(threshLoss[1], 0.75, 0.01);
   }
