@@ -109,7 +109,7 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
   @Override
   public void trainAndValidate() {
     train();
-    validate(numTrees, evalK);
+    //validate(numTrees, evalK);
     report.close();
 /*    try {
       if(!config.nomodel)
@@ -164,7 +164,15 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
       //Then create tree
       double[] minThresholdLoss = thresholds[minLossFeat];
       double minThreshold = minThresholdLoss[0];
-      RegressionTree tree = new RegressionTree(numLeaves, minLossFeat, minThreshold, trainingDocs);
+      RegressionTree tree;
+      try {
+        tree = new RegressionTree(numLeaves, minLossFeat, minThreshold, trainingDocs);
+      }
+      catch (InvalidFeatureThresholdException ie) {
+        System.err.printf("Valid tree could not be created. Stopping training early at tree %d \n", t - 1);
+        return; //TODO: Implement solution to continue creating trees. For now, stop training.
+      }
+      //RegressionTree tree = new RegressionTree(numLeaves, minLossFeat, minThreshold, trainingDocs);
       ranker.addTree(tree);
       minLoss = minThresholdLoss[1]; //For the next tree.
 

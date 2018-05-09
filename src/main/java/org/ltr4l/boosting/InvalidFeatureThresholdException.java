@@ -15,5 +15,20 @@
  */
 package org.ltr4l.boosting;
 
-public class InvalidFeatureThresholdException {
+public class InvalidFeatureThresholdException extends Exception {
+
+  public InvalidFeatureThresholdException(){
+    super("The specified starting feature and threshold resulted in one or more leaves with no documents." +
+        "Please use different processing method");
+  }
+
+  public InvalidFeatureThresholdException(String message){
+    super(message);
+  }
+
+  public InvalidFeatureThresholdException(RegressionTree tree){
+    //Add code to provide more details about the invalid tree.
+  }
+
+
 }

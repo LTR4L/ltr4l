@@ -25,7 +25,7 @@ import java.util.*;
 public class RegressionTree extends Ranker<TreeEnsemble.TreeConfig>{
   private final Split root;
 
-  public RegressionTree(int numLeaves, int initFeat, double initThreshold, List<Document> docs){
+  public RegressionTree(int numLeaves, int initFeat, double initThreshold, List<Document> docs) throws InvalidFeatureThresholdException{
     assert(numLeaves >= 2);
     root = new Split(null, initFeat, initThreshold, docs);
     Map<Split, double[]> splitErrorMap = new HashMap<>();
@@ -64,7 +64,7 @@ public class RegressionTree extends Ranker<TreeEnsemble.TreeConfig>{
     private int featureId;
     private final List<Document> scoredDocs;
 
-    public Split(Split source, int featureId, double threshold, List<Document> scoredDocs){ //For root node.
+    public Split(Split source, int featureId, double threshold, List<Document> scoredDocs) throws InvalidFeatureThresholdException{ //For root node.
       this.source = source;
       this.featureId = featureId;
       this.threshold = threshold;
@@ -80,7 +80,8 @@ public class RegressionTree extends Ranker<TreeEnsemble.TreeConfig>{
       rightLeaf = new Split(this, rightDocs);
     }
 
-    public Split(Split source, List<Document> scoredDocs){
+    public Split(Split source, List<Document> scoredDocs) throws InvalidFeatureThresholdException{
+      if(scoredDocs.isEmpty()) throw new InvalidFeatureThresholdException();
       this.source = source;
       this.scoredDocs = scoredDocs;
       leftLeaf = null;
@@ -90,7 +91,7 @@ public class RegressionTree extends Ranker<TreeEnsemble.TreeConfig>{
       featureId = -1;
     }
 
-    public void addSplit(int feature, double threshold){
+    public void addSplit(int feature, double threshold) throws InvalidFeatureThresholdException{
       this.featureId = feature;
       this.threshold = threshold;
       List<Document> leftDocs = new ArrayList<>();

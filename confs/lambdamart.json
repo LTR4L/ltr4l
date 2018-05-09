@@ -3,9 +3,9 @@
   "numIterations" : 100,
   "verbose": true,
   "params" : {
-    "numTrees" : 9,
+    "numTrees" : 15,
     "numLeaves" : 3,
-    "learningRate" : 0.1,
+    "learningRate" : 0.05,
     "optimizer" : "adam",
     "weightInit" : "xavier",
     "regularization" : {
