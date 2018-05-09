@@ -38,13 +38,14 @@ public class TreeTools {
     return optimalEntry.getKey();
   }
 
-  public static double[] findMinThreshold(RegressionTree.Split leaf){ //TODO: Faster code
+  public static double[] findMinThreshold(RegressionTree.Split leaf, int numSteps){ //Faster than default.
     int featureToSplit = 0;
     List<Document> leafDocs = leaf.getScoredDocs();
-    FeatureSortedDocs sortedDocs = FeatureSortedDocs.get(leafDocs, 0);
-    double[] featLoss = findThreshold(sortedDocs, 0);
+    if(numSteps > leafDocs.size()) numSteps = 0; //Just consider all candidate features if numSteps is greater.
+    FeatureSortedDocs sortedDocs = FeatureSortedDocs.get(leafDocs, numSteps);
+    double[] featLoss = findThreshold(sortedDocs, numSteps);
     for(int featId = 1; featId < sortedDocs.getFeatureLength(); featId++){
-      double[] error = findThreshold(FeatureSortedDocs.get(leafDocs, featId));
+      double[] error = findThreshold(FeatureSortedDocs.get(leafDocs, featId), numSteps);
       if(error[1] < featLoss[1]){
         featLoss = error;
         featureToSplit = featId;
@@ -52,7 +53,11 @@ public class TreeTools {
     }
     double loss = featLoss[1];
     double threshold = featLoss[0];
-    return new double[] {featureToSplit, loss, threshold};
+    return new double[] {featureToSplit, loss, threshold}; //TODO: Easier-to-use Implementation (featureToSplit is int...)
+  }
+
+  public static double[] findMinThreshold(RegressionTree.Split leaf){ //Note: this can be slow!
+    return findMinThreshold(leaf, 10);
   }
 
   //For using a statistical method to find thresholds, rather than checking all possible values.
@@ -152,9 +157,7 @@ public class TreeTools {
 
   private static int findMid(int lo, int hi){
     int diff = hi - lo;
-    int dHalf = (hi - lo) % 2 == 1 ? ((hi - lo) / 2) + 1 : (hi - lo) / 2;
+    int dHalf = diff % 2 == 1 ? (diff / 2) + 1 : diff / 2;
     return lo + dHalf;
   }
-
-
 }

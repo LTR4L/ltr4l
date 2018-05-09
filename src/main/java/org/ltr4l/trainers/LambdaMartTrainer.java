@@ -15,11 +15,8 @@
  */
 package org.ltr4l.trainers;
 
-import org.ltr4l.boosting.Ensemble;
-import org.ltr4l.boosting.RegressionTree;
+import org.ltr4l.boosting.*;
 import org.ltr4l.boosting.RegressionTree.Split;
-import org.ltr4l.boosting.TreeTools;
-import org.ltr4l.boosting.FeatureSortedDocs;
 import org.ltr4l.nn.Activation;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
