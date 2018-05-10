@@ -25,6 +25,7 @@ import org.ltr4l.tools.Config;
 import org.ltr4l.tools.DataProcessor;
 import org.ltr4l.tools.Error;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -111,12 +112,12 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
     train();
     //validate(numTrees, evalK);
     report.close();
-/*    try {
+    try {
       if(!config.nomodel)
         ranker.writeModel(config, modelFile);
     } catch (IOException e) {
       throw new RuntimeException(e);
-    }*/
+    }
   }
 
   @Override

@@ -16,10 +16,13 @@
 package org.ltr4l.boosting;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.ltr4l.Ranker;
 import org.ltr4l.tools.Config;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,10 @@ public class Ensemble extends Ranker<Ensemble.TreeConfig> {
 
   public Ensemble(){
     trees = new ArrayList<>();
+  }
+
+  public Ensemble(Reader reader){
+    trees = readModel(reader);
   }
 
   public void addTree(RegressionTree tree){
@@ -43,9 +50,23 @@ public class Ensemble extends Ranker<Ensemble.TreeConfig> {
     return trees.get(i);
   }
 
+  protected List<RegressionTree> readModel(Reader reader){
+    throw new UnsupportedOperationException();
+  }
+
+  protected RegressionTree.SavedModel[] getTreeModels(){
+    RegressionTree.SavedModel[] treeModels = new RegressionTree.SavedModel[trees.size()];
+    for(int i = 0; i < trees.size(); i++)
+      treeModels[i] = trees.get(i).getSavedModel();
+    return treeModels;
+  }
+
   @Override
   public void writeModel(Ensemble.TreeConfig config, Writer writer) throws IOException {
-    throw new UnsupportedOperationException(); //TODO: Implement
+    SavedModel savedModel = new SavedModel(config, getTreeModels() );
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    mapper.writeValue(writer, savedModel);
   }
 
   @Override
@@ -65,6 +86,20 @@ public class Ensemble extends Ranker<Ensemble.TreeConfig> {
     @JsonIgnore
     public double getLearningRate(){
       return getReqDouble(params, "learningRate");
+    }
+  }
+
+  protected static class SavedModel {
+
+    public TreeConfig config;
+    public RegressionTree.SavedModel[] treeModels;
+
+    SavedModel(){  // this is needed for Jackson...
+    }
+
+    SavedModel(TreeConfig config, RegressionTree.SavedModel[] treeModels){
+      this.config = config;
+      this.treeModels = treeModels;
     }
   }
 }
