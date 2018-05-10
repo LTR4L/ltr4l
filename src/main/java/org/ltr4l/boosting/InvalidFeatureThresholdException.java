@@ -13,41 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.ltr4l.boosting;
 
-package org.ltr4l.query;
+public class InvalidFeatureThresholdException extends Exception {
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Document {
-  private int label;
-  private List<Double> features;
-
-  public Document() {
-    features = new ArrayList<>();
+  public InvalidFeatureThresholdException(){
+    super("The specified starting feature and threshold resulted in one or more leaves with no documents." +
+        "Please use different processing method");
   }
 
-  public int getLabel() {
-    return label;
+  public InvalidFeatureThresholdException(String message){
+    super(message);
   }
 
-  public void setLabel(int newLabel) {
-    label = newLabel;
+  public InvalidFeatureThresholdException(RegressionTree tree){
+    //Add code to provide more details about the invalid tree.
   }
 
-  public List<Double> getFeatures() {
-    return features;
-  }
 
-  public double getFeature(int i){
-    return features.get(i);
-  }
-
-  public int getFeatureLength(){
-    return features.size();
-  }
-
-  public void addFeature(double feature) {
-    features.add(feature);
-  }
 }

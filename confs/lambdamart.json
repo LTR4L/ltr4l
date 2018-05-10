@@ -1,0 +1,39 @@
+{
+  "algorithm" : "LambdaMart",
+  "numIterations" : 100,
+  "verbose": true,
+  "params" : {
+    "numTrees" : 15,
+    "numLeaves" : 3,
+    "learningRate" : 0.05,
+    "optimizer" : "adam",
+    "weightInit" : "xavier",
+    "regularization" : {
+      "regularizer" : "L2",
+      "rate" : 0.01
+    }
+  },
+
+  "dataSet" : {
+    "training" : "data/MQ2008/Fold1/train.txt",
+    "validation" : "data/MQ2008/Fold1/vali.txt",
+    "test" : "data/MQ2008/Fold1/test.txt"
+  },
+
+  "model" : {
+    "format" : "json",
+    "file" : "model/lambdamart-model.json"
+  },
+
+  "evaluation" : {
+    "evaluator" : "NDCG",
+    "params" : {
+      "k" : 10
+    }
+  },
+
+  "report" : {
+    "format" : "csv",
+    "file" : "report/lambdamart-report.csv"
+  }
+}

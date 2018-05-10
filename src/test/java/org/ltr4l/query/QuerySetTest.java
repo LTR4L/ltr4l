@@ -65,8 +65,8 @@ public class QuerySetTest {
     Assert.assertEquals(0, docs1.get(0).getLabel());
     Assert.assertEquals(10, docs2.get(0).getLabel());
     for (int i = 0; i < 4; i++) {
-      Assert.assertEquals(features1[i], docs1.get(0).getFeatures().get(i), 0.0001);
-      Assert.assertEquals(features2[i], docs2.get(0).getFeatures().get(i), 0.0001);
+      Assert.assertEquals(features1[i], docs1.get(0).getFeature(i), 0.0001);
+      Assert.assertEquals(features2[i], docs2.get(0).getFeature(i), 0.0001);
     }
   }
 

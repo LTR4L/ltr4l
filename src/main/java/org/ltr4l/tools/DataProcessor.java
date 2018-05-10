@@ -49,7 +49,7 @@ public final class DataProcessor {
     for(int feature = 0; feature < featLength; feature++){
       int i = feature; //For lambda
       double featAvg = getAvgOfFeature(data, feature);
-      double var = data.stream().mapToDouble(doc -> Math.pow(doc.getFeatures().get(i) - featAvg, 2)).sum() / data.size();
+      double var = data.stream().mapToDouble(doc -> Math.pow(doc.getFeature(i) - featAvg, 2)).sum() / data.size();
       variance.put(feature, var);
     }
     return variance;
@@ -57,7 +57,7 @@ public final class DataProcessor {
 
   public static double getAvgOfFeature(List<Document> data, int feature){
     assert(feature < data.get(0).getFeatures().size());
-    return data.stream().mapToDouble(doc -> doc.getFeatures().get(feature)).sum() / data.size();
+    return data.stream().mapToDouble(doc -> doc.getFeature(feature)).sum() / data.size();
   }
 
   public static List<Integer> orderSelectedFeatures(Map<Integer, Double> variance, double allowance) {
@@ -94,7 +94,7 @@ public final class DataProcessor {
     double[][] featMinMax = new double[featLength][2];
     for(int feat = 0; feat < featLength; feat++){
       int i = feat;
-      Set<Double> featureSet = data.stream().map(doc -> doc.getFeatures().get(i)).collect(Collectors.toCollection(HashSet::new));
+      Set<Double> featureSet = data.stream().map(doc -> doc.getFeature(i)).collect(Collectors.toCollection(HashSet::new));
       double min = Collections.min(featureSet);
       double max = Collections.max(featureSet);
       featMinMax[feat] = new double[] {min, max};

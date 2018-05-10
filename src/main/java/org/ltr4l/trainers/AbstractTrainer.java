@@ -196,6 +196,8 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
             return new SortNetTrainer(trainingSet, validationSet, reader, override);
           case "listnet":
             return new ListNetTrainer(trainingSet, validationSet, reader, override);
+          case "lambdamart":
+            return new LambdaMartTrainer(trainingSet, validationSet, reader, override);
           default:
             return null;
         }

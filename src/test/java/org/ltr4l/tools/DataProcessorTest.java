@@ -132,7 +132,7 @@ public class DataProcessorTest {
   }
 
   private static double getFeature(Document doc, int feature){
-    return doc.getFeatures().get(feature);
+    return doc.getFeature(feature);
   }
 
 }
