@@ -46,8 +46,7 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
   }
 
   protected double[] getDoubleInfo(FillType type){
-    double[] info = new double[2 * numLeaves]; //For now, get for all leaves. Total is 2n - 1, but skipping index 0.
-    info[0] = Double.NaN; //Don't use 0th index, to make life easier.
+    double[] info = new double[2 * numLeaves - 1];
     switch(type){
       case THRESHOLD:
         root.fillThresholds(info);
@@ -58,12 +57,11 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
       default:
         throw new IllegalArgumentException();
     }
-    return Arrays.copyOfRange(info, 1, info.length);
+    return info;
   }
 
   protected int[] getIntInfo(FillType type){
-    int[] info = new int[2 * numLeaves];
-    info[0] = -2; //-2 should not occur during training. TODO: List or Integer
+    int[] info = new int[2 * numLeaves - 1];
     switch(type){
       case FEATURE:
         root.fillFeatures(info);
@@ -74,7 +72,7 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
       default:
         throw new IllegalArgumentException();
     }
-    return Arrays.copyOfRange(info, 1, info.length);
+    return info;
   }
 
 
@@ -121,9 +119,9 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
         if(doc.getFeature(featureId) < threshold) leftDocs.add(doc);
         else rightDocs.add(doc);
       }
-      leftLeaf = new Split(this, leftDocs, 2);
-      rightLeaf = new Split(this, rightDocs, 3);
-      leafId = 1;
+      leftLeaf = new Split(this, leftDocs, 1);
+      rightLeaf = new Split(this, rightDocs, 2);
+      leafId = 0;
     }
 
     protected Split(Split source, List<Document> scoredDocs, int leafId) throws InvalidFeatureThresholdException{
@@ -147,8 +145,8 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
         if(doc.getFeature(featureId) < threshold) leftDocs.add(doc);
         else rightDocs.add(doc);
       }
-      leftLeaf = new Split(this, leftDocs, 2 * leafId);
-      rightLeaf = new Split(this, rightDocs, (2 * leafId) + 1);
+      leftLeaf = new Split(this, leftDocs, 2 * leafId + 1);
+      rightLeaf = new Split(this, rightDocs, (2 * leafId) + 2);
     }
 
     protected List<Split> getTerminalLeaves(){
@@ -170,32 +168,33 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
 
     protected void fillScores(double[] scores){
       int index;
-      if(leafId == 1 || leafId == 2 || leafId == 3) index = leafId;
-      else index = leafId % 2 == 1 ? (leafId - 1) / 2 : leafId / 2;
+      if(leafId == 0 || leafId == 1 || leafId == 2) index = leafId;
+      else index = leafId % 2 == 1 ? (leafId - 2) / 2 : (leafId - 1) / 2;
       scores[index] = score;
       if(hasDestinations()) getDestinations().forEach(leaf -> leaf.fillScores(scores));
     }
 
     protected void fillThresholds(double[] thresholds){
       int index;
-      if(leafId == 1 || leafId == 2 || leafId == 3) index = leafId;
-      else index = leafId % 2 == 1 ? (leafId - 1) / 2 : leafId / 2;
-      thresholds[index] = score;
+      if(leafId == 0 || leafId == 1 || leafId == 2 ) index = leafId;
+      else index = leafId % 2 == 1 ? (leafId - 2) / 2 : (leafId - 1) / 2;
+      thresholds[index] = threshold;
       if(hasDestinations()) getDestinations().forEach(leaf -> leaf.fillThresholds(thresholds));
     }
 
     protected void fillFeatures(int[] leafFeatures){
       int index;
-      if(leafId == 1 || leafId == 2 || leafId == 3) index = leafId;
-      else index = leafId % 2 == 1 ? (leafId - 1) / 2 : leafId / 2;
+
+      if(leafId == 0 || leafId == 1 || leafId == 2) index = leafId;
+      else index = leafId % 2 == 1 ? (leafId - 2) / 2 : (leafId - 1) / 2;
       leafFeatures[index] = featureId;
       if(hasDestinations()) getDestinations().forEach(leaf -> leaf.fillFeatures(leafFeatures));
     }
 
     protected void fillIds(int[] ids){
       int index;
-      if(leafId == 1 || leafId == 2 || leafId == 3) index = leafId;
-      else index = leafId % 2 == 1 ? (leafId - 1) / 2 : leafId / 2;
+      if(leafId == 0 || leafId == 1 || leafId == 2) index = leafId;
+      else index = leafId % 2 == 1 ? (leafId - 2) / 2 : (leafId - 1) / 2;
       ids[index] = leafId;
       if(hasDestinations()) getDestinations().forEach(leaf -> leaf.fillIds(ids));
     }
