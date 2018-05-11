@@ -34,7 +34,6 @@ import static org.ltr4l.boosting.TreeTools.findMinLossFeat;
 
 public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeConfig> {
   private final List<Document> trainingDocs;
-  private final List<Document> validationDocs;
   private final List<Document[][]> trainingPairs;
   private final List<Document[][]> validationPairs;
   private final List<FeatureSortedDocs> featureSortedDocs;
@@ -48,7 +47,6 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
   LambdaMartTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
     super(training, validation, reader, override);
     trainingDocs = DataProcessor.makeDocList(trainingSet);
-    validationDocs = DataProcessor.makeDocList(validationSet);
     trainingPairs = trainingSet.stream().map(query -> query.orderDocPairs()).collect(Collectors.toList());
     validationPairs = validationSet.stream().map(query -> query.orderDocPairs()).collect(Collectors.toList());
     numTrees = config.getNumTrees();
