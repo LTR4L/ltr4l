@@ -222,8 +222,8 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
   protected static class SavedModel {
 
     public Ensemble.TreeConfig config;
-    public List<Integer> featureIds;
     public List<Integer> leafIds;
+    public List<Integer> featureIds;
     public List<Double> thresh;
     public List<Double> scores;
 
