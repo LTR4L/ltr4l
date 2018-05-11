@@ -45,6 +45,20 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
     }
   }
 
+  public RegressionTree(SavedModel model){
+    int numLeaves = model.leafIds.size();
+    root = new Split(null, model.thresh.get(0), model.leafIds.get(0), model.scores.get(0));
+    Split currentLeaf = root;
+    int currentId = root.leafId;
+    for(int i = 1; i < numLeaves; i++){
+      int nextId = model.leafIds.get(i);
+      if(nextId == 2 * currentId + 1){
+        currentLeaf.setLeftLeaf();
+      }
+
+    }
+  }
+
   protected List<Double> getModelInfo(DoubleProp type){
     List<Double> info = new ArrayList<>(); //2 * num leaves - 1 should be final list
     root.fill(info, type); //Start at 0.
@@ -116,6 +130,14 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
       score = 0.0d;
       threshold = Double.NEGATIVE_INFINITY;
       featureId = -1;
+    }
+
+    protected Split(Split source, double threshold, int leafId, double score){ //Used when reading model!
+      this.source = source;
+      this.threshold = threshold;
+      this.leafId = leafId;
+      this.score = score;
+      scoredDocs = new ArrayList<>();
     }
 
     protected void addSplit(int feature, double threshold) throws InvalidFeatureThresholdException {
@@ -213,6 +235,14 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
 
     public Split getSource() {
       return source;
+    }
+
+    protected void setLeftLeaf(Split leftLeaf) {
+      this.leftLeaf = leftLeaf;
+    }
+
+    protected void setRightLeaf(Split rightLeaf) {
+      this.rightLeaf = rightLeaf;
     }
   }
 

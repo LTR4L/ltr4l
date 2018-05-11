@@ -51,7 +51,20 @@ public class Ensemble extends Ranker<Ensemble.TreeConfig> {
   }
 
   protected List<RegressionTree> readModel(Reader reader){
-    throw new UnsupportedOperationException();
+    try{
+      ObjectMapper mapper = new ObjectMapper();
+      SavedModel savedModel = mapper.readValue(reader, SavedModel.class);
+      assert(savedModel.treeModels.length > 0);
+
+      List<RegressionTree> trees = new ArrayList<>();
+
+      for(RegressionTree.SavedModel model : savedModel.treeModels){
+        trees.add(new RegressionTree(model));
+      }
+
+    } catch(IOException e) {
+      //Do something
+    }
   }
 
   protected RegressionTree.SavedModel[] getTreeModels(){
