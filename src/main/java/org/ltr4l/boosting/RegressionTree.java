@@ -45,33 +45,15 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
     }
   }
 
-  protected double[] getDoubleInfo(FillType type){
-    double[] info = new double[2 * numLeaves - 1];
-    switch(type){
-      case THRESHOLD:
-        root.fillThresholds(info);
-        break;
-      case SCORE:
-        root.fillScores(info);
-        break;
-      default:
-        throw new IllegalArgumentException();
-    }
+  protected List<Double> getModelInfo(DoubleProp type){
+    List<Double> info = new ArrayList<>(); //2 * num leaves - 1 should be final list
+    root.fill(info, type); //Start at 0.
     return info;
   }
 
-  protected int[] getIntInfo(FillType type){
-    int[] info = new int[2 * numLeaves - 1];
-    switch(type){
-      case FEATURE:
-        root.fillFeatures(info);
-        break;
-      case ID:
-        root.fillIds(info);
-        break;
-      default:
-        throw new IllegalArgumentException();
-    }
+  protected List<Integer> getModelInfo(IntProp type){
+    List<Integer> info = new ArrayList<>();
+    root.fill(info, type);
     return info;
   }
 
@@ -87,14 +69,14 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
 
   @Override
   public void writeModel(Ensemble.TreeConfig config, Writer writer) throws IOException {
-    SavedModel savedModel = new SavedModel( getIntInfo(FillType.FEATURE), getIntInfo(FillType.ID), getDoubleInfo(FillType.THRESHOLD), getDoubleInfo(FillType.SCORE));
+    SavedModel savedModel = new SavedModel( getModelInfo(IntProp.FEATURE), getModelInfo(IntProp.ID), getModelInfo(DoubleProp.THRESHOLD), getModelInfo(DoubleProp.SCORE));
     ObjectMapper mapper = new ObjectMapper();
     mapper.enable(SerializationFeature.INDENT_OUTPUT);
     mapper.writeValue(writer, savedModel);
   }
 
   protected SavedModel getSavedModel(){ //"Suppress" config by making null.
-    return new SavedModel( getIntInfo(FillType.FEATURE), getIntInfo(FillType.ID), getDoubleInfo(FillType.THRESHOLD), getDoubleInfo(FillType.SCORE));
+    return new SavedModel( getModelInfo(IntProp.FEATURE), getModelInfo(IntProp.ID), getModelInfo(DoubleProp.THRESHOLD), getModelInfo(DoubleProp.SCORE));
   }
 
   public static class Split { //Node for trees
@@ -107,7 +89,7 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
     private final List<Document> scoredDocs;
     private final int leafId;
 
-    protected Split(int featureId, double threshold, List<Document> scoredDocs) throws InvalidFeatureThresholdException{ //For root node.
+    protected Split(int featureId, double threshold, List<Document> scoredDocs) throws InvalidFeatureThresholdException { //For root node.
       this.source = null;
       this.featureId = featureId;
       this.threshold = threshold;
@@ -115,8 +97,8 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
       score = 0.0d;
       List<Document> leftDocs = new ArrayList<>();
       List<Document> rightDocs = new ArrayList<>();
-      for(Document doc : this.scoredDocs){
-        if(doc.getFeature(featureId) < threshold) leftDocs.add(doc);
+      for (Document doc : this.scoredDocs) {
+        if (doc.getFeature(featureId) < threshold) leftDocs.add(doc);
         else rightDocs.add(doc);
       }
       leftLeaf = new Split(this, leftDocs, 1);
@@ -124,8 +106,8 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
       leafId = 0;
     }
 
-    protected Split(Split source, List<Document> scoredDocs, int leafId) throws InvalidFeatureThresholdException{
-      if(scoredDocs.isEmpty()) throw new InvalidFeatureThresholdException();
+    protected Split(Split source, List<Document> scoredDocs, int leafId) throws InvalidFeatureThresholdException {
+      if (scoredDocs.isEmpty()) throw new InvalidFeatureThresholdException();
       this.source = source;
       this.scoredDocs = scoredDocs;
       this.leafId = leafId;
@@ -136,22 +118,22 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
       featureId = -1;
     }
 
-    protected void addSplit(int feature, double threshold) throws InvalidFeatureThresholdException{
+    protected void addSplit(int feature, double threshold) throws InvalidFeatureThresholdException {
       this.featureId = feature;
       this.threshold = threshold;
       List<Document> leftDocs = new ArrayList<>();
       List<Document> rightDocs = new ArrayList<>();
-      for(Document doc : this.scoredDocs){
-        if(doc.getFeature(featureId) < threshold) leftDocs.add(doc);
+      for (Document doc : this.scoredDocs) {
+        if (doc.getFeature(featureId) < threshold) leftDocs.add(doc);
         else rightDocs.add(doc);
       }
       leftLeaf = new Split(this, leftDocs, 2 * leafId + 1);
       rightLeaf = new Split(this, rightDocs, (2 * leafId) + 2);
     }
 
-    protected List<Split> getTerminalLeaves(){
+    protected List<Split> getTerminalLeaves() {
       List<Split> terminalLeaves = new ArrayList<>();
-      if (!hasDestinations()){
+      if (!hasDestinations()) {
         terminalLeaves.add(this);
         return terminalLeaves;
       }
@@ -159,83 +141,62 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
       return terminalLeaves;
     }
 
-    protected double calculateScore(List<Double> features){
-      assert(leavesProperlySet());
-      if(!hasDestinations()) return score;
+    protected double calculateScore(List<Double> features) {
+      assert (leavesProperlySet());
+      if (!hasDestinations()) return score;
       Split destination = features.get(featureId) < threshold ? leftLeaf : rightLeaf;
       return destination.calculateScore(features);
     }
 
-    protected void fillScores(double[] scores){
-      int index;
-      if(leafId == 0 || leafId == 1 || leafId == 2) index = leafId;
-      else index = leafId % 2 == 1 ? (leafId - 2) / 2 : (leafId - 1) / 2;
-      scores[index] = score;
-      if(hasDestinations()) getDestinations().forEach(leaf -> leaf.fillScores(scores));
+    protected void fill(List<Double> info, DoubleProp type) {
+      assert (type != null);
+      double prop;
+      if (type == DoubleProp.THRESHOLD)
+        prop = threshold;
+      else //only two DoubleProps...
+        prop = score;
+      info.add(prop);
+      if (hasDestinations()) {
+        for (Split destination : getDestinations()) {
+          destination.fill(info, type);
+        }
+      }
     }
 
-    protected void fillThresholds(double[] thresholds){
-      int index;
-      if(leafId == 0 || leafId == 1 || leafId == 2 ) index = leafId;
-      else index = leafId % 2 == 1 ? (leafId - 2) / 2 : (leafId - 1) / 2;
-      thresholds[index] = threshold;
-      if(hasDestinations()) getDestinations().forEach(leaf -> leaf.fillThresholds(thresholds));
+    protected void fill(List<Integer> info, IntProp type) {
+      assert(type != null);
+      int prop;
+      if (type == IntProp.FEATURE)
+        prop = featureId;
+      else
+        prop = leafId;
+      info.add(prop);
+      if (hasDestinations()) {
+        for (Split destination : getDestinations()) {
+          destination.fill(info, type);
+        }
+      }
     }
 
-    protected void fillFeatures(int[] leafFeatures){
-      int index;
-
-      if(leafId == 0 || leafId == 1 || leafId == 2) index = leafId;
-      else index = leafId % 2 == 1 ? (leafId - 2) / 2 : (leafId - 1) / 2;
-      leafFeatures[index] = featureId;
-      if(hasDestinations()) getDestinations().forEach(leaf -> leaf.fillFeatures(leafFeatures));
-    }
-
-    protected void fillIds(int[] ids){
-      int index;
-      if(leafId == 0 || leafId == 1 || leafId == 2) index = leafId;
-      else index = leafId % 2 == 1 ? (leafId - 2) / 2 : (leafId - 1) / 2;
-      ids[index] = leafId;
-      if(hasDestinations()) getDestinations().forEach(leaf -> leaf.fillIds(ids));
-    }
-
-    protected boolean leavesProperlySet(){
+    protected boolean leavesProperlySet() {
       if(leftLeaf == null && rightLeaf == null) return true;
       if(leftLeaf != null && rightLeaf != null) return true;
       return false;
     }
 
-    protected boolean hasDestinations(){
+    protected boolean hasDestinations() {
       return !(leftLeaf == null && rightLeaf == null);
     }
 
-    protected List<Split> getDestinations(){
+    protected List<Split> getDestinations() {
       List<Split> destinations = new ArrayList<>();
       destinations.add(leftLeaf);
       destinations.add(rightLeaf);
       return destinations;
     }
 
-    public void setLeftLeaf(Split leftLeaf) { //TODO: Refractor
-      assert(leftLeaf == null || this.getRoot() != leftLeaf.getRoot());
-      if(this.leftLeaf != null)  this.leftLeaf.setSource(null); //Separate current destination reference to this leaf
-      if(leftLeaf != null) leftLeaf.setSource(this);
-      this.leftLeaf = leftLeaf;
-    }
-
-    public void setRightLeaf(Split rightLeaf) {
-      assert(rightLeaf == null || this.getRoot() != rightLeaf.getRoot());
-      if(this.rightLeaf != null)  this.rightLeaf.setSource(null); //Separate current destination reference to this leaf
-      if(rightLeaf != null) rightLeaf.setSource(this);
-      this.rightLeaf = rightLeaf;
-    }
-
     public List<Document> getScoredDocs() {
       return scoredDocs;
-    }
-
-    public void setFeatureId(int featureId) {
-      this.featureId = featureId;
     }
 
     public void setSource(Split source) {
@@ -246,47 +207,30 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
       this.score = score;
     }
 
-    public Split getRoot(){
-      return this.isRoot() ? this : source.getRoot();
-    }
-
-    public Split getLeftLeaf(){
-      return leftLeaf;
-    }
-
-    public Split getRightLeaf(){
-      return rightLeaf;
-    }
-
-    public boolean isRoot(){
+    public boolean isRoot() {
       return source == null;
     }
 
     public Split getSource() {
       return source;
     }
-
-    protected boolean isLinkedTo(Split leaf){ //Not currently used!
-      if(source == leaf) return true;
-      if(source.isRoot()) return false;
-      return source.isLinkedTo(leaf);
-    }
   }
 
-  protected enum FillType{THRESHOLD, SCORE, FEATURE, ID}
+  protected enum IntProp {FEATURE, ID}
+  protected enum DoubleProp {THRESHOLD, SCORE}
 
   protected static class SavedModel {
 
     public Ensemble.TreeConfig config;
-    public int[] featureIds;
-    public int[] leafIds;
-    public double[] thresh;
-    public double[] scores;
+    public List<Integer> featureIds;
+    public List<Integer> leafIds;
+    public List<Double> thresh;
+    public List<Double> scores;
 
-    SavedModel(){  // this is needed for Jackson...
+    SavedModel() {  // this is needed for Jackson...
     }
 
-    SavedModel(Ensemble.TreeConfig config, int[] featureIds, int[] leafIds, double[] thresh, double[] scores){
+    SavedModel(Ensemble.TreeConfig config, List<Integer> featureIds, List<Integer> leafIds, List<Double> thresh, List<Double> scores) {
       this.config = config;
       this.featureIds = featureIds;
       this.leafIds = leafIds;
@@ -294,7 +238,7 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
       this.scores = scores;
     }
 
-    SavedModel(int[] featureIds, int[] leafIds, double[] thresh, double[] scores){
+    SavedModel(List<Integer> featureIds, List<Integer> leafIds, List<Double> thresh, List<Double> scores) {
       this.featureIds = featureIds;
       this.leafIds = leafIds;
       this.thresh = thresh;
