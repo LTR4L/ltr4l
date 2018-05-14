@@ -63,7 +63,7 @@ You can download OHSUMED, LETOR MQ2007, LETOR MQ2008 from [this web page](https:
 
 **Dataset Descriptions**
 
-Each row is a query-document pair. The first column is relevance label of this pair, the second column is query id, the following columns are features, and the end of the row is comment about the pair, including id of the document. The larger the relevance label, the more relevant the query-document pair. A query-document pair is represented by a 46-dimensional sortedFeature vector. Here are several example rows from MQ2007 dataset:
+Each row is a query-document pair. The first column is relevance label of this pair, the second column is query id, the following columns are features, and the end of the row is comment about the pair, including id of the document. The larger the relevance label, the more relevant the query-document pair. A query-document pair is represented by a 46-dimensional feature vector. Here are several example rows from MQ2007 dataset:
 ```
 ====================================================
 
@@ -527,7 +527,7 @@ Weights and thresholds are updated per document, and documents are chosen at ran
 
 Note that in terms of a Neural Network, the structure behind PRank is relatively simple. It can be thought of as
 a network with only two layers: the input layer, and the output layer. In the input layer, each node
-represents a sortedFeature of the document (thus the number of nodes is equal to the number of features of the document). In the output layer, there is one node.
+represents a feature of the document (thus the number of nodes is equal to the number of features of the document). In the output layer, there is one node.
 The activation for each node in the network is the identity function, and each node's output is multiplied by a weight,
 and that becomes one of the inputs of the output node.
 
