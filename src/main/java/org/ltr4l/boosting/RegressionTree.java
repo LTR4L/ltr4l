@@ -45,6 +45,37 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
     }
   }
 
+  public RegressionTree(SavedModel model){
+    int numNodes = model.leafIds.size();
+    assert(numNodes > 3);
+    this.numLeaves = (numNodes + 1) / 2;
+    root = new Split(null, model.featureIds.get(0), model.thresh.get(0), model.leafIds.get(0), model.scores.get(0));
+    Split currentNode = root;
+    for(int i = 1; i < numNodes; i++){
+      int currentId = currentNode.leafId;
+      int featId = model.featureIds.get(i);
+      double nextThresh = model.thresh.get(i);
+      int nextId = model.leafIds.get(i);
+      double nextScore = model.scores.get(i);
+
+      if(nextId == 2 * currentId + 1){
+        currentNode.setLeftLeaf(new Split(currentNode, featId, nextThresh, nextId, nextScore));
+        currentNode = currentNode.leftLeaf;
+      }
+
+      else if(nextId == 2 * currentId + 2){
+        currentNode.setRightLeaf(new Split(currentNode, featId, nextThresh, nextId, nextScore));
+        currentNode = currentNode.rightLeaf;
+      }
+
+      else{
+        currentNode = currentNode.source; //Go back up the tree
+        i--;
+      }
+
+    }
+  }
+
   protected List<Double> getModelInfo(DoubleProp type){
     List<Double> info = new ArrayList<>(); //2 * num leaves - 1 should be final list
     root.fill(info, type); //Start at 0.
@@ -116,6 +147,15 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
       score = 0.0d;
       threshold = Double.NEGATIVE_INFINITY;
       featureId = -1;
+    }
+
+    protected Split(Split source, int featureId, double threshold, int leafId, double score){ //Used when reading model!
+      this.source = source;
+      this.featureId = featureId;
+      this.threshold = threshold;
+      this.leafId = leafId;
+      this.score = score;
+      scoredDocs = new ArrayList<>();
     }
 
     protected void addSplit(int feature, double threshold) throws InvalidFeatureThresholdException {
@@ -213,6 +253,14 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
 
     public Split getSource() {
       return source;
+    }
+
+    protected void setLeftLeaf(Split leftLeaf) {
+      this.leftLeaf = leftLeaf;
+    }
+
+    protected void setRightLeaf(Split rightLeaf) {
+      this.rightLeaf = rightLeaf;
     }
   }
 
