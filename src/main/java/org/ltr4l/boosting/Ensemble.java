@@ -62,8 +62,10 @@ public class Ensemble extends Ranker<Ensemble.TreeConfig> {
         trees.add(new RegressionTree(model));
       }
 
+      return trees;
+
     } catch(IOException e) {
-      //Do something
+      throw new RuntimeException();
     }
   }
 

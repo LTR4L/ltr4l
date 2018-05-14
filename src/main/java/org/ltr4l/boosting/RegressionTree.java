@@ -46,14 +46,31 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
   }
 
   public RegressionTree(SavedModel model){
-    int numLeaves = model.leafIds.size();
-    root = new Split(null, model.thresh.get(0), model.leafIds.get(0), model.scores.get(0));
-    Split currentLeaf = root;
-    int currentId = root.leafId;
-    for(int i = 1; i < numLeaves; i++){
+    int numNodes = model.leafIds.size();
+    assert(numNodes > 3);
+    this.numLeaves = (numNodes + 1) / 2;
+    root = new Split(null, model.featureIds.get(0), model.thresh.get(0), model.leafIds.get(0), model.scores.get(0));
+    Split currentNode = root;
+    for(int i = 1; i < numNodes; i++){
+      int currentId = currentNode.leafId;
+      int featId = model.featureIds.get(i);
+      double nextThresh = model.thresh.get(i);
       int nextId = model.leafIds.get(i);
+      double nextScore = model.scores.get(i);
+
       if(nextId == 2 * currentId + 1){
-        currentLeaf.setLeftLeaf();
+        currentNode.setLeftLeaf(new Split(currentNode, featId, nextThresh, nextId, nextScore));
+        currentNode = currentNode.leftLeaf;
+      }
+
+      else if(nextId == 2 * currentId + 2){
+        currentNode.setRightLeaf(new Split(currentNode, featId, nextThresh, nextId, nextScore));
+        currentNode = currentNode.rightLeaf;
+      }
+
+      else{
+        currentNode = currentNode.source; //Go back up the tree
+        i--;
       }
 
     }
@@ -132,8 +149,9 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
       featureId = -1;
     }
 
-    protected Split(Split source, double threshold, int leafId, double score){ //Used when reading model!
+    protected Split(Split source, int featureId, double threshold, int leafId, double score){ //Used when reading model!
       this.source = source;
+      this.featureId = featureId;
       this.threshold = threshold;
       this.leafId = leafId;
       this.score = score;
