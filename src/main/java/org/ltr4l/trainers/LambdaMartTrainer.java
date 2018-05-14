@@ -42,8 +42,6 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
   private final int numLeaves;
   private final double lrRate;
 
-  private static final double DEFAULT_VARIANCE_TOLERANCE = 0;
-
   LambdaMartTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
     super(training, validation, reader, override);
     trainingDocs = DataProcessor.makeDocList(trainingSet);
@@ -120,7 +118,6 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
 
   @Override
   public void train() {
-
     Map<Document, Double> pws = new HashMap<>();
     double minLoss = 0;
     for(Document doc : trainingDocs) pws.put(doc,Math.pow(2, doc.getLabel()) - 1 );
@@ -130,9 +127,14 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
     HashMap<Document, Double> lambdas = new HashMap<>();
     HashMap<Document, Double> logs = new HashMap<>();
     HashMap<Document, Double> lambdaDers = new HashMap<>();
+    Activation.Sigmoid sigmoid = new Activation.Sigmoid();
 
     for (int t = 1; t <= numTrees; t++){
       int minLossFeat = findMinLossFeat(thresholds, minLoss);
+      if(minLossFeat == -1){
+        System.out.println("Could not find valid feature with specified minimum loss. Stopping training early.");
+        return;
+      }
       //First, calculate lambdas for this iteration.
       for (int iq = 0; iq < trainingSet.size(); iq++) {
         if (trainingPairs.get(iq) == null) //As we are skipping these, they must not influence leaf scores.
@@ -152,7 +154,7 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
         for (Document[] pair : trainingPairs.get(iq)) {
           double dNCG = (pws.get(pair[0]) - pws.get(pair[1])) * (logs.get(pair[0]) - logs.get(pair[1])) / N;
           double diff = ranks.get(pair[1]) - ranks.get(pair[0]);  //- (si - sj) ; sigmoid has minus sign
-          double lambda = Math.abs(new Activation.Sigmoid().output(diff) * dNCG); //TODO: Make static method or class variable
+          double lambda = Math.abs(sigmoid.output(diff) * dNCG);
           double lambdaDer = lambda * (1 - (lambda/dNCG));
           lambdas.put(pair[0], lambdas.get(pair[0]) - lambda); //λ1 = λ1 - dλ
           lambdas.put(pair[1], lambdas.get(pair[1]) + lambda); //λ2 = λ2 - dλ
@@ -168,7 +170,7 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
         tree = new RegressionTree(numLeaves, minLossFeat, minThreshold, trainingDocs);
       }
       catch (InvalidFeatureThresholdException ie) {
-        System.err.printf("Valid tree could not be created. Stopping training early at tree %d \n", t - 1);
+        System.out.printf("Valid tree could not be created. Stopping training early at tree %d \n", t - 1);
         return; //TODO: Implement solution to continue creating trees. For now, stop training.
       }
       //RegressionTree tree = new RegressionTree(numLeaves, minLossFeat, minThreshold, trainingDocs);

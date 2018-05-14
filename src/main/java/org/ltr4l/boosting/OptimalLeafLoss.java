@@ -16,13 +16,11 @@
 package org.ltr4l.boosting;
 
 public class OptimalLeafLoss {
-  private RegressionTree.Split leaf;
   private int optimalFeature;
   private double minLoss;
   private double optimalThreshold;
 
-  public OptimalLeafLoss(RegressionTree.Split leaf, int optimalFeature, double optimalThreshold, double minLoss){
-    this.leaf = leaf;
+  public OptimalLeafLoss( int optimalFeature, double optimalThreshold, double minLoss){
     this.optimalFeature = optimalFeature;
     this.optimalThreshold = optimalThreshold;
     this.minLoss = minLoss;
@@ -40,7 +38,4 @@ public class OptimalLeafLoss {
     return optimalThreshold;
   }
 
-  public RegressionTree.Split getLeaf() {
-    return leaf;
-  }
 }
