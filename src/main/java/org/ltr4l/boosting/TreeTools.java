@@ -27,18 +27,18 @@ public class TreeTools {
     return documents.stream().sorted(Comparator.comparingDouble(doc -> doc.getFeature(feature))).collect(Collectors.toCollection(ArrayList::new));
   }
 
-  public static RegressionTree.Split findOptimalLeaf(Map<RegressionTree.Split, double[]> leafThresholdMap){
-    Iterator<Map.Entry<RegressionTree.Split, double[]>> iterator = leafThresholdMap.entrySet().iterator();
-    Map.Entry<RegressionTree.Split, double[]> optimalEntry = iterator.next();
+  public static RegressionTree.Split findOptimalLeaf(Map<RegressionTree.Split, OptimalLeafLoss> leafThresholdMap){
+    Iterator<Map.Entry<RegressionTree.Split, OptimalLeafLoss>> iterator = leafThresholdMap.entrySet().iterator();
+    OptimalLeafLoss optimalValue = iterator.next().getValue();
     while(iterator.hasNext()){
-      Map.Entry<RegressionTree.Split, double[]> nextEntry = iterator.next();
-      if(nextEntry.getValue()[1] < optimalEntry.getValue()[1])
-        optimalEntry = nextEntry;
+      OptimalLeafLoss nextValue = iterator.next().getValue();
+      if(nextValue.getMinLoss() < optimalValue.getMinLoss())
+        optimalValue = nextValue;
     }
-    return optimalEntry.getKey();
+    return optimalValue.getLeaf();
   }
 
-  public static double[] findMinThreshold(RegressionTree.Split leaf, int numSteps){ //Faster than default.
+  public static OptimalLeafLoss findMinThreshold(RegressionTree.Split leaf, int numSteps){ //Faster than default.
     int featureToSplit = 0;
     List<Document> leafDocs = leaf.getScoredDocs();
     if(numSteps > leafDocs.size()) numSteps = 0; //Just consider all candidate features if numSteps is greater.
@@ -53,10 +53,10 @@ public class TreeTools {
     }
     double loss = featLoss[1];
     double threshold = featLoss[0];
-    return new double[] {featureToSplit, loss, threshold}; //TODO: Easier-to-use Implementation (featureToSplit is int...)
+    return new OptimalLeafLoss(leaf, featureToSplit, threshold, loss);
   }
 
-  public static double[] findMinThreshold(RegressionTree.Split leaf){ //Note: this can be slow!
+  public static OptimalLeafLoss findMinThreshold(RegressionTree.Split leaf){ //Note: this can be slow!
     return findMinThreshold(leaf, 10);
   }
 
@@ -160,4 +160,6 @@ public class TreeTools {
     int dHalf = diff % 2 == 1 ? (diff / 2) + 1 : diff / 2;
     return lo + dHalf;
   }
+
+
 }
