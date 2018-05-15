@@ -26,11 +26,9 @@ import java.util.*;
 
 public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
   private final Split root;
-  private final int numLeaves;
 
   public RegressionTree(int numLeaves, int initFeat, double initThreshold, List<Document> docs) throws InvalidFeatureThresholdException{
     assert(numLeaves >= 2);
-    this.numLeaves = numLeaves;
     root = new Split(initFeat, initThreshold, docs);
     Map<Split, OptimalLeafLoss> splitErrorMap = new HashMap<>();
     for(int l = 2; l < numLeaves; l++) {
@@ -38,7 +36,7 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
         splitErrorMap.put(leaf, TreeTools.findMinLeafThreshold(leaf.getScoredDocs()));
       }
       Split optimalLeaf = TreeTools.findOptimalLeaf(splitErrorMap);
-      int feature = splitErrorMap.get(optimalLeaf).getOptimalFeature(); //TODO: feature and threshold should not be in same array.
+      int feature = splitErrorMap.get(optimalLeaf).getOptimalFeature();
       double threshold = splitErrorMap.get(optimalLeaf).getOptimalThreshold();
       optimalLeaf.addSplit(feature, threshold);
       splitErrorMap.remove(optimalLeaf);
@@ -48,11 +46,10 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
   public RegressionTree(SavedModel model){
     int numNodes = model.leafIds.size();
     assert(numNodes > 3);
-    this.numLeaves = (numNodes + 1) / 2;
     root = new Split(null, model.featureIds.get(0), model.thresh.get(0), model.leafIds.get(0), model.scores.get(0));
     Split currentNode = root;
     for(int i = 1; i < numNodes; i++){
-      int currentId = currentNode.leafId;
+      int currentId = currentNode.getLeafId();
       int featId = model.featureIds.get(i);
       double nextThresh = model.thresh.get(i);
       int nextId = model.leafIds.get(i);
@@ -60,16 +57,16 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
 
       if(nextId == 2 * currentId + 1){
         currentNode.setLeftLeaf(new Split(currentNode, featId, nextThresh, nextId, nextScore));
-        currentNode = currentNode.leftLeaf;
+        currentNode = currentNode.getLeftLeaf();
       }
 
       else if(nextId == 2 * currentId + 2){
         currentNode.setRightLeaf(new Split(currentNode, featId, nextThresh, nextId, nextScore));
-        currentNode = currentNode.rightLeaf;
+        currentNode = currentNode.getRightLeaf();
       }
 
       else{
-        currentNode = currentNode.source; //Go back up the tree
+        currentNode = currentNode.getSource(); //Go back up the tree
         i--;
       }
     }
@@ -87,9 +84,12 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
     return info;
   }
 
-
   public List<Split> getTerminalLeaves(){
     return root.getTerminalLeaves();
+  }
+
+  protected Split getRoot() {
+    return root;
   }
 
   @Override
@@ -119,6 +119,7 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
     private final List<Document> scoredDocs;
     private final int leafId;
 
+    //TODO: Add builder for Split.
     protected Split(int featureId, double threshold, List<Document> scoredDocs) throws InvalidFeatureThresholdException { //For root node.
       this.source = null;
       this.featureId = featureId;
@@ -237,30 +238,28 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
     public List<Document> getScoredDocs() {
       return scoredDocs;
     }
-
     public void setSource(Split source) {
       this.source = source;
     }
-
+    public Split getSource() { return source; }
     public void setScore(double score) {
       this.score = score;
     }
-
     public boolean isRoot() {
       return source == null;
     }
-
-    public Split getSource() {
-      return source;
-    }
-
     protected void setLeftLeaf(Split leftLeaf) {
       this.leftLeaf = leftLeaf;
     }
-
     protected void setRightLeaf(Split rightLeaf) {
       this.rightLeaf = rightLeaf;
     }
+    protected Split getLeftLeaf() { return leftLeaf; }
+    protected Split getRightLeaf() { return rightLeaf; }
+    public int getLeafId() { return leafId; }
+    public double getThreshold() { return threshold; }
+    public double getScore() { return score; }
+    public int getFeatureId() { return featureId; }
   }
 
   protected enum IntProp {FEATURE, ID}

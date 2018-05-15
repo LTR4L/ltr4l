@@ -351,7 +351,7 @@ public class TreeToolsTest {
   }
 
 
-  private static List<Document> makeDocsWithFeatures(double[][] docFeats){
+  protected static List<Document> makeDocsWithFeatures(double[][] docFeats){
     List<Document> docs = new ArrayList<>();
     for(double[] features : docFeats){
       Document doc = new Document();
@@ -361,7 +361,7 @@ public class TreeToolsTest {
     return docs;
   }
 
-  private static List<Document> docs(int... labels){
+  protected static List<Document> docs(int... labels){
     List<Document> documents = new ArrayList<>();
     for(int label: labels){
       Document doc = new Document();
