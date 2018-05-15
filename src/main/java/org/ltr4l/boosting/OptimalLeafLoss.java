@@ -16,9 +16,9 @@
 package org.ltr4l.boosting;
 
 public class OptimalLeafLoss {
-  private int optimalFeature;
-  private double minLoss;
-  private double optimalThreshold;
+  private final int optimalFeature;
+  private final double minLoss;
+  private final double optimalThreshold;
 
   public OptimalLeafLoss( int optimalFeature, double optimalThreshold, double minLoss){
     this.optimalFeature = optimalFeature;
