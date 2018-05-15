@@ -27,22 +27,32 @@ public class TreeTools {
     return documents.stream().sorted(Comparator.comparingDouble(doc -> doc.getFeature(feature))).collect(Collectors.toCollection(ArrayList::new));
   }
 
-  public static RegressionTree.Split findOptimalLeaf(Map<RegressionTree.Split, double[]> leafThresholdMap){
-    Iterator<Map.Entry<RegressionTree.Split, double[]>> iterator = leafThresholdMap.entrySet().iterator();
-    Map.Entry<RegressionTree.Split, double[]> optimalEntry = iterator.next();
+  /**
+   * Finds the best leaf to add a split.
+   * @param leafThresholdMap
+   * @return
+   */
+  public static RegressionTree.Split findOptimalLeaf(Map<RegressionTree.Split, OptimalLeafLoss> leafThresholdMap){
+    Iterator<Map.Entry<RegressionTree.Split, OptimalLeafLoss>> iterator = leafThresholdMap.entrySet().iterator();
+    Map.Entry<RegressionTree.Split, OptimalLeafLoss> optimalEntry = iterator.next();
     while(iterator.hasNext()){
-      Map.Entry<RegressionTree.Split, double[]> nextEntry = iterator.next();
-      if(nextEntry.getValue()[1] < optimalEntry.getValue()[1])
+      Map.Entry<RegressionTree.Split, OptimalLeafLoss> nextEntry = iterator.next();
+      if(nextEntry.getValue().getMinLoss() < optimalEntry.getValue().getMinLoss())
         optimalEntry = nextEntry;
     }
     return optimalEntry.getKey();
   }
 
-  public static double[] findMinThreshold(RegressionTree.Split leaf, int numSteps){ //Faster than default.
+  /**
+   * This method is used to find the threshold and feature which provides the "best" split
+   * (the split with the lowest loss). Looks at all features and candidate thresholds.
+   * @param leafDocs Docs which landed on a particular leaf.
+   * @param numSteps
+   * @return
+   */
+  public static OptimalLeafLoss findMinLeafThreshold(List<Document> leafDocs, int numSteps){ //Faster than default.
     int featureToSplit = 0;
-    List<Document> leafDocs = leaf.getScoredDocs();
-    if(numSteps > leafDocs.size()) numSteps = 0; //Just consider all candidate features if numSteps is greater.
-    FeatureSortedDocs sortedDocs = FeatureSortedDocs.get(leafDocs, numSteps);
+    FeatureSortedDocs sortedDocs = FeatureSortedDocs.get(leafDocs, featureToSplit);
     double[] featLoss = findThreshold(sortedDocs, numSteps);
     for(int featId = 1; featId < sortedDocs.getFeatureLength(); featId++){
       double[] error = findThreshold(FeatureSortedDocs.get(leafDocs, featId), numSteps);
@@ -53,39 +63,43 @@ public class TreeTools {
     }
     double loss = featLoss[1];
     double threshold = featLoss[0];
-    return new double[] {featureToSplit, loss, threshold}; //TODO: Easier-to-use Implementation (featureToSplit is int...)
+    return new OptimalLeafLoss(featureToSplit, threshold, loss);
   }
 
-  public static double[] findMinThreshold(RegressionTree.Split leaf){ //Note: this can be slow!
-    return findMinThreshold(leaf, 10);
+  public static OptimalLeafLoss findMinLeafThreshold(List<Document> leafDocs){ //Note: this can be slow!
+    return findMinLeafThreshold(leafDocs, 10);
   }
 
-  //For using a statistical method to find thresholds, rather than checking all possible values.
-  //This will be used for speedup.
+  /**
+   * Finds the best threshold for a given feature.
+   * @param fSortedDocs
+   * @param numSteps
+   * @return
+   */
   public static double[] findThreshold(FeatureSortedDocs fSortedDocs, int numSteps){
-    if(numSteps <= 0) return findThreshold(fSortedDocs);
+    if(numSteps <= 1 || numSteps > fSortedDocs.getFeatureSortedDocs().size())
+      return findThreshold(fSortedDocs);
     double fmin = fSortedDocs.getMinFeature();
     double fmax = fSortedDocs.getMaxFeature();
     double step = Math.abs(fmax - fmin) / numSteps;
-    double[] thresholds = new double[numSteps];
+    double[] thresholds = new double[numSteps + 1]; //TODO: Remove fmin or fmax from thresholds?
     thresholds[0] = fmin;
     for(int i = 1; i < numSteps; i++)
       thresholds[i] = thresholds[i - 1] + step;
 
     List<Document> samples = fSortedDocs.getFeatureSortedDocs();
-    int feat = fSortedDocs.getSortedFeature();
     double[] featureSamples = fSortedDocs.getFeatureSamples();
 
     double finalThreshold = fmin;
     double minLoss = Double.POSITIVE_INFINITY;
 
     for(double threshold : thresholds){
-      int idx = binaryThresholdSearch(featureSamples, threshold);
+      int idx = binaryThresholdSearch(featureSamples, threshold); //TODO: Add if statement fmin or fmax?
       List<Document> lDocs = new ArrayList<>(samples.subList(0, idx));
       List<Document> rDocs = new ArrayList<>(samples.subList(idx, samples.size()));
-      double loss = calcThresholdLoss(lDocs) + calcThresholdLoss(rDocs);
+      double loss = calcSplitLoss(lDocs) + calcSplitLoss(rDocs);
       if(loss < minLoss){
-        finalThreshold = !rDocs.isEmpty() ? rDocs.get(0).getFeature(feat) : lDocs.get(lDocs.size() - 1).getFeature(feat);
+        finalThreshold = threshold;
         minLoss = loss;
       }
     }
@@ -104,7 +118,7 @@ public class TreeTools {
       if (threshId != numDocs -1 && fSortedDocs.get(threshId).getFeature(feat) == fSortedDocs.get(threshId + 1).getFeature(feat)) continue;
       List<Document> lDocs = new ArrayList<>(fSortedDocs.subList(0, threshId + 1));
       List<Document> rDocs = new ArrayList<>(fSortedDocs.subList(threshId + 1, numDocs));
-      double loss = calcThresholdLoss(lDocs) + calcThresholdLoss(rDocs);
+      double loss = calcSplitLoss(lDocs) + calcSplitLoss(rDocs);
       if(loss < minLoss){
         threshold = !rDocs.isEmpty() ? rDocs.get(0).getFeature(feat) : lDocs.get(lDocs.size() - 1).getFeature(feat);
         minLoss = loss;
@@ -113,37 +127,37 @@ public class TreeTools {
     return new double[] {threshold, minLoss};
   }
 
-  public static double calcThresholdLoss(List<Document> subData){
+  public static double calcSplitLoss(List<Document> subData){
     if (subData.size() == 0) return 0;
     double avg = subData.stream().mapToDouble(doc -> doc.getLabel()).sum() / subData.size();
     return subData.stream().mapToDouble(doc -> Math.pow(doc.getLabel() - avg, 2)).sum();
   }
 
   public static int findMinLossFeat(double[][] thresholds){
-    return findMinLossFeat(thresholds, 0.0d);
+    return findMinLossFeat(thresholds, -1);
   }
 
-  //TODO: Faster code?
   public static int findMinLossFeat(double[][] thresholds, double minLoss){
-    int feat = 0;
+    int feat = -1;
     double loss = Double.POSITIVE_INFINITY;
     for (int fid  = 0; fid < thresholds.length; fid++){
       if(thresholds[fid][1] < loss && thresholds[fid][1] > minLoss){
-        loss = thresholds[feat][1];
+        loss = thresholds[fid][1];
         feat = fid;
       }
     }
     return feat;
   }
 
-  //Initialize with initial midpoint.
-  private static int binaryThresholdSearch(double[] featSamples, double threshold){
+  protected static int binaryThresholdSearch(double[] featSamples, double threshold){
     int lo = 0;
     int hi = featSamples.length;
     int mid = findMid(lo, hi);
     while(lo < hi){
-      if(hi - lo == 1) return hi;
-      if(featSamples[mid] <= threshold){
+      if(hi - lo == 1){
+        return featSamples[lo] >= threshold ? lo : hi;
+      }
+      if(featSamples[mid] < threshold){
         lo = mid;
         mid = findMid(lo, hi);
       }
@@ -160,4 +174,6 @@ public class TreeTools {
     int dHalf = diff % 2 == 1 ? (diff / 2) + 1 : diff / 2;
     return lo + dHalf;
   }
+
+
 }

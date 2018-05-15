@@ -32,14 +32,14 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
     assert(numLeaves >= 2);
     this.numLeaves = numLeaves;
     root = new Split(initFeat, initThreshold, docs);
-    Map<Split, double[]> splitErrorMap = new HashMap<>();
+    Map<Split, OptimalLeafLoss> splitErrorMap = new HashMap<>();
     for(int l = 2; l < numLeaves; l++) {
       for (Split leaf : root.getTerminalLeaves()) {
-        splitErrorMap.put(leaf, TreeTools.findMinThreshold(leaf));
+        splitErrorMap.put(leaf, TreeTools.findMinLeafThreshold(leaf.getScoredDocs()));
       }
       Split optimalLeaf = TreeTools.findOptimalLeaf(splitErrorMap);
-      int feature = (int) splitErrorMap.get(optimalLeaf)[0]; //TODO: feature and threshold should not be in same array.
-      double threshold = splitErrorMap.get(optimalLeaf)[2];
+      int feature = splitErrorMap.get(optimalLeaf).getOptimalFeature(); //TODO: feature and threshold should not be in same array.
+      double threshold = splitErrorMap.get(optimalLeaf).getOptimalThreshold();
       optimalLeaf.addSplit(feature, threshold);
       splitErrorMap.remove(optimalLeaf);
     }
@@ -72,7 +72,6 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
         currentNode = currentNode.source; //Go back up the tree
         i--;
       }
-
     }
   }
 
