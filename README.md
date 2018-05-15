@@ -92,13 +92,19 @@ git clone https://github.com/LTR4L/ltr4l.git
 $ cd ltr4l
 ```
 
-3- package jar file
+3- run ivy bootstrap (only needs to be run once after cloned)
+
+```
+ant ivy-bootstrap
+```
+
+4- package jar file
 
 ```
 $ ant clean package
 ```
 
-4-run the following command :
+5-run the following command :
 
 ```
 train ranknet
@@ -131,7 +137,7 @@ the existing settings in the config file.
  -version             print the version information and exit
 ```
 
-5- open the report file:
+6- open the report file:
 
 ```
 open report/ranknet-report.csv
