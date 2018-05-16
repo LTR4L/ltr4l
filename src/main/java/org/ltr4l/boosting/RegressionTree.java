@@ -33,7 +33,8 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
     Map<Split, OptimalLeafLoss> splitErrorMap = new HashMap<>();
     for(int l = 2; l < numLeaves; l++) {
       for (Split leaf : root.getTerminalLeaves()) {
-        splitErrorMap.put(leaf, TreeTools.findMinLeafThreshold(leaf.getScoredDocs()));
+        if(!splitErrorMap.containsKey(leaf)) //Speedup: only calculate if it hasnt been done so yet... should be twice
+          splitErrorMap.put(leaf, TreeTools.findMinLeafThreshold(leaf.getScoredDocs()));
       }
       Split optimalLeaf = TreeTools.findOptimalLeaf(splitErrorMap);
       int feature = splitErrorMap.get(optimalLeaf).getOptimalFeature();
