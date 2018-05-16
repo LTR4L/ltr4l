@@ -14,8 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.ltr4l.boosting.RegressionTree.*;
-
 public class RegressionTreeTest {
   private static final String MODEL_SRC = "{\n" +
       "    \"config\" : {\n" +
