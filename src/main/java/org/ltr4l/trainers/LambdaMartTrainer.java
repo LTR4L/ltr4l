@@ -132,7 +132,7 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
     for (int t = 1; t <= numTrees; t++){
       int minLossFeat = findMinLossFeat(thresholds, minLoss);
       if(minLossFeat == -1){
-        System.out.println("Could not find valid feature with specified minimum loss. Stopping training early.");
+        System.out.printf("Could not find valid feature with specified minimum loss. Stopping training early at tree %d \n", t);
         return;
       }
       //First, calculate lambdas for this iteration.
