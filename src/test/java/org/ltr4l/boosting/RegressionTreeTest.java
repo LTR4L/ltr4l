@@ -77,8 +77,15 @@ public class RegressionTreeTest {
     Assert.assertTrue(!leaf.getRightLeaf().hasDestinations());
     Assert.assertEquals(leaf.getLeafId(), 0);
 
-    Assert.assertTrue(!leaf.getRightLeaf().hasDestinations());
-    Assert.assertEquals(leaf.getRightLeaf().getLeafId(), 2);
+    Split rightLeaf = leaf.getRightLeaf();
+    Assert.assertTrue(!rightLeaf.hasDestinations());
+    Assert.assertEquals(rightLeaf.getLeafId(), 2);
+    Assert.assertEquals(rightLeaf.getFeatureId(), -1);
+    Assert.assertEquals(rightLeaf.getThreshold(), Double.NEGATIVE_INFINITY, 0.000001);
+    Assert.assertEquals(rightLeaf.getScore(), 0.045137089557086, 0.000001);
+
+    Assert.assertTrue(leaf.getLeftLeaf().hasDestinations());
+    Assert.assertEquals(leaf.getLeftLeaf().getLeafId(), 1);
   }
 
 
@@ -172,4 +179,42 @@ public class RegressionTreeTest {
     List<Document> samples = TreeToolsTest.makeDocsWithFeatures(features);
     RegressionTree tree = new RegressionTree(3, 1, 40, samples);
   }
+
+/*  public void assertTree(RegressionTree tree, RegressionTree.SavedModel model) throws Exception{
+    List<Integer> leafIds = model.leafIds;
+    List<Integer> features = model.featureIds;
+    List<Double> scores = model.scores;
+    List<Double> thresholds = model.thresh;
+    assert(leafIds.size() == features.size());
+    assert(leafIds.size() == scores.size());
+    assert(leafIds.size() == thresholds.size());
+    Assert.assertEquals(tree.getTerminalLeaves().size(), (leafIds.size() + 1)/2);
+
+    Split node = tree.getRoot();
+    boolean checked = false;
+
+    for(int i = 0; i < leafIds.size(); i++){
+    }
+  }*/
+
+/*  public void assertLeaf(Split leaf, RegressionTree.SavedModel model, int index) throws Exception{ //assertNode
+    int expLeafId = model.leafIds.get(index);
+    int expFId = model.featureIds.get(index);
+    double expScore = model.scores.get(index);
+    double expThresh = model.thresh.get(index);
+
+    Assert.assertEquals(leaf.getLeafId(), expLeafId);
+    Assert.assertEquals(leaf.getFeatureId(), expFId);
+    Assert.assertEquals(leaf.getScore(), expScore, 0.00001);
+    Assert.assertEquals(leaf.getThreshold(), expThresh, 0.00001);
+
+    if(expFId == -1) {
+      Assert.assertTrue(!leaf.hasDestinations());
+      Assert.assertEquals(leaf.getThreshold(), Double.NEGATIVE_INFINITY, 0.00001);
+    }
+    else{
+      Assert.assertTrue(leaf.hasDestinations());
+      Assert.assertEquals(leaf.getScore(), 0, 0.01);
+    }
+  }*/
 }
