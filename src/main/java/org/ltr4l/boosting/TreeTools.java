@@ -32,11 +32,11 @@ public class TreeTools {
    * @param leafThresholdMap
    * @return
    */
-  public static RegressionTree.Split findOptimalLeaf(Map<RegressionTree.Split, OptimalLeafLoss> leafThresholdMap){
-    Iterator<Map.Entry<RegressionTree.Split, OptimalLeafLoss>> iterator = leafThresholdMap.entrySet().iterator();
-    Map.Entry<RegressionTree.Split, OptimalLeafLoss> optimalEntry = iterator.next();
+  public static Split findOptimalLeaf(Map<Split, OptimalLeafLoss> leafThresholdMap){
+    Iterator<Map.Entry<Split, OptimalLeafLoss>> iterator = leafThresholdMap.entrySet().iterator();
+    Map.Entry<Split, OptimalLeafLoss> optimalEntry = iterator.next();
     while(iterator.hasNext()){
-      Map.Entry<RegressionTree.Split, OptimalLeafLoss> nextEntry = iterator.next();
+      Map.Entry<Split, OptimalLeafLoss> nextEntry = iterator.next();
       if(nextEntry.getValue().getMinLoss() < optimalEntry.getValue().getMinLoss())
         optimalEntry = nextEntry;
     }

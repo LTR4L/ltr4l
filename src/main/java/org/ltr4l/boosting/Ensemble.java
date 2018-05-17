@@ -55,15 +55,11 @@ public class Ensemble extends Ranker<Ensemble.TreeConfig> {
       ObjectMapper mapper = new ObjectMapper();
       SavedModel savedModel = mapper.readValue(reader, SavedModel.class);
       assert(savedModel.treeModels.length > 0);
-
       List<RegressionTree> trees = new ArrayList<>();
-
       for(RegressionTree.SavedModel model : savedModel.treeModels){
         trees.add(new RegressionTree(model));
       }
-
       return trees;
-
     } catch(IOException e) {
       throw new RuntimeException();
     }

@@ -26,19 +26,18 @@ import java.util.*;
 
 public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
   private final Split root;
-  private final int numLeaves;
 
   public RegressionTree(int numLeaves, int initFeat, double initThreshold, List<Document> docs) throws InvalidFeatureThresholdException{
     assert(numLeaves >= 2);
-    this.numLeaves = numLeaves;
     root = new Split(initFeat, initThreshold, docs);
     Map<Split, OptimalLeafLoss> splitErrorMap = new HashMap<>();
     for(int l = 2; l < numLeaves; l++) {
       for (Split leaf : root.getTerminalLeaves()) {
-        splitErrorMap.put(leaf, TreeTools.findMinLeafThreshold(leaf.getScoredDocs()));
+        if(!splitErrorMap.containsKey(leaf)) //Speedup: only calculate if it hasnt been done so yet... should be twice
+          splitErrorMap.put(leaf, TreeTools.findMinLeafThreshold(leaf.getScoredDocs()));
       }
       Split optimalLeaf = TreeTools.findOptimalLeaf(splitErrorMap);
-      int feature = splitErrorMap.get(optimalLeaf).getOptimalFeature(); //TODO: feature and threshold should not be in same array.
+      int feature = splitErrorMap.get(optimalLeaf).getOptimalFeature();
       double threshold = splitErrorMap.get(optimalLeaf).getOptimalThreshold();
       optimalLeaf.addSplit(feature, threshold);
       splitErrorMap.remove(optimalLeaf);
@@ -48,11 +47,10 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
   public RegressionTree(SavedModel model){
     int numNodes = model.leafIds.size();
     assert(numNodes > 3);
-    this.numLeaves = (numNodes + 1) / 2;
     root = new Split(null, model.featureIds.get(0), model.thresh.get(0), model.leafIds.get(0), model.scores.get(0));
     Split currentNode = root;
     for(int i = 1; i < numNodes; i++){
-      int currentId = currentNode.leafId;
+      int currentId = currentNode.getLeafId();
       int featId = model.featureIds.get(i);
       double nextThresh = model.thresh.get(i);
       int nextId = model.leafIds.get(i);
@@ -60,16 +58,16 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
 
       if(nextId == 2 * currentId + 1){
         currentNode.setLeftLeaf(new Split(currentNode, featId, nextThresh, nextId, nextScore));
-        currentNode = currentNode.leftLeaf;
+        currentNode = currentNode.getLeftLeaf();
       }
 
       else if(nextId == 2 * currentId + 2){
         currentNode.setRightLeaf(new Split(currentNode, featId, nextThresh, nextId, nextScore));
-        currentNode = currentNode.rightLeaf;
+        currentNode = currentNode.getRightLeaf();
       }
 
       else{
-        currentNode = currentNode.source; //Go back up the tree
+        currentNode = currentNode.getSource(); //Go back up the tree
         i--;
       }
     }
@@ -87,9 +85,12 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
     return info;
   }
 
-
   public List<Split> getTerminalLeaves(){
     return root.getTerminalLeaves();
+  }
+
+  protected Split getRoot() {
+    return root;
   }
 
   @Override
@@ -107,160 +108,6 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
 
   protected SavedModel getSavedModel(){ //"Suppress" config by making null.
     return new SavedModel( getModelInfo(IntProp.FEATURE), getModelInfo(IntProp.ID), getModelInfo(DoubleProp.THRESHOLD), getModelInfo(DoubleProp.SCORE));
-  }
-
-  public static class Split { //Node for trees
-    private Split source;
-    private Split leftLeaf; //TODO: Use List?
-    private Split rightLeaf;
-    private double threshold;
-    private double score;
-    private int featureId;
-    private final List<Document> scoredDocs;
-    private final int leafId;
-
-    protected Split(int featureId, double threshold, List<Document> scoredDocs) throws InvalidFeatureThresholdException { //For root node.
-      this.source = null;
-      this.featureId = featureId;
-      this.threshold = threshold;
-      this.scoredDocs = scoredDocs;
-      score = 0.0d;
-      List<Document> leftDocs = new ArrayList<>();
-      List<Document> rightDocs = new ArrayList<>();
-      for (Document doc : this.scoredDocs) {
-        if (doc.getFeature(featureId) < threshold) leftDocs.add(doc);
-        else rightDocs.add(doc);
-      }
-      leftLeaf = new Split(this, leftDocs, 1);
-      rightLeaf = new Split(this, rightDocs, 2);
-      leafId = 0;
-    }
-
-    protected Split(Split source, List<Document> scoredDocs, int leafId) throws InvalidFeatureThresholdException {
-      if (scoredDocs.isEmpty()) throw new InvalidFeatureThresholdException();
-      this.source = source;
-      this.scoredDocs = scoredDocs;
-      this.leafId = leafId;
-      leftLeaf = null;
-      rightLeaf = null;
-      score = 0.0d;
-      threshold = Double.NEGATIVE_INFINITY;
-      featureId = -1;
-    }
-
-    protected Split(Split source, int featureId, double threshold, int leafId, double score){ //Used when reading model!
-      this.source = source;
-      this.featureId = featureId;
-      this.threshold = threshold;
-      this.leafId = leafId;
-      this.score = score;
-      scoredDocs = new ArrayList<>();
-    }
-
-    protected void addSplit(int feature, double threshold) throws InvalidFeatureThresholdException {
-      this.featureId = feature;
-      this.threshold = threshold;
-      List<Document> leftDocs = new ArrayList<>();
-      List<Document> rightDocs = new ArrayList<>();
-      for (Document doc : this.scoredDocs) {
-        if (doc.getFeature(featureId) < threshold) leftDocs.add(doc);
-        else rightDocs.add(doc);
-      }
-      leftLeaf = new Split(this, leftDocs, 2 * leafId + 1);
-      rightLeaf = new Split(this, rightDocs, (2 * leafId) + 2);
-    }
-
-    protected List<Split> getTerminalLeaves() {
-      List<Split> terminalLeaves = new ArrayList<>();
-      if (!hasDestinations()) {
-        terminalLeaves.add(this);
-        return terminalLeaves;
-      }
-      getDestinations().forEach(leaf -> terminalLeaves.addAll(leaf.getTerminalLeaves()));
-      return terminalLeaves;
-    }
-
-    protected double calculateScore(List<Double> features) {
-      assert (leavesProperlySet());
-      if (!hasDestinations()) return score;
-      Split destination = features.get(featureId) < threshold ? leftLeaf : rightLeaf;
-      return destination.calculateScore(features);
-    }
-
-    protected void fill(List<Double> info, DoubleProp type) {
-      assert (type != null);
-      double prop;
-      if (type == DoubleProp.THRESHOLD)
-        prop = threshold;
-      else //only two DoubleProps...
-        prop = score;
-      info.add(prop);
-      if (hasDestinations()) {
-        for (Split destination : getDestinations()) {
-          destination.fill(info, type);
-        }
-      }
-    }
-
-    protected void fill(List<Integer> info, IntProp type) {
-      assert(type != null);
-      int prop;
-      if (type == IntProp.FEATURE)
-        prop = featureId;
-      else
-        prop = leafId;
-      info.add(prop);
-      if (hasDestinations()) {
-        for (Split destination : getDestinations()) {
-          destination.fill(info, type);
-        }
-      }
-    }
-
-    protected boolean leavesProperlySet() {
-      if(leftLeaf == null && rightLeaf == null) return true;
-      if(leftLeaf != null && rightLeaf != null) return true;
-      return false;
-    }
-
-    protected boolean hasDestinations() {
-      return !(leftLeaf == null && rightLeaf == null);
-    }
-
-    protected List<Split> getDestinations() {
-      List<Split> destinations = new ArrayList<>();
-      destinations.add(leftLeaf);
-      destinations.add(rightLeaf);
-      return destinations;
-    }
-
-    public List<Document> getScoredDocs() {
-      return scoredDocs;
-    }
-
-    public void setSource(Split source) {
-      this.source = source;
-    }
-
-    public void setScore(double score) {
-      this.score = score;
-    }
-
-    public boolean isRoot() {
-      return source == null;
-    }
-
-    public Split getSource() {
-      return source;
-    }
-
-    protected void setLeftLeaf(Split leftLeaf) {
-      this.leftLeaf = leftLeaf;
-    }
-
-    protected void setRightLeaf(Split rightLeaf) {
-      this.rightLeaf = rightLeaf;
-    }
   }
 
   protected enum IntProp {FEATURE, ID}

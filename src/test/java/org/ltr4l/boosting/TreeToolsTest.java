@@ -102,16 +102,16 @@ public class TreeToolsTest {
     leaf3Docs.get(1).setLabel(0);
     leaf3Docs.get(2).setLabel(1);
 
-    RegressionTree.Split leaf1 = new RegressionTree.Split(null, leaf1Docs, 1);
-    RegressionTree.Split leaf2 = new RegressionTree.Split(null, leaf2Docs, 2);
-    RegressionTree.Split leaf3 = new RegressionTree.Split(null, leaf3Docs, 3);
+    Split leaf1 = new Split(null, leaf1Docs, 1);
+    Split leaf2 = new Split(null, leaf2Docs, 2);
+    Split leaf3 = new Split(null, leaf3Docs, 3);
 
-    Map<RegressionTree.Split, OptimalLeafLoss> leafLossMap = new HashMap<>();
+    Map<Split, OptimalLeafLoss> leafLossMap = new HashMap<>();
     leafLossMap.put(leaf1, TreeTools.findMinLeafThreshold(leaf1.getScoredDocs()));
     leafLossMap.put(leaf2, TreeTools.findMinLeafThreshold(leaf2.getScoredDocs()));
     leafLossMap.put(leaf3, TreeTools.findMinLeafThreshold(leaf3.getScoredDocs()));
 
-    RegressionTree.Split optimalLeaf = TreeTools.findOptimalLeaf(leafLossMap);
+    Split optimalLeaf = TreeTools.findOptimalLeaf(leafLossMap);
     Assert.assertEquals(optimalLeaf, leaf2); //TODO: End test here?
     OptimalLeafLoss optLeafLoss = leafLossMap.get(optimalLeaf);
 
@@ -351,7 +351,7 @@ public class TreeToolsTest {
   }
 
 
-  private static List<Document> makeDocsWithFeatures(double[][] docFeats){
+  protected static List<Document> makeDocsWithFeatures(double[][] docFeats){
     List<Document> docs = new ArrayList<>();
     for(double[] features : docFeats){
       Document doc = new Document();
@@ -361,7 +361,7 @@ public class TreeToolsTest {
     return docs;
   }
 
-  private static List<Document> docs(int... labels){
+  protected static List<Document> docs(int... labels){
     List<Document> documents = new ArrayList<>();
     for(int label: labels){
       Document doc = new Document();
