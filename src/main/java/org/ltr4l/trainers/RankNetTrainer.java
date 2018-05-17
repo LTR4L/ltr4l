@@ -36,6 +36,10 @@ import org.ltr4l.tools.Regularization;
  * The implementation of MLPTrainer which uses the
  * RankNet algorithm.
  *
+ * C.J.C. Burges, T. Shaked, E. Renshaw, A. Lazier, M. Deeds, N. Hamilton, G. Hullender: Learning
+ * to Rank using Gradient Descent . Proceedings of the International Conference on Machine
+ * Learning, 2005.
+ *
  */
 public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   protected final List<Document[][]> trainingPairs;

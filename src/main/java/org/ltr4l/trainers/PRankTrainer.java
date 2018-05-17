@@ -37,6 +37,8 @@ import org.ltr4l.tools.Error;
  * The implementation of AbstractTrainer which uses the
  * PRank(Perceptron Ranking) algorithm.
  *
+ * K. Crammer, Y. Singer. Pranking with ranking. In NIPS, pages 641 - 647, 2001.
+ *
  */
 public class PRankTrainer extends AbstractTrainer<PRankTrainer.PRank, Config> {
 

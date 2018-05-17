@@ -32,6 +32,8 @@ import org.ltr4l.tools.Error;
  * The implementation of AbstractTrainer which uses the
  * OAP-BPM algorithm.
  *
+ * E. Harrington: Online ranking/collaborative filtering using the Perceptron algorithm . ICML
+ * 20, 2003.
  */
 public class OAPBPMTrainer extends AbstractTrainer<OAPBPMTrainer.OAPBPMRank, OAPBPMTrainer.OAPBPMConfig> {
   private double maxScore;

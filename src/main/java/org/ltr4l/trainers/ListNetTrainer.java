@@ -34,6 +34,9 @@ import org.ltr4l.tools.Regularization;
  * ListNetTrainer is an extension of AbstractTrainer.
  * Despite note extending MLPTrainer, this trainer
  * trains an MLP network.
+ *
+ * Z. Cao, T. Qin, T. Liu, M. Tsai, and H. Li: Learning to rank: from pairwise approach to listwise
+ * approach . Proceedings of the International Conference on Machine Learning. pp. 129–136, 2007.
  */
 public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
   private double lrRate;
