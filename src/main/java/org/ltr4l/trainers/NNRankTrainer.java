@@ -29,6 +29,10 @@ import org.ltr4l.tools.Regularization;
  * The implementation of MLPTrainer which uses the
  * Neural Network Ranking (NNRank) algorithm.
  *
+ * J. Cheng, Z. Wang, and G. Pollastri: A neural network approach to ordinal regression.
+ * Proceedings of the IEEE International Joint Conference on Neural Networks (IJCNN2008, IEEE
+ * World Congress on Computational Intelligence). IEEE Press, pp. 1279–1284, 2008.
+ *
  */
 public class NNRankTrainer extends MLPTrainer<MLP> {
   private final int outputNodeNumber;

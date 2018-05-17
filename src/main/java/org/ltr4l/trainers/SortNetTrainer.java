@@ -34,6 +34,9 @@ import org.ltr4l.tools.Regularization;
  * The implementation of MLPTrainer which uses the SortNet algorithm.
  * This network trains an MLP network.
  *
+ * L. Rigutini, T. Papini, M. Maggini, and F. Scarselli: SortNet: Learning to Rank by a Neural
+ * Preference Function . IEEE Transactions on Neural Networks, 22, pp. 1368–1380, 2011.
+ *
  */
 public class SortNetTrainer extends AbstractTrainer<SortNetMLP, MLPTrainer.MLPConfig> {
   protected double maxScore;

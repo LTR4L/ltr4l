@@ -30,6 +30,10 @@ import org.ltr4l.tools.Config;
  * FRank can be considered a "midway step" between RankNet
  * and LambdaRank.
  *
+ * C. Burges: From RankNet to LambdaRank to LambdaMART: An overview. Technical Report
+ * MSRTR201082,
+ * Microsoft Research, 2010.
+ *
  */
 public class FRankTrainer extends RankNetTrainer {
 

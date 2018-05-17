@@ -32,6 +32,14 @@ import java.util.stream.Collectors;
 
 import static org.ltr4l.boosting.TreeTools.findMinLossFeat;
 
+/**
+ * CART algorithm, using the lambdas from LambdaRank to
+ * calculate the scores of newly added trees (gradient boosting).
+ *
+ * C. Burges: From RankNet to LambdaRank to LambdaMART: An overview. Technical Report
+ * MSRTR201082,
+ * Microsoft Research, 2010.
+ */
 public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeConfig> {
   private final List<Document> trainingDocs;
   private final List<Document[][]> trainingPairs;

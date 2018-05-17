@@ -32,6 +32,10 @@ import org.ltr4l.tools.Config;
  * LambdaRankTrainer trains the RankNetTrainer's network
  * through a different algorithm, which incorporates
  * ΔNDCG.
+ *
+ * C. Burges: From RankNet to LambdaRank to LambdaMART: An overview. Technical Report
+ * MSRTR201082,
+ * Microsoft Research, 2010.
  * */
 public class LambdaRankTrainer extends RankNetTrainer {
 
