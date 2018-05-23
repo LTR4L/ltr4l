@@ -177,7 +177,7 @@ public class RegressionTreeTest {
         {6, 35, 360}
     };
     List<Document> samples = TreeToolsTest.makeDocsWithFeatures(features);
-    RegressionTree tree = new RegressionTree(3, 1, 40, samples);
+    RegressionTree tree = new RegressionTree(3, 1, 40, samples, 10);
   }
 
 /*  public void assertTree(RegressionTree tree, RegressionTree.SavedModel model) throws Exception{
