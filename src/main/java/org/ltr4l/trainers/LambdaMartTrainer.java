@@ -48,6 +48,7 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
   private final double[][] thresholds;
   private final int numTrees;
   private final int numLeaves;
+  private final int numSteps;
   private final double lrRate;
 
   LambdaMartTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
@@ -58,6 +59,7 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
     numTrees = config.getNumTrees();
     numLeaves = config.getNumLeaves();
     lrRate = config.getLearningRate();
+    numSteps = config.getNumSteps();
 
     featureSortedDocs = new ArrayList<>();
     //{
@@ -175,7 +177,7 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
       double minThreshold = minThresholdLoss[0];
       RegressionTree tree;
       try {
-        tree = new RegressionTree(numLeaves, minLossFeat, minThreshold, trainingDocs);
+        tree = new RegressionTree(numLeaves, minLossFeat, minThreshold, trainingDocs, numSteps);
       }
       catch (InvalidFeatureThresholdException ie) {
         System.out.printf("Valid tree could not be created. Stopping training early at tree %d \n", t - 1);

@@ -27,14 +27,14 @@ import java.util.*;
 public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
   private final Split root;
 
-  public RegressionTree(int numLeaves, int initFeat, double initThreshold, List<Document> docs) throws InvalidFeatureThresholdException{
+  public RegressionTree(int numLeaves, int initFeat, double initThreshold, List<Document> docs, int numSteps) throws InvalidFeatureThresholdException{
     assert(numLeaves >= 2);
     root = new Split(initFeat, initThreshold, docs);
     Map<Split, OptimalLeafLoss> splitErrorMap = new HashMap<>();
     for(int l = 2; l < numLeaves; l++) {
       for (Split leaf : root.getTerminalLeaves()) {
         if(!splitErrorMap.containsKey(leaf)) //Speedup: only calculate if it hasnt been done so yet... should be twice
-          splitErrorMap.put(leaf, TreeTools.findMinLeafThreshold(leaf.getScoredDocs(), 10));
+          splitErrorMap.put(leaf, TreeTools.findMinLeafThreshold(leaf.getScoredDocs(), numSteps));
       }
       Split optimalLeaf = TreeTools.findOptimalLeaf(splitErrorMap);
       int feature = splitErrorMap.get(optimalLeaf).getOptimalFeature();

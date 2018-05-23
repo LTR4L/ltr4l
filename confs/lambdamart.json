@@ -4,7 +4,8 @@
   "verbose": true,
   "params" : {
     "numTrees" : 15,
-    "numLeaves" : 3,
+    "numLeaves" : 4,
+    "numSteps" : 10,
     "learningRate" : 0.05,
     "optimizer" : "adam",
     "weightInit" : "xavier",
