@@ -34,7 +34,7 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
     for(int l = 2; l < numLeaves; l++) {
       for (Split leaf : root.getTerminalLeaves()) {
         if(!splitErrorMap.containsKey(leaf)) //Speedup: only calculate if it hasnt been done so yet... should be twice
-          splitErrorMap.put(leaf, TreeTools.findMinLeafThreshold(leaf.getScoredDocs()));
+          splitErrorMap.put(leaf, TreeTools.findMinLeafThreshold(leaf.getScoredDocs(), 10));
       }
       Split optimalLeaf = TreeTools.findOptimalLeaf(splitErrorMap);
       int feature = splitErrorMap.get(optimalLeaf).getOptimalFeature();

@@ -28,7 +28,7 @@ public class FeatureSortedDocs {
     return new FeatureSortedDocs(TreeTools.orderByFeature(docs, featureToSort), featureToSort);
   }
 
-  public FeatureSortedDocs(List<Document> featureSortedDocs, int sortedFeature){
+  private FeatureSortedDocs(List<Document> featureSortedDocs, int sortedFeature){
     this.featureSortedDocs = featureSortedDocs;
     this.sortedFeature = sortedFeature;
     this.featureSamples = featureSortedDocs.stream().mapToDouble(doc -> doc.getFeature(sortedFeature)).toArray();

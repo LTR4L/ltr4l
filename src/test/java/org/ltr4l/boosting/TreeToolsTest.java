@@ -283,8 +283,9 @@ public class TreeToolsTest {
     Assert.assertEquals(threshLoss[0], 7.5225, 0.01);
     Assert.assertEquals(threshLoss[1], 0, 0.01);
 
+    //Check for default.
     threshLoss = TreeTools.findThreshold(sortedDocs, 5);
-    Assert.assertEquals(threshLoss[0], 6.024, 0.01);
+    Assert.assertEquals(threshLoss[0], 10.0, 0.01);
     Assert.assertEquals(threshLoss[1], 0, 0.01);
 
     //Check for default.

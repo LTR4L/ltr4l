@@ -77,15 +77,17 @@ public class TreeTools {
    * @return
    */
   public static double[] findThreshold(FeatureSortedDocs fSortedDocs, int numSteps){
-    if(numSteps <= 1 || numSteps > fSortedDocs.getFeatureSortedDocs().size())
+    if(numSteps <= 1 || numSteps >= fSortedDocs.getFeatureSortedDocs().size())
       return findThreshold(fSortedDocs);
     double fmin = fSortedDocs.getMinFeature();
     double fmax = fSortedDocs.getMaxFeature();
+    if(fmax == fmin)
+      return new double[]{Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY}; //Skip this
     double step = Math.abs(fmax - fmin) / numSteps;
-    double[] thresholds = new double[numSteps + 1]; //TODO: Remove fmin or fmax from thresholds?
+    double[] thresholds = new double[numSteps + 1];
     thresholds[0] = fmin;
-    for(int i = 1; i < numSteps; i++)
-      thresholds[i] = thresholds[i - 1] + step;
+    for(int i = 1; i <= numSteps; i++)
+      thresholds[i] = thresholds[i - 1] + step; //TODO: make last threshold positive infinity?
 
     List<Document> samples = fSortedDocs.getFeatureSortedDocs();
     double[] featureSamples = fSortedDocs.getFeatureSamples();
@@ -94,7 +96,7 @@ public class TreeTools {
     double minLoss = Double.POSITIVE_INFINITY;
 
     for(double threshold : thresholds){
-      int idx = binaryThresholdSearch(featureSamples, threshold); //TODO: Add if statement fmin or fmax?
+      int idx = binaryThresholdSearch(featureSamples, threshold);
       List<Document> lDocs = new ArrayList<>(samples.subList(0, idx));
       List<Document> rDocs = new ArrayList<>(samples.subList(idx, samples.size()));
       double loss = calcSplitLoss(lDocs) + calcSplitLoss(rDocs);
@@ -108,6 +110,8 @@ public class TreeTools {
 
   public static double[] findThreshold(FeatureSortedDocs featureSortedDocs){
     List<Document> fSortedDocs = featureSortedDocs.getFeatureSortedDocs();
+    if(featureSortedDocs.getMaxFeature() == featureSortedDocs.getMinFeature())
+      return new double[]{Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY}; //Skip this feature
     int feat = featureSortedDocs.getSortedFeature();
 
     int numDocs = fSortedDocs.size();
