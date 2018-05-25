@@ -15,13 +15,22 @@
  */
 package org.ltr4l.boosting;
 
+import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
+import org.ltr4l.tools.Config;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 
-public class WeakLearner {
+public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
   private final int fid;
   private final double threshold;
+  private double alpha;
+
+  public static WeakLearner findWeakLearner(RBDistribution dist, RankBoost rb){ // Here we want to find alpha and criteria for new weak learner
+    throw new UnsupportedOperationException();
+  }
 
   public WeakLearner(int fid, double threshold){
     this.fid = fid;
@@ -29,10 +38,24 @@ public class WeakLearner {
   }
 
   public int calculateScore(List<Double> features){
-    return features.get(fid) < threshold ? 0 :1;
+    return features.get(fid) < threshold ? 0 : 1;
   }
 
   public int getFid() {
     return fid;
+  }
+
+  @Override
+  public void writeModel(RankBoost.RankBoostConfig config, Writer writer) throws IOException {
+
+  }
+
+  @Override
+  public double predict(List<Double> features) {
+    return calculateScore(features);
+  }
+
+  public double getAlpha() {
+    return alpha;
   }
 }

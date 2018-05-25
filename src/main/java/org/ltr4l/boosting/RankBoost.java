@@ -15,5 +15,36 @@
  */
 package org.ltr4l.boosting;
 
-public class RankBoost {
+import org.ltr4l.Ranker;
+import org.ltr4l.tools.Config;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+
+public class RankBoost extends Ranker<RankBoost.RankBoostConfig> {
+  private final List<WeakLearner> learners;
+
+  private RankBoost(){
+    learners = new ArrayList<>();
+  }
+
+  public void addLearner(WeakLearner wl){
+    learners.add(wl);
+  }
+
+  @Override
+  public void writeModel(RankBoostConfig config, Writer writer) throws IOException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public double predict(List<Double> features) {
+    return learners.stream().mapToDouble(wl -> wl.predict(features)).sum();
+  }
+
+  public static class RankBoostConfig extends Config {
+    //Placeholder
+  }
 }
