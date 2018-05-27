@@ -18,6 +18,7 @@ package org.ltr4l.trainers;
 import org.ltr4l.Ranker;
 import org.ltr4l.boosting.RBDistribution;
 import org.ltr4l.boosting.RankBoost;
+import org.ltr4l.boosting.WeakLearner;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.query.RankedDocs;
@@ -69,13 +70,15 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
 
   @Override
   public void train() {
-
-
+    //One iteration of training.
+    WeakLearner wl = WeakLearner.findWeakLearner(distribution, ranker);
+    ranker.addLearner(wl);
+    distribution.update(wl, rTrainingSet);
   }
 
   @Override
-  protected <R extends Ranker> R constructRanker() {
-    return null;
+  protected RankBoost constructRanker() {
+    return new RankBoost();
   }
 
   @Override

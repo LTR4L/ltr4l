@@ -26,7 +26,7 @@ import java.util.List;
 public class RankBoost extends Ranker<RankBoost.RankBoostConfig> {
   private final List<WeakLearner> learners;
 
-  private RankBoost(){
+  public RankBoost(){
     learners = new ArrayList<>();
   }
 

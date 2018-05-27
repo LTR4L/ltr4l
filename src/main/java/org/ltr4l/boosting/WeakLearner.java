@@ -16,8 +16,6 @@
 package org.ltr4l.boosting;
 
 import org.ltr4l.Ranker;
-import org.ltr4l.query.Document;
-import org.ltr4l.tools.Config;
 
 import java.io.IOException;
 import java.io.Writer;

@@ -15,9 +15,7 @@
  */
 package org.ltr4l.boosting;
 
-import org.ltr4l.Ranker;
 import org.ltr4l.query.RankedDocs;
-import org.ltr4l.trainers.RankBoostTrainer;
 
 import java.util.List;
 
@@ -50,15 +48,15 @@ public class RBDistribution {
     for(int i = 0; i < size - 1; i++){
       if(rDocs.getLabel(i) == 0) return D_0; //Speedup. As the list is ranked, there should be no valid pairs after 0.
       for(int j = i + 1; j < size; j++){
-        D_0[i][j] = 1d / correctPairNum;
+        if(rDocs.getLabel(i) > rDocs.getLabel(j))
+          D_0[i][j] = 1d / correctPairNum;
       }
     }
     return D_0;
   }
 
-  public RBDistribution update(RankBoost ranker, List<RankedDocs> queries ){ //TODO: Restrict Ranker type to RankBoost?
+  public RBDistribution update(WeakLearner wl, List<RankedDocs> queries ){ //TODO: Restrict Ranker type to RankBoost?
     double newNormFactor = 0d;
-    WeakLearner wl = WeakLearner.findWeakLearner(this, ranker);
     for(int qid = 0; qid < queries.size(); qid++){
       newNormFactor += updateQuery(wl, qid, queries.get(qid));
     }
@@ -66,7 +64,7 @@ public class RBDistribution {
     return this;
   }
 
-  private double updateQuery(WeakLearner wl, int qid, RankedDocs rankedDocs){ //returns the query normalization factor
+  protected double updateQuery(WeakLearner wl, int qid, RankedDocs rankedDocs){ //returns the query normalization factor
     double newNormFactor = 0d;
     for(int i = 0; i < rankedDocs.size() - 1; i++){
       for(int j = rankedDocs.size(); j >= i + 1; j--){ //Speedup. Go back until equivalent label is reached.

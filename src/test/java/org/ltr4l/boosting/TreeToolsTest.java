@@ -1,8 +1,8 @@
 package org.ltr4l.boosting;
 
 import org.junit.Test;
-
 import org.junit.Assert;
+
 import org.ltr4l.query.Document;
 
 import java.util.ArrayList;
@@ -370,6 +370,13 @@ public class TreeToolsTest {
       documents.add(doc);
     }
     return documents;
+  }
+
+  protected static List<Document> addLabels(List<Document> docList, int... labels){
+    assert(labels.length == docList.size());
+    for(int i = 0; i < docList.size(); i++)
+      docList.get(i).setLabel(labels[i]);
+    return docList;
   }
 
 
