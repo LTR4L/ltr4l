@@ -30,9 +30,10 @@ public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
     throw new UnsupportedOperationException();
   }
 
-  public WeakLearner(int fid, double threshold){
+  public WeakLearner(int fid, double threshold, double alpha){
     this.fid = fid;
     this.threshold = threshold;
+    this.alpha = alpha;
   }
 
   public int calculateScore(List<Double> features){

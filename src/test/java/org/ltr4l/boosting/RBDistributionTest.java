@@ -114,6 +114,29 @@ public class RBDistributionTest {
 
   @Test
   public void testUpdateQuery() throws Exception{
+    RBDistribution distribution = RBDistribution.getInitDist(queries, 24);
+    WeakLearner wl = new WeakLearner(4, 10.0,2);
+    int qid = 0;
+    double newNormFactor = distribution.updateQuery(wl, qid, queries.get(qid));
+    double[][] qDist = distribution.getQueryDist(qid);
+
+    Assert.assertEquals(qDist[0][0], 0d, 0.01);
+    Assert.assertEquals(qDist[0][1], 1d/24 * Math.exp(-2), 0.01);
+    Assert.assertEquals(qDist[0][2], 1d/24 * Math.exp(-2), 0.01);
+    Assert.assertEquals(qDist[0][3], 1d/24 * 1, 0.01);
+    Assert.assertEquals(qDist[0][4], 1d/24 * 1, 0.01);
+    Assert.assertEquals(qDist[1][1], 0d, 0.01);
+    Assert.assertEquals(qDist[1][2], 0d, 0.01);
+    Assert.assertEquals(qDist[1][3], 1d/24 * Math.exp(2), 0.01);
+    Assert.assertEquals(qDist[1][4], 1d/24 * Math.exp(2), 0.01);
+    Assert.assertEquals(qDist[2][2], 0, 0.01);
+    Assert.assertEquals(qDist[2][3], 1d/24 * Math.exp(2), 0.01);
+    Assert.assertEquals(qDist[2][4], 1d/24 * Math.exp(2), 0.01);
+    Assert.assertEquals(qDist[3][3], 0d, 0.01);
+    Assert.assertEquals(qDist[3][4], 0d, 0.01);
+
+    double actualNormFactor = (2d/24 * Math.exp(-2)) + 2d/24 + (4d/24 * Math.exp(2));
+    Assert.assertEquals(newNormFactor, actualNormFactor, 0.01);
   }
 
   public static void assertRankedDocs(RankedDocs rDocs) throws Exception{

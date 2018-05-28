@@ -67,9 +67,9 @@ public class RBDistribution {
   protected double updateQuery(WeakLearner wl, int qid, RankedDocs rankedDocs){ //returns the query normalization factor
     double newNormFactor = 0d;
     for(int i = 0; i < rankedDocs.size() - 1; i++){
-      for(int j = rankedDocs.size(); j >= i + 1; j--){ //Speedup. Go back until equivalent label is reached.
-        if(dist[qid][i][j] == 0) return newNormFactor;
-        dist[qid][i][j] *= wl.getAlpha() * (wl.predict(rankedDocs.get(i).getFeatures()) - wl.predict(rankedDocs.get(j).getFeatures()));
+      for(int j = rankedDocs.size() - 1; j >= i + 1; j--){ //Speedup. Go back until equivalent label is reached.
+        if(dist[qid][i][j] == 0) continue;
+        dist[qid][i][j] *= Math.exp(wl.getAlpha() * (wl.predict(rankedDocs.get(i).getFeatures()) - wl.predict(rankedDocs.get(j).getFeatures())));
         newNormFactor += dist[qid][i][j];
       }
     }
