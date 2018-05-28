@@ -3,10 +3,8 @@ package org.ltr4l.click;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.*;
 
@@ -57,7 +55,7 @@ public class ClickModelConverterTest {
 
   @Test
   public void testGetCMQuery() throws Exception{
-    InputStream inputStream = new FileInputStream("ltr-response-query/test.json");
+    InputStream inputStream = new ByteArrayInputStream(SRC_JSON.getBytes(StandardCharsets.UTF_8));
     OutputStream os = new ByteArrayOutputStream();
     ClickModelConverter.getCMQuery(inputStream, os);
     String json = os.toString();
