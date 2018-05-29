@@ -6,9 +6,7 @@ import org.junit.Test;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.*;
-
-public class ClickModelConverterTest {
+public class CMQueryHandlerTest {
   private static final String SRC_JSON = "{\n" +
       " \"data\": [\n" +
       "   {\n" +
@@ -56,7 +54,7 @@ public class ClickModelConverterTest {
   @Test
   public void testGetCMQuery() throws Exception{
     InputStream inputStream = new ByteArrayInputStream(SRC_JSON.getBytes(StandardCharsets.UTF_8));
-    ClickModelConverter cmc = new ClickModelConverter(inputStream);
+    CMQueryHandler cmc = new CMQueryHandler(inputStream);
     OutputStream os = cmc.getQuery();
     String json = os.toString();
     Assert.assertEquals(TARGET_JSON, json);

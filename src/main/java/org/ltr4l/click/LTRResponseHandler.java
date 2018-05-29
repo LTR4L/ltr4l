@@ -23,10 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class LTRResponseParser {
+public class LTRResponseHandler {
   protected final LTRResponse response;
 
-  protected LTRResponseParser(Reader reader) throws IOException{
+  protected LTRResponseHandler(Reader reader) throws IOException{
     ObjectMapper mapper = new ObjectMapper();
     response = mapper.readValue(reader, LTRResponse.class);
   }

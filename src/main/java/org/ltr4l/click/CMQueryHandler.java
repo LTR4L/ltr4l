@@ -21,10 +21,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.*;
 import java.util.*;
 
-public class ClickModelConverter {
+public class CMQueryHandler {
   private final Map<String,Map<String, Float>> clickRates;
 
-  public ClickModelConverter(InputStream inputStream){
+  public CMQueryHandler(InputStream inputStream){
     Objects.requireNonNull(inputStream);
     List<ImpressionLog> impressionLogList = ClickModels.getInstance().parseImpressionLog(inputStream);
     ClickModelAnalyzer clickModelAnalyzer = new ClickModelAnalyzer();
