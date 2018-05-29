@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class LTRResponseParser {
   protected final LTRResponse response;
@@ -30,7 +31,7 @@ public class LTRResponseParser {
     response = mapper.readValue(reader, LTRResponse.class);
   }
 
-  public Map<String, LTRResponse.Doc[]> getQueryMap(){
+  protected Map<String, LTRResponse.Doc[]> getQueryMap(){
     Map<String, LTRResponse.Doc[]> qMap = new HashMap<>();
     LTRResponse.LQuery[] queries = response.results.result.data.queries;
     for(LTRResponse.LQuery lQuery : queries)
@@ -41,4 +42,19 @@ public class LTRResponseParser {
   public LTRResponse getResponse() {
     return response;
   }
+
+  public Map<String, LTRResponse.Doc[]> mergeClickRates(Map<String, Map<String, Float>> clickrates){
+    Objects.requireNonNull(clickrates);
+    Map<String, LTRResponse.Doc[]> qMap = getQueryMap();
+    for(Map.Entry<String, LTRResponse.Doc[]> entry : qMap.entrySet()){
+      String query = entry.getKey();
+      Map<String, Float> queryCR = Objects.requireNonNull(clickrates.get(query), " qid/query mismatch between query and response. \n");
+      for(LTRResponse.Doc doc : entry.getValue()){
+        Float clickrate = Objects.requireNonNull(queryCR.get(doc.id), "docid mismatch between query and response. \n");
+        doc.setClickrate(clickrate);
+      }
+    }
+    return qMap;
+  }
+
 }

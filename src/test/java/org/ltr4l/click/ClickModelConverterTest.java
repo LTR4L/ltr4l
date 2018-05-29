@@ -56,8 +56,8 @@ public class ClickModelConverterTest {
   @Test
   public void testGetCMQuery() throws Exception{
     InputStream inputStream = new ByteArrayInputStream(SRC_JSON.getBytes(StandardCharsets.UTF_8));
-    OutputStream os = new ByteArrayOutputStream();
-    ClickModelConverter.getCMQuery(inputStream, os);
+    ClickModelConverter cmc = new ClickModelConverter(inputStream);
+    OutputStream os = cmc.getQuery();
     String json = os.toString();
     Assert.assertEquals(TARGET_JSON, json);
   }

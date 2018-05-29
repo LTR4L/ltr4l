@@ -3,14 +3,11 @@ package org.ltr4l.click;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.FileReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
-public class LTRResponseParserTest {
+public class LTRResponseHandlerTest {
   private static final String testJson = "{\n" +
       "    \"responseHeader\": {\n" +
       "        \"QTime\": 6, \n" +
@@ -121,7 +118,7 @@ public class LTRResponseParserTest {
   @Test
   public void getQueryMap() throws Exception{
     Reader reader = new StringReader(testJson);
-    LTRResponseParser parser = new LTRResponseParser(reader);
+    LTRResponseHandler parser = new LTRResponseHandler(reader);
     Map<String, LTRResponse.Doc[]> qMap = parser.getQueryMap();
     LTRResponse.Doc[] docs = qMap.get("ipod");
     Assert.assertEquals(docs.length, 3);

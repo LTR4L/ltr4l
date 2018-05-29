@@ -15,41 +15,50 @@
  */
 package org.ltr4l.click;
 
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class LTRResponse {
   public ResponseHeader responseHeader;
   public Results results;
 
-  public static class ResponseHeader{
+  public static class ResponseHeader {
     public int QTime;
     public int status;
   }
 
-  public static class Results{
+  public static class Results {
     public String command;
     public long procId;
     public Result result;
   }
 
-  public static class Result{
+  public static class Result {
     public Data data;
   }
 
-  public static class Data{
+  public static class Data {
     public String[] feature;
     public LQuery[] queries;
   }
 
-  public static class LQuery{
+  public static class LQuery {
     public Doc[] docs;
     public int qid;
     public String query;
   }
 
-  public static class Doc{
+  public static class Doc {
     public double[] feature;
     public String id;
-  }
+    @JsonIgnore
+    private float clickrate;
 
+    public void setClickrate(float clickrate) {
+      this.clickrate = clickrate;
+    }
+
+    public double getClickrate() {
+      return clickrate;
+    }
+  }
 }
