@@ -16,6 +16,7 @@
 package org.ltr4l.boosting;
 
 import org.ltr4l.Ranker;
+import org.ltr4l.query.RankedDocs;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -26,11 +27,28 @@ public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
   private final double threshold;
   private double alpha;
 
-  public static WeakLearner findWeakLearner(RBDistribution dist, RankBoost rb){ // Here we want to find alpha and criteria for new weak learner
+  public static WeakLearner findWeakLearner(RBDistribution dist, RankBoost rb, List<RankedDocs> queries){ // Here we want to find alpha and criteria for new weak learner
+    //Note: The implementation here uses an approximation; see the third method of 3.2 in the original paper.
+    double[][] potential = calculatePotential(dist, queries);
+
+
     throw new UnsupportedOperationException();
   }
 
-  public WeakLearner(int fid, double threshold, double alpha){
+  public static double[][] calculatePotential(RBDistribution dist, List<RankedDocs> queries){
+    double[][] potential = new double[queries.size()][];
+    for(int qid = 0; qid < queries.size(); qid++){
+      double[][] qDist = dist.getQueryDist(qid);
+      RankedDocs query = queries.get(qid);
+      potential[qid] = new double[query.size()];
+      for(int i = 0; i < query.size(); i++)  //Note: because of how RBDistribution is created, this can be sped up.
+        for(int j = 0; j < query.size(); j++)
+          potential[qid][i] += qDist[i][j] - qDist[j][i];
+    }
+    return potential;
+  }
+
+  protected WeakLearner(int fid, double threshold, double alpha){
     this.fid = fid;
     this.threshold = threshold;
     this.alpha = alpha;

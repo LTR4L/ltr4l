@@ -71,7 +71,7 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
   @Override
   public void train() {
     //One iteration of training.
-    WeakLearner wl = WeakLearner.findWeakLearner(distribution, ranker);
+    WeakLearner wl = WeakLearner.findWeakLearner(distribution, ranker, rTrainingSet);
     ranker.addLearner(wl);
     distribution.update(wl, rTrainingSet);
   }
