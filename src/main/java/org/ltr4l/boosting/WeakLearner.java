@@ -16,21 +16,23 @@
 package org.ltr4l.boosting;
 
 import org.ltr4l.Ranker;
+import org.ltr4l.query.Document;
 import org.ltr4l.query.RankedDocs;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 
 public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
   private final int fid;
   private final double threshold;
   private double alpha;
 
-  public static WeakLearner findWeakLearner(RBDistribution dist, RankBoost rb, List<RankedDocs> queries){ // Here we want to find alpha and criteria for new weak learner
+  public static WeakLearner findWeakLearner(RBDistribution dist, List<RankedDocs> queries, Map<Document, int[]> docMap){ // Here we want to find alpha and criteria for new weak learner
     //Note: The implementation here uses an approximation; see the third method of 3.2 in the original paper.
     double[][] potential = calculatePotential(dist, queries);
-
+    RankBoostTools tools = new RankBoostTools(potential, docMap);
 
     throw new UnsupportedOperationException();
   }

@@ -68,9 +68,10 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
     // ...
     //}
     thresholds = new double[training.getFeatureLength()][2];
+    TreeTools treeTools = new RegressionTreeTools();
     for (int feat = 0; feat < training.getFeatureLength(); feat++) {
       featureSortedDocs.add(FeatureSortedDocs.get(trainingDocs, feat));
-      thresholds[feat] = TreeTools.findThreshold(featureSortedDocs.get(feat));
+      thresholds[feat] = treeTools.findThreshold(featureSortedDocs.get(feat));
     }
   }
 

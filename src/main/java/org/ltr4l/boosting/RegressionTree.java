@@ -31,10 +31,11 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
     assert(numLeaves >= 2);
     root = new Split(initFeat, initThreshold, docs);
     Map<Split, OptimalLeafLoss> splitErrorMap = new HashMap<>();
+    TreeTools treeTools = new RegressionTreeTools();
     for(int l = 2; l < numLeaves; l++) {
       for (Split leaf : root.getTerminalLeaves()) {
         if(!splitErrorMap.containsKey(leaf)) //Speedup: only calculate if it hasnt been done so yet... should be twice
-          splitErrorMap.put(leaf, TreeTools.findMinLeafThreshold(leaf.getScoredDocs(), numSteps));
+          splitErrorMap.put(leaf, treeTools.findMinLeafThreshold(leaf.getScoredDocs(), numSteps));
       }
       Split optimalLeaf = TreeTools.findOptimalLeaf(splitErrorMap);
       int feature = splitErrorMap.get(optimalLeaf).getOptimalFeature();

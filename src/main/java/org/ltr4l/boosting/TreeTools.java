@@ -20,8 +20,56 @@ import org.ltr4l.query.Document;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TreeTools {
-  private TreeTools(){}
+public abstract class TreeTools {
+
+  public TreeTools(){}
+
+  public OptimalLeafLoss findMinThreshold(List<Document> docs, int numSteps){
+    int featureToSplit = 0;
+    FeatureSortedDocs sortedDocs = FeatureSortedDocs.get(docs, featureToSplit);
+    double[] featLoss = findThreshold(sortedDocs, numSteps);
+    for(int featId = 1; featId < sortedDocs.getFeatureLength(); featId++){
+      double[] error = findThreshold(FeatureSortedDocs.get(docs, featId), numSteps);
+      if(error[1] < featLoss[1]){
+        featLoss = error;
+        featureToSplit = featId;
+      }
+    }
+    double loss = featLoss[1];
+    double threshold = featLoss[0];
+    return new OptimalLeafLoss(featureToSplit, threshold, loss);
+  }
+
+  public OptimalLeafLoss findMinThreshold(List<Document> docs){
+    return findMinThreshold(docs, 10); //TODO: Default 10 ok?
+  }
+
+  /**
+   * Finds the best threshold for a given feature.
+   * @param fSortedDocs
+   * @param numSteps
+   * @return
+   */
+  public double[] findThreshold(FeatureSortedDocs fSortedDocs, int numSteps){
+    if(numSteps <= 1 || numSteps >= fSortedDocs.getFeatureSortedDocs().size())
+      return findThreshold(fSortedDocs);
+    double fmin = fSortedDocs.getMinFeature();
+    double fmax = fSortedDocs.getMaxFeature();
+    if(fmax == fmin)
+      return new double[]{Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY}; //Skip this
+    double step = Math.abs(fmax - fmin) / numSteps;
+    double[] thresholds = new double[numSteps + 1];
+    thresholds[0] = fmin;
+    for(int i = 1; i <= numSteps; i++)
+      thresholds[i] = thresholds[i - 1] + step; //TODO: make last threshold positive infinity?
+    return searchThresholds(fSortedDocs, thresholds);
+  }
+
+  public abstract double[] findThreshold(FeatureSortedDocs fSortedDocs);
+  public abstract double calcWLloss(List<Document> subData);
+  public abstract double[] searchThresholds(FeatureSortedDocs fSortedDocs, double[] thresholds);
+
+
   public static List<Document> orderByFeature(List<Document> documents, int feature){
     assert(feature >= 0 && feature < documents.get(0).getFeatureLength());
     return documents.stream().sorted(Comparator.comparingDouble(doc -> doc.getFeature(feature))).collect(Collectors.toCollection(ArrayList::new));
@@ -50,7 +98,7 @@ public class TreeTools {
    * @param numSteps
    * @return
    */
-  public static OptimalLeafLoss findMinLeafThreshold(List<Document> leafDocs, int numSteps){ //Faster than default.
+  public OptimalLeafLoss findMinLeafThreshold(List<Document> leafDocs, int numSteps){ //Faster than default.
     int featureToSplit = 0;
     FeatureSortedDocs sortedDocs = FeatureSortedDocs.get(leafDocs, featureToSplit);
     double[] featLoss = findThreshold(sortedDocs, numSteps);
@@ -66,75 +114,8 @@ public class TreeTools {
     return new OptimalLeafLoss(featureToSplit, threshold, loss);
   }
 
-  public static OptimalLeafLoss findMinLeafThreshold(List<Document> leafDocs){ //Note: this can be slow!
+  public OptimalLeafLoss findMinLeafThreshold(List<Document> leafDocs){ //Note: this can be slow!
     return findMinLeafThreshold(leafDocs, 10);
-  }
-
-  /**
-   * Finds the best threshold for a given feature.
-   * @param fSortedDocs
-   * @param numSteps
-   * @return
-   */
-  public static double[] findThreshold(FeatureSortedDocs fSortedDocs, int numSteps){
-    if(numSteps <= 1 || numSteps >= fSortedDocs.getFeatureSortedDocs().size())
-      return findThreshold(fSortedDocs);
-    double fmin = fSortedDocs.getMinFeature();
-    double fmax = fSortedDocs.getMaxFeature();
-    if(fmax == fmin)
-      return new double[]{Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY}; //Skip this
-    double step = Math.abs(fmax - fmin) / numSteps;
-    double[] thresholds = new double[numSteps + 1];
-    thresholds[0] = fmin;
-    for(int i = 1; i <= numSteps; i++)
-      thresholds[i] = thresholds[i - 1] + step; //TODO: make last threshold positive infinity?
-
-    List<Document> samples = fSortedDocs.getFeatureSortedDocs();
-    double[] featureSamples = fSortedDocs.getFeatureSamples();
-
-    double finalThreshold = fmin;
-    double minLoss = Double.POSITIVE_INFINITY;
-
-    for(double threshold : thresholds){
-      int idx = binaryThresholdSearch(featureSamples, threshold);
-      List<Document> lDocs = new ArrayList<>(samples.subList(0, idx));
-      List<Document> rDocs = new ArrayList<>(samples.subList(idx, samples.size()));
-      double loss = calcSplitLoss(lDocs) + calcSplitLoss(rDocs);
-      if(loss < minLoss){
-        finalThreshold = threshold;
-        minLoss = loss;
-      }
-    }
-    return new double[] {finalThreshold, minLoss};
-  }
-
-  public static double[] findThreshold(FeatureSortedDocs featureSortedDocs){
-    List<Document> fSortedDocs = featureSortedDocs.getFeatureSortedDocs();
-    if(featureSortedDocs.getMaxFeature() == featureSortedDocs.getMinFeature())
-      return new double[]{Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY}; //Skip this feature
-    int feat = featureSortedDocs.getSortedFeature();
-
-    int numDocs = fSortedDocs.size();
-    double threshold = fSortedDocs.get(0).getFeature(feat);
-    double minLoss = Double.POSITIVE_INFINITY;
-    for(int threshId = 0; threshId < numDocs; threshId++ ){
-      //Consider cases where sortedFeature values are the same!
-      if (threshId != numDocs -1 && fSortedDocs.get(threshId).getFeature(feat) == fSortedDocs.get(threshId + 1).getFeature(feat)) continue;
-      List<Document> lDocs = new ArrayList<>(fSortedDocs.subList(0, threshId + 1));
-      List<Document> rDocs = new ArrayList<>(fSortedDocs.subList(threshId + 1, numDocs));
-      double loss = calcSplitLoss(lDocs) + calcSplitLoss(rDocs);
-      if(loss < minLoss){
-        threshold = !rDocs.isEmpty() ? rDocs.get(0).getFeature(feat) : lDocs.get(lDocs.size() - 1).getFeature(feat);
-        minLoss = loss;
-      }
-    }
-    return new double[] {threshold, minLoss};
-  }
-
-  public static double calcSplitLoss(List<Document> subData){
-    if (subData.size() == 0) return 0;
-    double avg = subData.stream().mapToDouble(doc -> doc.getLabel()).sum() / subData.size();
-    return subData.stream().mapToDouble(doc -> Math.pow(doc.getLabel() - avg, 2)).sum();
   }
 
   public static int findMinLossFeat(double[][] thresholds){

@@ -19,6 +19,7 @@ import org.ltr4l.Ranker;
 import org.ltr4l.boosting.RBDistribution;
 import org.ltr4l.boosting.RankBoost;
 import org.ltr4l.boosting.WeakLearner;
+import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.query.RankedDocs;
@@ -27,11 +28,14 @@ import org.ltr4l.tools.Error;
 
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankBoostConfig>{
   private final RBDistribution distribution;
   private final List<RankedDocs> rTrainingSet; //Contains doc lists sorted by label. Queries with no pairs of differing labels should be removed.
+  private final Map<Document, int[]> docMap; //values are {qid, position}
 
   public static int getCorrectPairNumber(RankedDocs docs){
     int correctPairs = 0;
@@ -46,6 +50,8 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
   public RankBoostTrainer(QuerySet training, QuerySet validation, Reader reader, Config override){
     super(training, validation, reader, override);
     rTrainingSet = new ArrayList<>();
+    docMap = new HashMap<>();
+    int qid = 0;
     int correctPairs = 0;
     for(Query query : trainingSet) {
       //Sort into correct rank. This is not just for initialization, but also for later calculation.
@@ -53,7 +59,10 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
       int pairNum = getCorrectPairNumber(rDocs);
       if(pairNum == 0) continue;
       rTrainingSet.add(rDocs);
+      for(int i = 0; i < rDocs.size(); i++)
+        docMap.put(rDocs.get(i), new int[]{qid, i});
       correctPairs += pairNum;
+      qid++;
     }
     distribution = RBDistribution.getInitDist(rTrainingSet, correctPairs);
   }
@@ -71,7 +80,7 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
   @Override
   public void train() {
     //One iteration of training.
-    WeakLearner wl = WeakLearner.findWeakLearner(distribution, ranker, rTrainingSet);
+    WeakLearner wl = WeakLearner.findWeakLearner(distribution, rTrainingSet, docMap);
     ranker.addLearner(wl);
     distribution.update(wl, rTrainingSet);
   }
