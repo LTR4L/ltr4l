@@ -21,8 +21,10 @@ import org.ltr4l.query.RankedDocs;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
   private final int fid;
@@ -33,8 +35,10 @@ public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
     //Note: The implementation here uses an approximation; see the third method of 3.2 in the original paper.
     double[][] potential = calculatePotential(dist, queries);
     RankBoostTools tools = new RankBoostTools(potential, docMap);
-
-    throw new UnsupportedOperationException();
+    List<Document> docs = new ArrayList<>();
+    queries.forEach(docs::addAll);
+    OptimalLeafLoss optloss = tools.findMinLeafThreshold(docs, 10);
+    return new WeakLearner(optloss.getOptimalFeature(), optloss.getOptimalThreshold(), 0.5); //TODO: implement alpha.
   }
 
   public static double[][] calculatePotential(RBDistribution dist, List<RankedDocs> queries){

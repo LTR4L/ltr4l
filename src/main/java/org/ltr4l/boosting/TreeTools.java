@@ -24,26 +24,6 @@ public abstract class TreeTools {
 
   public TreeTools(){}
 
-  public OptimalLeafLoss findMinThreshold(List<Document> docs, int numSteps){
-    int featureToSplit = 0;
-    FeatureSortedDocs sortedDocs = FeatureSortedDocs.get(docs, featureToSplit);
-    double[] featLoss = findThreshold(sortedDocs, numSteps);
-    for(int featId = 1; featId < sortedDocs.getFeatureLength(); featId++){
-      double[] error = findThreshold(FeatureSortedDocs.get(docs, featId), numSteps);
-      if(error[1] < featLoss[1]){
-        featLoss = error;
-        featureToSplit = featId;
-      }
-    }
-    double loss = featLoss[1];
-    double threshold = featLoss[0];
-    return new OptimalLeafLoss(featureToSplit, threshold, loss);
-  }
-
-  public OptimalLeafLoss findMinThreshold(List<Document> docs){
-    return findMinThreshold(docs, 10); //TODO: Default 10 ok?
-  }
-
   /**
    * Finds the best threshold for a given feature.
    * @param fSortedDocs
