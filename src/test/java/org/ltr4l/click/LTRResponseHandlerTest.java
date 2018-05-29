@@ -3,15 +3,15 @@ package org.ltr4l.click;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.FileReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
-public class LTRResponseParserTest {
-  private static final String testJson = "{\n" +
+public class LTRResponseHandlerTest {
+  private static final String testResponse = "{\n" +
       "    \"responseHeader\": {\n" +
       "        \"QTime\": 6, \n" +
       "        \"status\": 0\n" +
@@ -118,10 +118,165 @@ public class LTRResponseParserTest {
       "    }\n" +
       "}";
 
+  private static final String SRC_JSON = "{\n" +
+      " \"data\": [\n" +
+      "   {\n" +
+      "     \"query\": \"iPhone\",\n" +
+      "     \"impressions\": [ \"docA\", \"docB\", \"docC\", \"docD\", \"docE\" ],\n" +
+      "     \"clicks\": [ \"docA\", \"docC\" ]\n" +
+      "   },\n" +
+      "   {\n" +
+      "     \"query\": \"iPhone\",\n" +
+      "     \"impressions\": [ \"docA\", \"docB\", \"docC\", \"docD\", \"docE\" ],\n" +
+      "     \"clicks\": [ \"docA\" ]\n" +
+      "   },\n" +
+      "   {\n" +
+      "     \"query\": \"Android\",\n" +
+      "     \"impressions\": [ \"docA\", \"docB\", \"docC\", \"docD\", \"docE\" ],\n" +
+      "     \"clicks\": [ \"docD\", \"docC\", \"docD\" ]\n" +
+      "   },\n" +
+      "   {\n" +
+      "     \"query\": \"Android\",\n" +
+      "     \"impressions\": [ \"docA\", \"docB\", \"docC\", \"docD\", \"docE\" ],\n" +
+      "     \"clicks\": [ \"docA\" ]\n" +
+      "   },\n" +
+      "   {\n" +
+      "     \"query\": \"Android\",\n" +
+      "     \"impressions\": [ \"docA\", \"docB\", \"docC\", \"docD\", \"docE\" ],\n" +
+      "     \"clicks\": []\n" +
+      "   }\n" +
+      " ]\n" +
+      "}";
+
+  private static final String RESPONSE_JSON = "{\n" +
+      "  \"responseHeader\": {\n" +
+      "    \"QTime\": 6,\n" +
+      "    \"status\": 0\n" +
+      "  },\n" +
+      "  \"results\": {\n" +
+      "    \"command\": \"download\",\n" +
+      "    \"procId\": 1476600502540,\n" +
+      "    \"result\": {\n" +
+      "      \"data\": {\n" +
+      "        \"feature\": [\n" +
+      "          \"TF in name\",\n" +
+      "          \"TF in features\",\n" +
+      "          \"IDF in name\",\n" +
+      "          \"IDF in features\"\n" +
+      "        ],\n" +
+      "        \"queries\": [\n" +
+      "          {\n" +
+      "            \"docs\": [\n" +
+      "              {\n" +
+      "                \"feature\": [\n" +
+      "                  1,\n" +
+      "                  0,\n" +
+      "                  2.397895,\n" +
+      "                  3.496508\n" +
+      "                ],\n" +
+      "                \"id\": \"docA\"\n" +
+      "              },\n" +
+      "              {\n" +
+      "                \"feature\": [\n" +
+      "                  2,\n" +
+      "                  1,\n" +
+      "                  2.397895,\n" +
+      "                  3.496508\n" +
+      "                ],\n" +
+      "                \"id\": \"docB\"\n" +
+      "              },\n" +
+      "              {\n" +
+      "                \"feature\": [\n" +
+      "                  1,\n" +
+      "                  0,\n" +
+      "                  2.397895,\n" +
+      "                  3.496508\n" +
+      "                ],\n" +
+      "                \"id\": \"docC\"\n" +
+      "              },\n" +
+      "              {\n" +
+      "                \"feature\": [\n" +
+      "                  1,\n" +
+      "                  0,\n" +
+      "                  2.397895,\n" +
+      "                  3.496508\n" +
+      "                ],\n" +
+      "                \"id\": \"docD\"\n" +
+      "              },\n" +
+      "              {\n" +
+      "                \"feature\": [\n" +
+      "                  1,\n" +
+      "                  0,\n" +
+      "                  2.397895,\n" +
+      "                  3.496508\n" +
+      "                ],\n" +
+      "                \"id\": \"docE\"\n" +
+      "              }\n" +
+      "            ],\n" +
+      "            \"qid\": 0,\n" +
+      "            \"query\": \"iPhone\"\n" +
+      "          },\n" +
+      "          {\n" +
+      "            \"docs\": [\n" +
+      "              {\n" +
+      "                \"feature\": [\n" +
+      "                  1,\n" +
+      "                  0,\n" +
+      "                  2.397895,\n" +
+      "                  2.80336\n" +
+      "                ],\n" +
+      "                \"id\": \"docA\"\n" +
+      "              },\n" +
+      "              {\n" +
+      "                \"feature\": [\n" +
+      "                  1,\n" +
+      "                  0,\n" +
+      "                  2.397895,\n" +
+      "                  2.80336\n" +
+      "                ],\n" +
+      "                \"id\": \"docB\"\n" +
+      "              },\n" +
+      "              {\n" +
+      "                \"feature\": [\n" +
+      "                  1,\n" +
+      "                  0,\n" +
+      "                  2.397895,\n" +
+      "                  2.80336\n" +
+      "                ],\n" +
+      "                \"id\": \"docC\"\n" +
+      "              },\n" +
+      "              {\n" +
+      "                \"feature\": [\n" +
+      "                  0,\n" +
+      "                  3,\n" +
+      "                  2.397895,\n" +
+      "                  2.80336\n" +
+      "                ],\n" +
+      "                \"id\": \"docD\"\n" +
+      "              },\n" +
+      "              {\n" +
+      "                \"feature\": [\n" +
+      "                  0,\n" +
+      "                  1,\n" +
+      "                  2.397895,\n" +
+      "                  2.80336\n" +
+      "                ],\n" +
+      "                \"id\": \"docE\"\n" +
+      "              }\n" +
+      "            ],\n" +
+      "            \"qid\": 1,\n" +
+      "            \"query\": \"Android\"\n" +
+      "          }\n" +
+      "        ]\n" +
+      "      }\n" +
+      "    }\n" +
+      "  }\n" +
+      "}";
+
   @Test
-  public void getQueryMap() throws Exception{
-    Reader reader = new StringReader(testJson);
-    LTRResponseParser parser = new LTRResponseParser(reader);
+  public void testGetQueryMap() throws Exception{
+    Reader reader = new StringReader(testResponse);
+    LTRResponseHandler parser = new LTRResponseHandler(reader);
     Map<String, LTRResponse.Doc[]> qMap = parser.getQueryMap();
     LTRResponse.Doc[] docs = qMap.get("ipod");
     Assert.assertEquals(docs.length, 3);
@@ -183,5 +338,22 @@ public class LTRResponseParserTest {
     Assert.assertEquals(doc.feature[1], 1, 0.01);
     Assert.assertEquals(doc.feature[2], 2.397895, 0.01);
     Assert.assertEquals(doc.feature[3], 2.80336, 0.01);
+  }
+
+  @Test
+  public void testMergeClickRates() throws Exception{
+    InputStream inputStream = new ByteArrayInputStream(SRC_JSON.getBytes(StandardCharsets.UTF_8));
+    CMQueryHandler cmc = new CMQueryHandler(inputStream);
+    LTRResponseHandler lrh = new LTRResponseHandler(new StringReader(RESPONSE_JSON));
+    Map<String, Map<String, Float>> clickRates = cmc.getClickRates();
+
+    Map<String, LTRResponse.Doc[]> mcr = lrh.mergeClickRates(clickRates);
+    LTRResponse.Doc[] docs = mcr.get("iPhone");
+    for(LTRResponse.Doc doc : docs)
+      Assert.assertEquals((float)clickRates.get("iPhone").get(doc.id), doc.getClickrate(), 0.01);
+
+    docs = mcr.get("Android");
+    for(LTRResponse.Doc doc : docs)
+      Assert.assertEquals((float)clickRates.get("Android").get(doc.id), doc.getClickrate(), 0.01);
   }
 }

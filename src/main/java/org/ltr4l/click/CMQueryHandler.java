@@ -19,25 +19,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class ClickModelConverter {
+public class CMQueryHandler {
+  private final Map<String,Map<String, Float>> clickRates;
 
-  public static void getCMQuery(InputStream inputStream, OutputStream outputStream) throws IOException{
+  public CMQueryHandler(InputStream inputStream){
+    Objects.requireNonNull(inputStream);
     List<ImpressionLog> impressionLogList = ClickModels.getInstance().parseImpressionLog(inputStream);
     ClickModelAnalyzer clickModelAnalyzer = new ClickModelAnalyzer();
-    Map<String, Map<String, Float>> clickRates = clickModelAnalyzer.calcClickRate(impressionLogList);
+    clickRates = clickModelAnalyzer.calcClickRate(impressionLogList);
+  }
+
+  public OutputStream getQuery() throws IOException{
+    return getQuery(new ByteArrayOutputStream());
+  }
+
+  public OutputStream getQuery(OutputStream outputStream) throws IOException{
     CMQueries cmq = new CMQueries(clickRates);
     ObjectMapper mapper = new ObjectMapper();
     mapper.enable(SerializationFeature.INDENT_OUTPUT);
     mapper.writeValue(outputStream, cmq);
+    return outputStream;
   }
 
-  public static void getCMQuery(InputStream inputStream) throws IOException{
-    getCMQuery(inputStream, new ByteArrayOutputStream());
+  public Map<String, Map<String, Float>> getClickRates() {
+    return clickRates;
   }
 
   public static class CMQueries {
