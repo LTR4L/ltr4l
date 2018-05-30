@@ -15,6 +15,7 @@
  */
 package org.ltr4l.boosting;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.ltr4l.Ranker;
 import org.ltr4l.tools.Config;
 
@@ -45,6 +46,7 @@ public class RankBoost extends Ranker<RankBoost.RankBoostConfig> {
   }
 
   public static class RankBoostConfig extends Config {
-    //Placeholder
+    @JsonIgnore
+    public int getNumSteps() { return getInt(params, "numSteps", 0); } //TODO: OK default value?
   }
 }

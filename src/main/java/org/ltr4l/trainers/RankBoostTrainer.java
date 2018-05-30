@@ -61,7 +61,7 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
   @Override
   public void train() {
     //One iteration of training.
-    WeakLearner wl = WeakLearner.findWeakLearner(distribution, rTrainingSet);
+    WeakLearner wl = WeakLearner.findWeakLearner(distribution, rTrainingSet, config.getNumSteps());
     ranker.addLearner(wl);
     distribution.update(wl, rTrainingSet);
   }
@@ -72,8 +72,12 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
   }
 
   @Override
-  public <C extends Config> Class<C> getConfigClass() {
-    return null;
+  public Class<RankBoost.RankBoostConfig> getConfigClass() {
+    return getCC();
+  }
+
+  public static Class<RankBoost.RankBoostConfig> getCC(){
+    return RankBoost.RankBoostConfig.class;
   }
 
 }

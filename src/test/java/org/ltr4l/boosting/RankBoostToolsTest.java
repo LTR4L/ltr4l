@@ -85,33 +85,33 @@ public class RankBoostToolsTest {
 
     double[] thresholds = rbt.makeStepThresholds(fsd.getMinFeature(), fsd.getMaxFeature(), 3);
     double[] threshLossq = rbt.searchStepThresholds(fsd, thresholds);
-    Assert.assertEquals(threshLossq[0], 16.8, 0.01);
-    Assert.assertEquals(threshLossq[1], 4d/3, 0.01);
-    Assert.assertEquals(threshLossq[2], 1.0, 0.01);
+    Assert.assertEquals(16.8, threshLossq[0], 0.01);
+    Assert.assertEquals(4d/3, threshLossq[1], 0.01);
+    Assert.assertEquals(1.0, threshLossq[2], 0.01);
 
     thresholds = rbt.makeStepThresholds(fsd.getMinFeature(), fsd.getMaxFeature(), 2);
     threshLossq = rbt.searchStepThresholds(fsd, thresholds);
-    Assert.assertEquals(threshLossq[0], 24.7, 0.01);
-    Assert.assertEquals(threshLossq[1], 8d/5, 0.01);
-    Assert.assertEquals(threshLossq[2], 1.0, 0.01);
+    Assert.assertEquals(24.7, threshLossq[0], 0.01);
+    Assert.assertEquals(8d/5, threshLossq[1], 0.01);
+    Assert.assertEquals(1.0, threshLossq[2], 0.01);
 
     thresholds = rbt.makeStepThresholds(fsd.getMinFeature(), fsd.getMaxFeature(), 4);
     threshLossq = rbt.searchStepThresholds(fsd, thresholds);
-    Assert.assertEquals(threshLossq[0], 12.85, 0.01);
-    Assert.assertEquals(threshLossq[1], 4d/3, 0.01);
-    Assert.assertEquals(threshLossq[2], 1.0, 0.01);
+    Assert.assertEquals(12.85, threshLossq[0], 0.01);
+    Assert.assertEquals(4d/3, threshLossq[1], 0.01);
+    Assert.assertEquals(1.0, threshLossq[2], 0.01);
 
     thresholds = rbt.makeStepThresholds(fsd.getMinFeature(), fsd.getMaxFeature(), 5);
     threshLossq = rbt.searchStepThresholds(fsd, thresholds);
-    Assert.assertEquals(threshLossq[0], 10.48, 0.01);
-    Assert.assertEquals(threshLossq[1], 4d/3, 0.01);
-    Assert.assertEquals(threshLossq[2], 1.0, 0.01);
+    Assert.assertEquals(10.48, threshLossq[0], 0.01);
+    Assert.assertEquals(4d/3, threshLossq[1], 0.01);
+    Assert.assertEquals(1.0, threshLossq[2], 0.01);
 
     thresholds = rbt.makeStepThresholds(fsd.getMinFeature(), fsd.getMaxFeature(), 6);
     threshLossq = rbt.searchStepThresholds(fsd, thresholds);
-    Assert.assertEquals(threshLossq[0], 8.9, 0.01);
-    Assert.assertEquals(threshLossq[1], 4d/3, 0.01);
-    Assert.assertEquals(threshLossq[2], 1.0, 0.01);
+    Assert.assertEquals(8.9, threshLossq[0], 0.01);
+    Assert.assertEquals(4d/3, threshLossq[1], 0.01);
+    Assert.assertEquals(1.0, threshLossq[2], 0.01);
 
     //Default
     OptimalLeafLoss oml = rbt.findMinLeafThreshold(allDocs, 15);
