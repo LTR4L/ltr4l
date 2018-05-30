@@ -38,10 +38,12 @@ public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
     List<Document> docs = new ArrayList<>();
     queries.forEach(docs::addAll);
     OptimalLeafLoss optloss = tools.findMinLeafThreshold(docs, 10);
-    return new WeakLearner(optloss.getOptimalFeature(), optloss.getOptimalThreshold(), 0.5); //TODO: implement alpha.
+    double r = 1 / optloss.getMinLoss();
+    double alpha = 0.5 * Math.log((1 + r) / (1 - r));
+    return new WeakLearner(optloss.getOptimalFeature(), optloss.getOptimalThreshold(), alpha);
   }
 
-  public static double[][] calculatePotential(RBDistribution dist, List<RankedDocs> queries){
+  protected static double[][] calculatePotential(RBDistribution dist, List<RankedDocs> queries){
     double[][] potential = new double[queries.size()][];
     for(int qid = 0; qid < queries.size(); qid++){
       double[][] qDist = dist.getQueryDist(qid);

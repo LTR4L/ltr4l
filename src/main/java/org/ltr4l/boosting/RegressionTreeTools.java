@@ -48,7 +48,7 @@ public class RegressionTreeTools extends TreeTools {
   }
 
   @Override
-  public double[] searchThresholds(FeatureSortedDocs fSortedDocs, double[] thresholds){
+  protected double[] searchThresholds(FeatureSortedDocs fSortedDocs, double[] thresholds){
     double[] featureSamples = fSortedDocs.getFeatureSamples();
     List<Document> samples = fSortedDocs.getFeatureSortedDocs();
     double finalThreshold = thresholds[0]; //minimum feature
@@ -56,8 +56,8 @@ public class RegressionTreeTools extends TreeTools {
 
     for(double threshold : thresholds){
       int idx = binaryThresholdSearch(featureSamples, threshold);
-      List<Document> lDocs = new ArrayList<>(samples.subList(0, idx));
-      List<Document> rDocs = new ArrayList<>(samples.subList(idx, samples.size()));
+      List<Document> lDocs = samples.subList(0, idx);
+      List<Document> rDocs = samples.subList(idx, samples.size());
       double loss = calcWLloss(lDocs) + calcWLloss(rDocs);
       if(loss < minLoss){
         finalThreshold = threshold;
@@ -67,7 +67,7 @@ public class RegressionTreeTools extends TreeTools {
     return new double[] {finalThreshold, minLoss};
   }
 
-  public double calcWLloss(List<Document> subData){
+  protected double calcWLloss(List<Document> subData){
     if (subData.size() == 0) return 0;
     double avg = subData.stream().mapToDouble(doc -> doc.getLabel()).sum() / subData.size();
     return subData.stream().mapToDouble(doc -> Math.pow(doc.getLabel() - avg, 2)).sum();

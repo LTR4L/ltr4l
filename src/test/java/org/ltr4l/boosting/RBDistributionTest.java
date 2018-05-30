@@ -7,6 +7,7 @@ import org.ltr4l.query.Document;
 import org.ltr4l.query.RankedDocs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -106,6 +107,9 @@ public class RBDistributionTest {
     Assert.assertEquals(qDist[3][3], 0d, 0.01);
     Assert.assertEquals(qDist[3][4], 0d, 0.01);
 
+    //Finally, test distribution sum.
+    double sum = sumDistribution(distribution.getFullDist());
+    Assert.assertEquals(1d, sum, 0.01);
   }
 
   @Test
@@ -145,5 +149,9 @@ public class RBDistributionTest {
       assert(doc.getLabel() <= label);
       label = doc.getLabel();
     }
+  }
+
+  public static double sumDistribution(double[][][] distribution){
+    return Arrays.stream(distribution).mapToDouble(q -> Arrays.stream(q).mapToDouble(d1 -> Arrays.stream(d1).sum()).sum()).sum();
   }
 }

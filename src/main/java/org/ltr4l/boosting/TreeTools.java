@@ -46,8 +46,8 @@ public abstract class TreeTools {
   }
 
   public abstract double[] findThreshold(FeatureSortedDocs fSortedDocs);
-  public abstract double calcWLloss(List<Document> subData);
-  public abstract double[] searchThresholds(FeatureSortedDocs fSortedDocs, double[] thresholds);
+  protected abstract double calcWLloss(List<Document> subData);
+  protected abstract double[] searchThresholds(FeatureSortedDocs fSortedDocs, double[] thresholds);
 
 
   public static List<Document> orderByFeature(List<Document> documents, int feature){
