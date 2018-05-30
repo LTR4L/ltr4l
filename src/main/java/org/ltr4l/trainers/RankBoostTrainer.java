@@ -35,36 +35,17 @@ import java.util.Map;
 public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankBoostConfig>{
   private final RBDistribution distribution;
   private final List<RankedDocs> rTrainingSet; //Contains doc lists sorted by label. Queries with no pairs of differing labels should be removed.
-  private final Map<Document, int[]> docMap; //values are {qid, position}
 
-  public static int getCorrectPairNumber(RankedDocs docs){
-    int correctPairs = 0;
-    for(int i = 0; i < docs.size() - 1; i++){
-      if(docs.getLabel(i) == 0) return correctPairs;
-      for(int j = docs.size(); j >= i + 1 && docs.getLabel(i) > docs.getLabel(j); j--){ //Go backwards until first label match
-        correctPairs++;
-      }
-    }
-    return correctPairs;
-  }
   public RankBoostTrainer(QuerySet training, QuerySet validation, Reader reader, Config override){
     super(training, validation, reader, override);
     rTrainingSet = new ArrayList<>();
-    docMap = new HashMap<>();
-    int qid = 0;
-    int correctPairs = 0;
     for(Query query : trainingSet) {
       //Sort into correct rank. This is not just for initialization, but also for later calculation.
       RankedDocs rDocs = new RankedDocs(query.getDocList());
-      int pairNum = getCorrectPairNumber(rDocs);
-      if(pairNum == 0) continue;
+      if(rDocs.getLabel(0) == rDocs.getLabel(rDocs.size() - 1)) continue;
       rTrainingSet.add(rDocs);
-      for(int i = 0; i < rDocs.size(); i++)
-        docMap.put(rDocs.get(i), new int[]{qid, i});
-      correctPairs += pairNum;
-      qid++;
     }
-    distribution = RBDistribution.getInitDist(rTrainingSet, correctPairs);
+    distribution = RBDistribution.getInitDist(rTrainingSet);
   }
 
   @Override
@@ -80,7 +61,7 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
   @Override
   public void train() {
     //One iteration of training.
-    WeakLearner wl = WeakLearner.findWeakLearner(distribution, rTrainingSet, docMap);
+    WeakLearner wl = WeakLearner.findWeakLearner(distribution, rTrainingSet);
     ranker.addLearner(wl);
     distribution.update(wl, rTrainingSet);
   }

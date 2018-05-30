@@ -48,7 +48,7 @@ public class RegressionTreeTools extends TreeTools {
   }
 
   @Override
-  protected double[] searchThresholds(FeatureSortedDocs fSortedDocs, double[] thresholds){
+  protected double[] searchStepThresholds(FeatureSortedDocs fSortedDocs, double[] thresholds){
     double[] featureSamples = fSortedDocs.getFeatureSamples();
     List<Document> samples = fSortedDocs.getFeatureSortedDocs();
     double finalThreshold = thresholds[0]; //minimum feature

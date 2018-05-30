@@ -36,18 +36,23 @@ public abstract class TreeTools {
     double fmin = fSortedDocs.getMinFeature();
     double fmax = fSortedDocs.getMaxFeature();
     if(fmax == fmin)
-      return new double[]{Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY}; //Skip this
+      return new double[]{Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY}; //skip this feature
+    double[] thresholds = makeStepThresholds(fmin, fmax, numSteps);
+    return searchStepThresholds(fSortedDocs, thresholds);
+  }
+
+  protected double[] makeStepThresholds(double fmin, double fmax, int numSteps){
     double step = Math.abs(fmax - fmin) / numSteps;
     double[] thresholds = new double[numSteps + 1];
     thresholds[0] = fmin;
     for(int i = 1; i <= numSteps; i++)
       thresholds[i] = thresholds[i - 1] + step; //TODO: make last threshold positive infinity?
-    return searchThresholds(fSortedDocs, thresholds);
+    return thresholds;
   }
 
   public abstract double[] findThreshold(FeatureSortedDocs fSortedDocs);
   protected abstract double calcWLloss(List<Document> subData);
-  protected abstract double[] searchThresholds(FeatureSortedDocs fSortedDocs, double[] thresholds);
+  protected abstract double[] searchStepThresholds(FeatureSortedDocs fSortedDocs, double[] thresholds);
 
 
   public static List<Document> orderByFeature(List<Document> documents, int feature){

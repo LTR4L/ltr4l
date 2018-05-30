@@ -16,6 +16,7 @@
 package org.ltr4l.boosting;
 
 import org.ltr4l.query.RankedDocs;
+import org.ltr4l.trainers.RankBoostTrainer;
 
 import java.util.List;
 
@@ -23,17 +24,42 @@ public class RBDistribution {
   private final double[][][] dist;
   private double normFactor;
 
-
-  public static RBDistribution getInitDist(List<RankedDocs> rQueries, int correctPairNum){
+  public static RBDistribution getInitDist(List<RankedDocs> rQueries){
+    int correctPairNum = 0;
+    for(RankedDocs query : rQueries)
+      correctPairNum += getCorrectPairNumber(query);
     RBDistribution iDist = new RBDistribution(rQueries.size());
     iDist.initialize(rQueries, correctPairNum);
     return iDist;
+  }
+
+  public static int getCorrectPairNumber(RankedDocs docs){
+    int correctPairs = 0;
+    for(int i = 0; i < docs.size() - 1; i++){
+      if(docs.getLabel(i) == 0) return correctPairs;
+      for(int j = docs.size() - 1; j >= i + 1 && docs.getLabel(i) > docs.getLabel(j); j--){ //Go backwards until first label match
+        correctPairs++;
+      }
+    }
+    return correctPairs;
   }
 
 
   protected RBDistribution(int queryNum){
     dist = new double[queryNum][][];
     normFactor = 1d; //normFactor will change depending on iteration of the distribution. Initially, it should be 1.
+  }
+
+  protected double[][] calcPotential(){
+    double[][] potential = new double[dist.length][];
+    for(int qid = 0; qid < dist.length; qid++){
+      double[][] qDist = getQueryDist(qid);
+      potential[qid] = new double[qDist.length];
+      for(int i = 0; i < qDist.length; i++)  //Note: because of how RBDistribution is created, this can be sped up.
+        for(int j = 0; j < qDist.length; j++)
+          potential[qid][i] += qDist[j][i] - qDist[i][j];
+    }
+    return potential;
   }
 
   private void initialize(List<RankedDocs> rQueries, int correctPairNum){

@@ -35,16 +35,16 @@ public class RBDistributionTest {
     Random random = new Random();
 
     for(double[] document : docs)
-      for(double feature : document)
-        feature *= random.nextDouble();
+      for(int i = 0; i < document.length; i++)
+        document[i] *= random.nextDouble();
     docList = makeDocsWithFeatures(docs);
     addLabels(docList, labels);
     RankedDocs rDocs2 = new RankedDocs(docList);
     assertRankedDocs(rDocs2);
 
     for(double[] document : docs)
-      for(double feature : document)
-        feature *= 10 * random.nextDouble();
+      for(int i = 0; i < document.length; i++)
+        document[i] *= 10 * random.nextDouble();
     docList = makeDocsWithFeatures(docs);
     addLabels(docList, labels);
     RankedDocs rDocs3 = new RankedDocs(docList);
@@ -58,7 +58,7 @@ public class RBDistributionTest {
 
   @Test
   public void testGetInitDist() throws Exception{
-    RBDistribution distribution = RBDistribution.getInitDist(queries, 24);
+    RBDistribution distribution = RBDistribution.getInitDist(queries);
     double[][] qDist = distribution.getQueryDist(0);
     Assert.assertEquals(qDist[0][0], 0d, 0.01);
     Assert.assertEquals(qDist[0][1], 1d/24, 0.01);
@@ -118,7 +118,7 @@ public class RBDistributionTest {
 
   @Test
   public void testUpdateQuery() throws Exception{
-    RBDistribution distribution = RBDistribution.getInitDist(queries, 24);
+    RBDistribution distribution = RBDistribution.getInitDist(queries);
     WeakLearner wl = new WeakLearner(4, 10.0,2);
     int qid = 0;
     double newNormFactor = distribution.updateQuery(wl, qid, queries.get(qid));
@@ -141,6 +141,29 @@ public class RBDistributionTest {
 
     double actualNormFactor = (2d/24 * Math.exp(-2)) + 2d/24 + (4d/24 * Math.exp(2));
     Assert.assertEquals(newNormFactor, actualNormFactor, 0.01);
+  }
+
+  @Test
+  public void testCalcPotential() throws Exception{
+    RBDistribution dist = RBDistribution.getInitDist(queries);
+    double[][] potential = dist.calcPotential();
+    Assert.assertEquals(-1d/6, potential[0][0], 0.01);
+    Assert.assertEquals(-1d/24, potential[0][1], 0.01);
+    Assert.assertEquals(-1d/24, potential[0][2], 0.01);
+    Assert.assertEquals(1d/8, potential[0][3], 0.01);
+    Assert.assertEquals(1d/8, potential[0][4], 0.01);
+
+    Assert.assertEquals(-1d/6, potential[1][0], 0.01);
+    Assert.assertEquals(-1d/24, potential[1][1], 0.01);
+    Assert.assertEquals(-1d/24, potential[1][2], 0.01);
+    Assert.assertEquals(1d/8, potential[1][3], 0.01);
+    Assert.assertEquals(1d/8, potential[1][4], 0.01);
+
+    Assert.assertEquals(-1d/6, potential[2][0], 0.01);
+    Assert.assertEquals(-1d/24, potential[2][1], 0.01);
+    Assert.assertEquals(-1d/24, potential[2][2], 0.01);
+    Assert.assertEquals(1d/8, potential[2][3], 0.01);
+    Assert.assertEquals(1d/8, potential[2][4], 0.01);
   }
 
   public static void assertRankedDocs(RankedDocs rDocs) throws Exception{

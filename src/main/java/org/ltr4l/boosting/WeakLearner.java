@@ -23,18 +23,16 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
   private final int fid;
   private final double threshold;
   private double alpha;
 
-  public static WeakLearner findWeakLearner(RBDistribution dist, List<RankedDocs> queries, Map<Document, int[]> docMap){ // Here we want to find alpha and criteria for new weak learner
+  public static WeakLearner findWeakLearner(RBDistribution dist, List<RankedDocs> queries){ // Here we want to find alpha and criteria for new weak learner
     //Note: The implementation here uses an approximation; see the third method of 3.2 in the original paper.
-    double[][] potential = calculatePotential(dist, queries);
-    RankBoostTools tools = new RankBoostTools(potential, docMap);
+    double[][] potential = dist.calcPotential();
+    RankBoostTools tools = new RankBoostTools(potential, queries);
     List<Document> docs = new ArrayList<>();
     queries.forEach(docs::addAll);
     OptimalLeafLoss optloss = tools.findMinLeafThreshold(docs, 10);
@@ -43,18 +41,6 @@ public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
     return new WeakLearner(optloss.getOptimalFeature(), optloss.getOptimalThreshold(), alpha);
   }
 
-  protected static double[][] calculatePotential(RBDistribution dist, List<RankedDocs> queries){
-    double[][] potential = new double[queries.size()][];
-    for(int qid = 0; qid < queries.size(); qid++){
-      double[][] qDist = dist.getQueryDist(qid);
-      RankedDocs query = queries.get(qid);
-      potential[qid] = new double[query.size()];
-      for(int i = 0; i < query.size(); i++)  //Note: because of how RBDistribution is created, this can be sped up.
-        for(int j = 0; j < query.size(); j++)
-          potential[qid][i] += qDist[i][j] - qDist[j][i];
-    }
-    return potential;
-  }
 
   protected WeakLearner(int fid, double threshold, double alpha){
     this.fid = fid;

@@ -1,18 +1,22 @@
 package org.ltr4l.boosting;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.RankedDocs;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
 import static org.ltr4l.boosting.RBDistributionTest.assertRankedDocs;
 import static org.ltr4l.boosting.TreeToolsTest.addLabels;
 import static org.ltr4l.boosting.TreeToolsTest.makeDocsWithFeatures;
 
 public class RankBoostToolsTest {
+  private List<RankedDocs> queries;
+  private List<Document> allDocs;
   private RankBoostTools rbt;
 
   @Before
@@ -21,59 +25,99 @@ public class RankBoostToolsTest {
         {-1.0 , 0d  , 20.0, 20.0, 3.0 , 4.0 , 5.0  },
         {5.0  , 4.0 , 3.0 , 2.0 , 1.0 , 0d  , -1.0 },
         {-10.0, 0d  , 10.0, 20.0, 30.0, 40.0, 50.0 },
-        {50.0 , 40.0, 30.0, 20.0, 10.0, 0d  , -10.0},
-        {-0.01, 0d  , 0.01, 0.02, 0.03, 0.04, 0.05 }
+        {50.0 , 40.0, 30.0, 20.0, 17.0, 0d  , -10.0},
+        {-0.01, 0d  , 0.01, 0.02, 40.0, 0.04, 0.05 }
     };
     List<Document> docList = makeDocsWithFeatures(docs);
     int[] labels = {0, 0, 1, 1, 2};
     addLabels(docList, labels);
     RankedDocs rDocs1 = new RankedDocs(docList);
-    assertRankedDocs(rDocs1);
-
-    Random random = new Random();
 
     for(double[] document : docs)
-      for(double feature : document)
-        feature *= random.nextDouble();
+      for(int i = 0; i < document.length; i++) {
+        document[i] *= 1.1; //Chosen so that the best feature can be determined easily...
+      }
     docList = makeDocsWithFeatures(docs);
     addLabels(docList, labels);
     RankedDocs rDocs2 = new RankedDocs(docList);
-    assertRankedDocs(rDocs2);
 
     for(double[] document : docs)
-      for(double feature : document)
-        feature *= 10 * random.nextDouble();
+      for(int i = 0; i < document.length; i++)
+        document[i] *= 1.1;
     docList = makeDocsWithFeatures(docs);
     addLabels(docList, labels);
     RankedDocs rDocs3 = new RankedDocs(docList);
-    assertRankedDocs(rDocs3);
 
-    List<RankedDocs> queries = new ArrayList<>();
+    queries = new ArrayList<>();
     queries.add(rDocs1);
     queries.add(rDocs2);
     queries.add(rDocs3);
-    RBDistribution distribution = RBDistribution.getInitDist(queries, 24);
-    Map<Document, int[]> docMap = new HashMap<>();
-    for(int qid = 0; qid < queries.size(); qid++){
-      RankedDocs query = queries.get(qid);
-      for(int idx = 0; idx < query.size(); idx++){
-        Document key = query.get(idx);
-        int[] value = {qid, idx};
-        docMap.put(key, value);
-      }
-    }
-    rbt = new RankBoostTools(WeakLearner.calculatePotential(distribution, queries), docMap);
+    allDocs = new ArrayList<>();
+    queries.forEach(rd -> allDocs.addAll(rd));
+
+    RBDistribution distribution = RBDistribution.getInitDist(queries);
+    rbt = new RankBoostTools(distribution.calcPotential(), queries);
   }
 
   @Test
-  public void findThreshold() {
+  public void testFindThresholdNoStep() throws Exception{
+    //Nicely split case tested...
+    FeatureSortedDocs fsd = FeatureSortedDocs.get(allDocs, 4);
+    double[] threshLossq = rbt.findThreshold(fsd);
+    Assert.assertEquals(17.0, threshLossq[0], 0.01);
+    Assert.assertEquals(4d/3, threshLossq[1], 0.01);
+    Assert.assertEquals(1.0, threshLossq[2], 0.01);
+
+    //TODO: Write for other features...
   }
 
   @Test
-  public void searchThresholds() {
+  public void testFindAbsMinThreshold() throws Exception{
+    OptimalLeafLoss oml = rbt.findMinLeafThreshold(allDocs, 0);
+    Assert.assertEquals(17.0, oml.getOptimalThreshold(), 0.01);
+    Assert.assertEquals(4d/3, oml.getMinLoss(), 0.01);
+    Assert.assertEquals(4, oml.getOptimalFeature());
   }
 
   @Test
-  public void calcWLloss() {
+  public void testSearchStepThreshold() throws Exception{
+    FeatureSortedDocs fsd = FeatureSortedDocs.get(allDocs, 4);
+
+    double[] thresholds = rbt.makeStepThresholds(fsd.getMinFeature(), fsd.getMaxFeature(), 3);
+    double[] threshLossq = rbt.searchStepThresholds(fsd, thresholds);
+    Assert.assertEquals(threshLossq[0], 16.8, 0.01);
+    Assert.assertEquals(threshLossq[1], 4d/3, 0.01);
+    Assert.assertEquals(threshLossq[2], 1.0, 0.01);
+
+    thresholds = rbt.makeStepThresholds(fsd.getMinFeature(), fsd.getMaxFeature(), 2);
+    threshLossq = rbt.searchStepThresholds(fsd, thresholds);
+    Assert.assertEquals(threshLossq[0], 24.7, 0.01);
+    Assert.assertEquals(threshLossq[1], 8d/5, 0.01);
+    Assert.assertEquals(threshLossq[2], 1.0, 0.01);
+
+    thresholds = rbt.makeStepThresholds(fsd.getMinFeature(), fsd.getMaxFeature(), 4);
+    threshLossq = rbt.searchStepThresholds(fsd, thresholds);
+    Assert.assertEquals(threshLossq[0], 12.85, 0.01);
+    Assert.assertEquals(threshLossq[1], 4d/3, 0.01);
+    Assert.assertEquals(threshLossq[2], 1.0, 0.01);
+
+    thresholds = rbt.makeStepThresholds(fsd.getMinFeature(), fsd.getMaxFeature(), 5);
+    threshLossq = rbt.searchStepThresholds(fsd, thresholds);
+    Assert.assertEquals(threshLossq[0], 10.48, 0.01);
+    Assert.assertEquals(threshLossq[1], 4d/3, 0.01);
+    Assert.assertEquals(threshLossq[2], 1.0, 0.01);
+
+    thresholds = rbt.makeStepThresholds(fsd.getMinFeature(), fsd.getMaxFeature(), 6);
+    threshLossq = rbt.searchStepThresholds(fsd, thresholds);
+    Assert.assertEquals(threshLossq[0], 8.9, 0.01);
+    Assert.assertEquals(threshLossq[1], 4d/3, 0.01);
+    Assert.assertEquals(threshLossq[2], 1.0, 0.01);
+
+    //Default
+    OptimalLeafLoss oml = rbt.findMinLeafThreshold(allDocs, 15);
+    Assert.assertEquals(17.0, oml.getOptimalThreshold(), 0.01);
+    Assert.assertEquals(4d/3, oml.getMinLoss(), 0.01);
+    Assert.assertEquals(4, oml.getOptimalFeature());
   }
+
 }

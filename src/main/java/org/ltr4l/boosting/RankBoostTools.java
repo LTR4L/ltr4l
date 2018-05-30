@@ -16,43 +16,44 @@
 package org.ltr4l.boosting;
 
 import org.ltr4l.query.Document;
+import org.ltr4l.query.RankedDocs;
 
 import java.util.*;
 
 public class RankBoostTools extends TreeTools {
   private final double[][] potential; //Since all threshold calculations require potential...
-  private final Map<Document, int[]> docMap; //{qid, index}
+  private final Map<Document, int[]> docMap; //{qid, index}, since FeatureSortedDocs are used...
 
-  public RankBoostTools(double[][] potential, Map<Document, int[]> docMap){
+  public RankBoostTools(double[][] potential, List<RankedDocs> queries){
     this.potential = Objects.requireNonNull(potential);
-    this.docMap = Objects.requireNonNull(docMap);
+    Objects.requireNonNull(queries);
+    this.docMap = new HashMap<>();
+    for(int qid = 0; qid < queries.size(); qid++){
+      RankedDocs query = queries.get(qid);
+      for(int idx = 0; idx < query.size(); idx++)
+        docMap.put(query.get(idx), new int[] {qid, idx});
+    }
   }
 
   @Override
   public double[] findThreshold(FeatureSortedDocs featureSortedDocs){
-    List<Document> fSortedDocs = featureSortedDocs.getFeatureSortedDocs();
+    List<Document> samples = featureSortedDocs.getFeatureSortedDocs();
     if(featureSortedDocs.getMaxFeature() == featureSortedDocs.getMinFeature())
       return new double[]{Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY}; //Skip this feature
     int feat = featureSortedDocs.getSortedFeature();
-    int numDocs = fSortedDocs.size();
-    double threshold = fSortedDocs.get(0).getFeature(feat);
+    int numDocs = samples.size();
+    double threshold = samples.get(0).getFeature(feat);
     double maxr = Double.NEGATIVE_INFINITY;
     int qdef = 0;
-    for(int threshId = 0; threshId < numDocs; threshId++ ){
+    for(int threshIdx = 0; threshIdx < numDocs; threshIdx++ ){
       //Consider cases where sortedFeature values are the same!
-      if (threshId != numDocs -1 && fSortedDocs.get(threshId).getFeature(feat) == fSortedDocs.get(threshId + 1).getFeature(feat)) continue;
+      if (threshIdx != numDocs -1 && samples.get(threshIdx).getFeature(feat) == samples.get(threshIdx + 1).getFeature(feat)) continue;
       double R = Arrays.stream(potential).mapToDouble(q -> Arrays.stream(q).sum()).sum();
-      double L = 0d;
-      for(int i = threshId; i < fSortedDocs.size(); i++){
-        Document doc = fSortedDocs.get(i);
-        int qid = docMap.get(doc)[0];
-        int index = docMap.get(doc)[1];
-        L += potential[qid][index];
-      }
+      double L = calcWLloss(samples.subList(threshIdx, numDocs));
       int q = Math.abs(L) > Math.abs(L - R) ? 0 : 1;
       double r = Math.abs(L - (q * R));
       if(r > maxr){
-        threshold = threshId;
+        threshold = featureSortedDocs.getFeatureFromIndex(threshIdx);
         maxr = r;
         qdef = q;
       }
@@ -61,7 +62,7 @@ public class RankBoostTools extends TreeTools {
   }
 
   @Override
-  protected double[] searchThresholds(FeatureSortedDocs fSortedDocs, double[] thresholds) { //find the threshold which maximizes r, and return error Z
+  protected double[] searchStepThresholds(FeatureSortedDocs fSortedDocs, double[] thresholds) { //find the threshold which maximizes r, and return error Z
     double[] featureSamples = fSortedDocs.getFeatureSamples();
     List<Document> samples = fSortedDocs.getFeatureSortedDocs();
     double finalThreshold = thresholds[0];
