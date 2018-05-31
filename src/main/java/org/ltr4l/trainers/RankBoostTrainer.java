@@ -15,11 +15,9 @@
  */
 package org.ltr4l.trainers;
 
-import org.ltr4l.Ranker;
 import org.ltr4l.boosting.RBDistribution;
 import org.ltr4l.boosting.RankBoost;
 import org.ltr4l.boosting.WeakLearner;
-import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.query.RankedDocs;
@@ -28,9 +26,7 @@ import org.ltr4l.tools.Error;
 
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankBoostConfig>{
   private final RBDistribution distribution;
@@ -49,14 +45,12 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
   }
 
   @Override
-  double calculateLoss(List<Query> queries) {
-    return 0;
-  }
+  double calculateLoss(List<Query> queries) { return 0; }
 
   @Override
   protected Error makeErrorFunc() {
-    return null;
-  }
+    return new Error.Entropy();
+  } //TODO: Choose appropriate error function
 
   @Override
   public void train() {

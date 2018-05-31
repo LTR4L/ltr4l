@@ -198,8 +198,10 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
             return new ListNetTrainer(trainingSet, validationSet, reader, override);
           case "lambdamart":
             return new LambdaMartTrainer(trainingSet, validationSet, reader, override);
+          case "rankboost":
+            return new RankBoostTrainer(trainingSet, validationSet, reader, override);
           default:
-            return null;
+            throw new IllegalArgumentException();
         }
       }
       finally {

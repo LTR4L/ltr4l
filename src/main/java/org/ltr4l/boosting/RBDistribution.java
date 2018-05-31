@@ -55,9 +55,16 @@ public class RBDistribution {
     for(int qid = 0; qid < dist.length; qid++){
       double[][] qDist = getQueryDist(qid);
       potential[qid] = new double[qDist.length];
-      for(int i = 0; i < qDist.length; i++)  //Note: because of how RBDistribution is created, this can be sped up.
+      for(int i = 0; i < qDist.length; i++) {  //Note: because of how RBDistribution is created, this can be sped up.
         for(int j = 0; j < qDist.length; j++)
           potential[qid][i] += qDist[j][i] - qDist[i][j];
+/*        double p = 0d;
+        for (int k = i + 1; k < qDist.length; k++)
+          p += qDist[i][k];
+        for(int k = 0; k < i; k++)
+          p -= qDist[k][i];
+        potential[qid][i] = p;*/
+      }
     }
     return potential;
   }
@@ -81,13 +88,13 @@ public class RBDistribution {
     return D_0;
   }
 
-  public RBDistribution update(WeakLearner wl, List<RankedDocs> queries ){ //TODO: Restrict Ranker type to RankBoost?
+  public void update(WeakLearner wl, List<RankedDocs> queries ){
     double newNormFactor = 0d;
     for(int qid = 0; qid < queries.size(); qid++){
       newNormFactor += updateQuery(wl, qid, queries.get(qid));
     }
     normalize(newNormFactor);
-    return this;
+    normFactor = newNormFactor;
   }
 
   protected double updateQuery(WeakLearner wl, int qid, RankedDocs rankedDocs){ //returns the query normalization factor

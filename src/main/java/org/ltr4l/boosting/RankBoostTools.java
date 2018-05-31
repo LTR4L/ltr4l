@@ -52,7 +52,9 @@ public class RankBoostTools extends TreeTools {
       double L = calcWLloss(samples.subList(threshIdx, numDocs));
       int q = Math.abs(L) > Math.abs(L - R) ? 0 : 1;
       double r = Math.abs(L - (q * R));
-      if(r > maxr){
+      //This statement is to get the algorithm to look at other features; when r maxes at 1 for a certain feature,
+      //it continues to be chosen.
+      if(r > maxr && r < 0.98){
         threshold = featureSortedDocs.getFeatureFromIndex(threshIdx);
         maxr = r;
         qdef = q;
@@ -74,7 +76,9 @@ public class RankBoostTools extends TreeTools {
       double L = calcWLloss(samples.subList(idx, samples.size()));
       int q = Math.abs(L) > Math.abs(L - R) ? 0 : 1;
       double r = Math.abs(L - (q * R));
-      if(r > maxr){
+      //This statement is to get the algorithm to look at other features; when r maxes at 1 for a certain feature,
+      //it continues to be chosen.
+      if(r > maxr && r < 0.98){ //TODO: Keep set of already selected features to ensure other features are not skipped.
         finalThreshold = threshold;
         maxr = r;
         qdef = q;

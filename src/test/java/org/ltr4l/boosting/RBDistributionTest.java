@@ -143,6 +143,63 @@ public class RBDistributionTest {
     Assert.assertEquals(newNormFactor, actualNormFactor, 0.01);
   }
 
+/*  @Test
+  public void testNormalize() throws Exception{
+    RBDistribution distribution = RBDistribution.getInitDist(queries);
+    distribution.normalize(2d);
+    double[][] qDist = distribution.getQueryDist(0);
+    Assert.assertEquals(qDist[0][0], 0d, 0.01);
+    Assert.assertEquals(qDist[0][1], 1d/48, 0.01);
+    Assert.assertEquals(qDist[0][2], 1d/48, 0.01);
+    Assert.assertEquals(qDist[0][3], 1d/48, 0.01);
+    Assert.assertEquals(qDist[0][4], 1d/48, 0.01);
+    Assert.assertEquals(qDist[1][1], 0d, 0.01);
+    Assert.assertEquals(qDist[1][2], 0d, 0.01);
+    Assert.assertEquals(qDist[1][3], 1d/48, 0.01);
+    Assert.assertEquals(qDist[1][4], 1d/48, 0.01);
+    Assert.assertEquals(qDist[2][2], 0, 0.01);
+    Assert.assertEquals(qDist[2][3], 1d/48, 0.01);
+    Assert.assertEquals(qDist[2][4], 1d/48, 0.01);
+    Assert.assertEquals(qDist[3][3], 0d, 0.01);
+    Assert.assertEquals(qDist[3][4], 0d, 0.01);
+
+    qDist = distribution.getQueryDist(1);
+    Assert.assertEquals(qDist[0][0], 0d, 0.01);
+    Assert.assertEquals(qDist[0][1], 1d/48, 0.01);
+    Assert.assertEquals(qDist[0][2], 1d/48, 0.01);
+    Assert.assertEquals(qDist[0][3], 1d/48, 0.01);
+    Assert.assertEquals(qDist[0][4], 1d/48, 0.01);
+    Assert.assertEquals(qDist[1][1], 0d, 0.01);
+    Assert.assertEquals(qDist[1][2], 0d, 0.01);
+    Assert.assertEquals(qDist[1][3], 1d/48, 0.01);
+    Assert.assertEquals(qDist[1][4], 1d/48, 0.01);
+    Assert.assertEquals(qDist[2][2], 0, 0.01);
+    Assert.assertEquals(qDist[2][3], 1d/48, 0.01);
+    Assert.assertEquals(qDist[2][4], 1d/48, 0.01);
+    Assert.assertEquals(qDist[3][3], 0d, 0.01);
+    Assert.assertEquals(qDist[3][4], 0d, 0.01);
+
+    qDist = distribution.getQueryDist(2);
+    Assert.assertEquals(qDist[0][0], 0d, 0.01);
+    Assert.assertEquals(qDist[0][1], 1d/48, 0.01);
+    Assert.assertEquals(qDist[0][2], 1d/48, 0.01);
+    Assert.assertEquals(qDist[0][3], 1d/48, 0.01);
+    Assert.assertEquals(qDist[0][4], 1d/48, 0.01);
+    Assert.assertEquals(qDist[1][1], 0d, 0.01);
+    Assert.assertEquals(qDist[1][2], 0d, 0.01);
+    Assert.assertEquals(qDist[1][3], 1d/48, 0.01);
+    Assert.assertEquals(qDist[1][4], 1d/48, 0.01);
+    Assert.assertEquals(qDist[2][2], 0, 0.01);
+    Assert.assertEquals(qDist[2][3], 1d/48, 0.01);
+    Assert.assertEquals(qDist[2][4], 1d/48, 0.01);
+    Assert.assertEquals(qDist[3][3], 0d, 0.01);
+    Assert.assertEquals(qDist[3][4], 0d, 0.01);
+
+    //Finally, test distribution sum.
+    double sum = sumDistribution(distribution.getFullDist());
+    Assert.assertEquals(0.5, sum, 0.01);
+  }*/
+
   @Test
   public void testCalcPotential() throws Exception{
     RBDistribution dist = RBDistribution.getInitDist(queries);

@@ -53,12 +53,9 @@ public class WeakLearnerTest {
     Assert.assertEquals(4, wl.getFid());
     Assert.assertEquals(0.5 * Math.log(7), wl.getAlpha(), 0.01);
 
-    for(RankedDocs query : queries){
-      for(int idx = 0; idx < query.size(); idx++){
+    for(RankedDocs query : queries)
+      for(int idx = 0; idx < query.size(); idx++)
         Assert.assertEquals(idx < 3 ? 1d : 0d, wl.predict(query.get(idx).getFeatures()), 0.01);
-      }
-    }
-
   }
 
 }

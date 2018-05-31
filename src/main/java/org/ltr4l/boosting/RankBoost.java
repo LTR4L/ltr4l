@@ -42,7 +42,7 @@ public class RankBoost extends Ranker<RankBoost.RankBoostConfig> {
 
   @Override
   public double predict(List<Double> features) {
-    return learners.stream().mapToDouble(wl -> wl.predict(features)).sum();
+    return learners.isEmpty() ? 0 : learners.stream().mapToDouble(wl -> wl.getAlpha() * wl.predict(features)).sum();
   }
 
   public static class RankBoostConfig extends Config {

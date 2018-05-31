@@ -48,7 +48,7 @@ public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
     this.alpha = alpha;
   }
 
-  public int calculateScore(List<Double> features){
+  protected int calculateScore(List<Double> features){
     return features.get(fid) < threshold ? 0 : 1;
   }
 
@@ -58,7 +58,7 @@ public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
 
   @Override
   public void writeModel(RankBoost.RankBoostConfig config, Writer writer) throws IOException {
-
+    throw new UnsupportedOperationException();
   }
 
   @Override
