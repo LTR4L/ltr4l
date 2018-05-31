@@ -69,4 +69,6 @@ public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
   public double getAlpha() {
     return alpha;
   }
+
+  public double getThreshold() { return threshold; }
 }

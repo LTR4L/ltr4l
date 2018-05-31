@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.boosting.Ensemble;
+import org.ltr4l.boosting.RankBoost;
 import org.ltr4l.nn.*;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
@@ -156,6 +157,8 @@ public abstract class Ranker<C extends Config> {
             return new ListNetMLP(reader);
           case "lambdamart":
             return new Ensemble(reader);
+          case "rankboost":
+            return new RankBoost(reader);
           default:
             throw new IllegalArgumentException("Specified algorithm does not exist.");
         }
