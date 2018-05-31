@@ -64,7 +64,7 @@ public class RankBoost extends Ranker<RankBoost.RankBoostConfig> {
       for(int i = 0; i < model.thresholds.length; i++)
         wls.add(new WeakLearner(model.features[i], model.thresholds[i], model.weights[i]));
     } catch(IOException e){
-      throw new RuntimeException();
+      throw new RuntimeException(e);
     }
     return wls;
   }

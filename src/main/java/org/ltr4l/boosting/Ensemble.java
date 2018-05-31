@@ -61,7 +61,7 @@ public class Ensemble extends Ranker<Ensemble.TreeConfig> {
       }
       return trees;
     } catch(IOException e) {
-      throw new RuntimeException();
+      throw new RuntimeException(e);
     }
   }
 
