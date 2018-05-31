@@ -51,6 +51,10 @@ public class FeatureSortedDocs {
     return featureSortedDocs.get(last).getFeature(sortedFeature);
   }
 
+  public double getFeatureFromIndex(int i){
+    return featureSortedDocs.get(i).getFeature(sortedFeature);
+  }
+
   public int getFeatureLength(){
     return featureSortedDocs.get(0).getFeatureLength();
   }
