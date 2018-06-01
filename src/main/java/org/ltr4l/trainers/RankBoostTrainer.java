@@ -18,6 +18,7 @@ package org.ltr4l.trainers;
 import org.ltr4l.boosting.RBDistribution;
 import org.ltr4l.boosting.RankBoost;
 import org.ltr4l.boosting.WeakLearner;
+import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.query.RankedDocs;
@@ -27,6 +28,7 @@ import org.ltr4l.tools.Error;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankBoostConfig>{
   private final RBDistribution distribution;
@@ -45,12 +47,28 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
   }
 
   @Override
-  double calculateLoss(List<Query> queries) { return 0; }
+  double calculateLoss(List<Query> queries) { //TODO: Make a LossCalculation class to be used by all trainers
+    double loss = 0d;
+    int pairs = 0;
+    for(Query query : queries){
+      List<Document> qDocs = query.getDocList();
+      for(int i = 0; i < qDocs.size(); i++){ //TODO: Speed up
+        for(int j = 0; j < qDocs.size(); j++){
+          int lDiff = qDocs.get(i).getLabel() - qDocs.get(j).getLabel();
+          if(lDiff >= 0 ) continue;
+          double scoreDiff = ranker.predict(qDocs.get(i).getFeatures()) - ranker.predict(qDocs.get(j).getFeatures());
+          if(lDiff * scoreDiff <= 0d) loss++;
+          pairs++;
+        }
+      }
+    }
+    return loss / pairs;
+  }
 
   @Override
   protected Error makeErrorFunc() {
-    return new Error.Entropy();
-  } //TODO: Choose appropriate error function
+   return new Error.Entropy();
+  }
 
   @Override
   public void train() {
