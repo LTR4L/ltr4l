@@ -31,9 +31,8 @@ import org.ltr4l.nn.WeightInitializer;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Config;
+import org.ltr4l.tools.*;
 import org.ltr4l.tools.Error;
-import org.ltr4l.tools.Regularization;
 
 /**
  * The basic implementation of AbstractTrainer for classes which use Multi-Layer Perceptron rankers.
@@ -65,6 +64,11 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends AbstractTrainer<
   }
 
   @Override
+  protected LossCalculator makeLossCalculator(){
+    return new PointwiseLossCalc.StandardPointLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
+  }
+
+  @Override
   protected AbstractMLP constructRanker(){
     int featureLength = trainingSet.get(0).getFeatureLength();
     NetworkShape networkShape = config.getNetworkShape();
@@ -72,15 +76,6 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends AbstractTrainer<
     Regularization regularization = config.getReguFunction();
     String weightModel = config.getWeightInit();
     return new MLP(featureLength, networkShape, optFact, regularization, weightModel);
-  }
-
-  protected double calculateLoss(List<Query> queries) {
-    double loss = 0d;
-    for (Query query : queries) {
-      List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> errorFunc.error(ranker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
-    }
-    return loss / queries.size();
   }
 
   @Override

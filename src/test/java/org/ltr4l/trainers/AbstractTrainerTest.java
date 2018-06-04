@@ -139,9 +139,7 @@ public class AbstractTrainerTest {
     }
 
     @Override
-    double calculateLoss(List<Query> queries) {
-      return 0;
-    }
+    protected LossCalculator makeLossCalculator() {return null; }
 
     @Override
     protected org.ltr4l.tools.Error makeErrorFunc() {

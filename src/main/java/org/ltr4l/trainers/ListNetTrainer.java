@@ -26,9 +26,8 @@ import org.ltr4l.nn.Optimizer;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Config;
+import org.ltr4l.tools.*;
 import org.ltr4l.tools.Error;
-import org.ltr4l.tools.Regularization;
 
 /**
  * ListNetTrainer is an extension of AbstractTrainer.
@@ -65,6 +64,11 @@ public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
   }
 
   @Override
+  protected LossCalculator makeLossCalculator(){
+    return new PointwiseLossCalc.ListNetLossCalc(ranker, trainingSet, validationSet, errorFunc);
+  }
+
+  @Override
   public Class<MLPTrainer.MLPConfig> getConfigClass(){
     return MLPTrainer.MLPConfig.class;
   }
@@ -79,23 +83,6 @@ public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
       ranker.updateWeights(lrRate, rgRate);
     }
   }
-
-  @Override
-  protected double calculateLoss(List<Query> querySet) {
-    double loss = 0;
-    for (Query query : querySet) {
-      double targetSum = query.getDocList().stream().mapToDouble(i -> Math.exp(i.getLabel())).sum();
-      double outputSum = query.getDocList().stream().mapToDouble(i -> Math.exp(ranker.forwardProp(i))).sum();
-      double qLoss = query.getDocList().stream().mapToDouble(i -> errorFunc.error( //-Py(log(Pfx))
-          Math.exp(ranker.forwardProp(i)) / outputSum, //output: exp(f(x)) / sum(f(x))
-          i.getLabel() / targetSum))                 //target: y / sum(exp(y))
-          .sum(); //sum over all documents                // Should it be exp(y)/sum(exp(y))?
-      loss += qLoss;
-    }
-    return loss / querySet.size();
-  }
-
-
 
 }
 

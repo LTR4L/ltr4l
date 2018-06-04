@@ -27,6 +27,8 @@ import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
+import org.ltr4l.tools.LossCalculator;
+import org.ltr4l.tools.PointwiseLossCalc;
 
 /**
  * The implementation of AbstractTrainer which uses the
@@ -59,21 +61,17 @@ public class OAPBPMTrainer extends AbstractTrainer<OAPBPMTrainer.OAPBPMRank, OAP
   }
 
   @Override
+  protected LossCalculator makeLossCalculator(){
+    return new PointwiseLossCalc.StandardPointLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
+  }
+
+  @Override
   public Class<OAPBPMConfig> getConfigClass() {
     return getCC();
   }
 
   static Class<OAPBPMConfig> getCC(){
     return OAPBPMConfig.class;
-  }
-
-  protected double calculateLoss(List<Query> queries) {
-    double loss = 0d;
-    for (Query query : queries) {
-      List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> errorFunc.error(ranker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
-    }
-    return loss / queries.size();
   }
 
   @Override
