@@ -74,6 +74,7 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends AbstractTrainer<
     return new MLP(featureLength, networkShape, optFact, regularization, weightModel);
   }
 
+  @Override
   protected double calculateLoss(List<Query> queries) {
     double loss = 0d;
     for (Query query : queries) {

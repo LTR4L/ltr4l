@@ -67,6 +67,7 @@ public class OAPBPMTrainer extends AbstractTrainer<OAPBPMTrainer.OAPBPMRank, OAP
     return OAPBPMConfig.class;
   }
 
+  @Override
   protected double calculateLoss(List<Query> queries) {
     double loss = 0d;
     for (Query query : queries) {

@@ -55,7 +55,7 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
       for(int i = 0; i < qDocs.size(); i++){ //TODO: Speed up
         for(int j = 0; j < qDocs.size(); j++){
           int lDiff = qDocs.get(i).getLabel() - qDocs.get(j).getLabel();
-          if(lDiff >= 0 ) continue;
+          if(lDiff <= 0 ) continue;
           double scoreDiff = ranker.predict(qDocs.get(i).getFeatures()) - ranker.predict(qDocs.get(j).getFeatures());
           if(lDiff * scoreDiff <= 0d) loss++;
           pairs++;

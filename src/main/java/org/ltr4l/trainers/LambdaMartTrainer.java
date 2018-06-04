@@ -83,7 +83,7 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
   }
 
   @Override
-  double calculateLoss(List<Query> queries) {
+  public double calculateLoss(List<Query> queries) {
     List<Document[][]> docPairs;
     if (queries == trainingSet)
       docPairs = trainingPairs;
