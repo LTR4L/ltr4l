@@ -144,6 +144,9 @@ public class AbstractTrainerTest {
     }
 
     @Override
+    protected LossCalculator makeLossCalculator() {return null; }
+
+    @Override
     protected org.ltr4l.tools.Error makeErrorFunc() {
       return null;
     }

@@ -25,16 +25,17 @@ import org.ltr4l.query.Query;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public abstract class PairwiseLossCalc<R extends Ranker> implements LossCalculator{
   protected final R ranker;
   protected final List<Document[][]> trainingPairs;
   protected final List<Document[][]> validationPairs;
 
-  protected PairwiseLossCalc(R ranker, List<Document[][]> trainingPairs, List<Document[][]> validationPairs){
+  protected PairwiseLossCalc(R ranker, List<Query> trainingSet, List<Query> validationSet){
     this.ranker = ranker;
-    this.trainingPairs = trainingPairs;
-    this.validationPairs = validationPairs;
+    trainingPairs = trainingSet.stream().map(query -> query.orderDocPairs()).collect(Collectors.toList());
+    validationPairs = validationSet.stream().map(query -> query.orderDocPairs()).collect(Collectors.toList());
   }
 
   @Override
@@ -55,8 +56,8 @@ public abstract class PairwiseLossCalc<R extends Ranker> implements LossCalculat
   public static class RankNetLossCalc<R extends Ranker> extends PairwiseLossCalc<R> {
     private final Error errorFunc;
 
-    public RankNetLossCalc(R ranker, List<Document[][]> trainingPairs, List<Document[][]> validationPairs, Error errorFunc){
-      super(ranker, trainingPairs, validationPairs);
+    public RankNetLossCalc(R ranker, List<Query> trainingSet, List<Query> validationSet, Error errorFunc){
+      super(ranker, trainingSet, validationSet);
       this.errorFunc = errorFunc;
 
     }
@@ -86,8 +87,8 @@ public abstract class PairwiseLossCalc<R extends Ranker> implements LossCalculat
     protected final Error errorFunc;
     protected final double[][] targets;
 
-    public SortNetLossCalc(SortNetMLP ranker, List<Document[][]> trainingPairs, List<Document[][]> validationPairs, Error errorFunc, double[][] targets){
-      super(ranker, trainingPairs, validationPairs);
+    public SortNetLossCalc(SortNetMLP ranker, List<Query> trainingSet, List<Query> validationSet, Error errorFunc, double[][] targets){
+      super(ranker, trainingSet, validationSet);
       this.errorFunc = errorFunc;
       this.targets = targets;
     }
@@ -115,8 +116,8 @@ public abstract class PairwiseLossCalc<R extends Ranker> implements LossCalculat
 
   public static class RankBoostLossCalc<R extends Ranker> extends PairwiseLossCalc<R>{
 
-    public RankBoostLossCalc(R ranker, List<Document[][]> trainingPairs, List<Document[][]> validationPairs){
-      super(ranker, trainingPairs, validationPairs);
+    public RankBoostLossCalc(R ranker, List<Query> trainingSet, List<Query> validationSet){
+      super(ranker, trainingSet, validationSet);
     }
 
     @Override

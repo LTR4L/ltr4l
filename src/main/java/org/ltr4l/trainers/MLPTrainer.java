@@ -31,9 +31,8 @@ import org.ltr4l.nn.WeightInitializer;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Config;
+import org.ltr4l.tools.*;
 import org.ltr4l.tools.Error;
-import org.ltr4l.tools.Regularization;
 
 /**
  * The basic implementation of AbstractTrainer for classes which use Multi-Layer Perceptron rankers.
@@ -62,6 +61,11 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends AbstractTrainer<
   @Override
   protected Error makeErrorFunc(){
     return new Error.Square(); //Default square error
+  }
+
+  @Override
+  protected LossCalculator makeLossCalculator(){
+    return new PointwiseLossCalc.StandardPointLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
   }
 
   @Override

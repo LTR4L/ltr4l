@@ -26,9 +26,8 @@ import org.ltr4l.nn.Optimizer;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Config;
+import org.ltr4l.tools.*;
 import org.ltr4l.tools.Error;
-import org.ltr4l.tools.Regularization;
 
 /**
  * ListNetTrainer is an extension of AbstractTrainer.
@@ -62,6 +61,11 @@ public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
   @Override
   protected Error makeErrorFunc(){
     return new Error.Entropy();
+  }
+
+  @Override
+  protected LossCalculator makeLossCalculator(){
+    return new PointwiseLossCalc.ListNetLossCalc(ranker, trainingSet, validationSet, errorFunc);
   }
 
   @Override

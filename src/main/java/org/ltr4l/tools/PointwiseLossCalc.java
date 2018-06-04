@@ -68,9 +68,9 @@ public abstract class PointwiseLossCalc<R extends Ranker> implements LossCalcula
     }
   }
 
-  public static class ListNetPointCalc extends StandardPointLossCalc<ListNetMLP>{
+  public static class ListNetLossCalc extends StandardPointLossCalc<ListNetMLP>{
 
-    public ListNetPointCalc(ListNetMLP ranker, List<Query> trainingSet, List<Query> validationSet, Error errorFunc){
+    public ListNetLossCalc(ListNetMLP ranker, List<Query> trainingSet, List<Query> validationSet, Error errorFunc){
       super(ranker, trainingSet, validationSet, errorFunc);
     }
 

@@ -30,7 +30,11 @@ import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
+import org.ltr4l.tools.LossCalculator;
 import org.ltr4l.tools.Report;
+
+import static org.ltr4l.tools.LossCalculator.DataSet.TRAINING;
+import static org.ltr4l.tools.LossCalculator.DataSet.VALIDATION;
 
 /**
  * Abstract class used for training the model held by Rankers.
@@ -51,6 +55,7 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
   protected final int evalK;
   protected final String modelFile;
   protected final RankEval eval;
+  private final  LossCalculator lossCalc;
 
   AbstractTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
     this.config = getConfig(reader);
@@ -59,14 +64,15 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
     trainingSet = training.getQueries();
     validationSet = validation.getQueries();
     maxScore = 0d;
-    ranker = constructRanker();
+    ranker = constructRanker(); //TODO: ranker, errorFunc, and lossCalc assignments are done in child classes by implementing methods...
+    errorFunc = makeErrorFunc();
+    lossCalc = makeLossCalculator(); //TODO: In child classes, requires that ranker and errorFunc be created already...
     assert(config.batchSize >= 0);
     batchSize = config.batchSize;
     eval = getEvaluator(config);
     evalK = getEvaluatorAtK(config);
     modelFile = getModelFile(config);
-    this.report = Report.getReport(config);
-    this.errorFunc = makeErrorFunc();
+    report = Report.getReport(config);
   }
 
   private static RankEval getEvaluator(Config config){
@@ -105,8 +111,10 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
    */
   protected abstract Error makeErrorFunc();
 
+  protected abstract LossCalculator makeLossCalculator();
+
   public double[] calculateLoss() {
-    return new double[]{calculateLoss(trainingSet), calculateLoss(validationSet)};
+    return new double[]{lossCalc.calculateLoss(TRAINING), lossCalc.calculateLoss(VALIDATION)};
   }
 
   public void validate(int iter, int pos) {

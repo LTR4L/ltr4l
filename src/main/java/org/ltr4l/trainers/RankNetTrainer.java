@@ -20,6 +20,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.ltr4l.nn.Activation;
 import org.ltr4l.nn.NetworkShape;
@@ -28,9 +29,8 @@ import org.ltr4l.nn.RankNetMLP;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Config;
+import org.ltr4l.tools.*;
 import org.ltr4l.tools.Error;
-import org.ltr4l.tools.Regularization;
 
 /**
  * The implementation of MLPTrainer which uses the
@@ -76,6 +76,11 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   @Override
   protected Error makeErrorFunc(){
     return new Error.Entropy();
+  }
+
+  @Override
+  protected LossCalculator makeLossCalculator(){
+    return new PairwiseLossCalc.RankNetLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
   }
 
   @Override

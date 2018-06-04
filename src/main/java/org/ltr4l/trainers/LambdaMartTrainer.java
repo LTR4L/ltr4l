@@ -21,8 +21,7 @@ import org.ltr4l.nn.Activation;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Config;
-import org.ltr4l.tools.DataProcessor;
+import org.ltr4l.tools.*;
 import org.ltr4l.tools.Error;
 
 import java.io.IOException;
@@ -75,8 +74,6 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
     }
   }
 
-
-
   @Override
   protected Ensemble constructRanker() {
     return new Ensemble();
@@ -112,6 +109,11 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
   @Override
   protected Error makeErrorFunc() {
     return new Error.Entropy();
+  }
+
+  @Override
+  protected LossCalculator makeLossCalculator(){
+    return new PairwiseLossCalc.RankNetLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
   }
 
   @Override
