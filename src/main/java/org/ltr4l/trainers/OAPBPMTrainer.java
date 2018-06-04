@@ -75,16 +75,6 @@ public class OAPBPMTrainer extends AbstractTrainer<OAPBPMTrainer.OAPBPMRank, OAP
   }
 
   @Override
-  protected double calculateLoss(List<Query> queries) {
-    double loss = 0d;
-    for (Query query : queries) {
-      List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> errorFunc.error(ranker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
-    }
-    return loss / queries.size();
-  }
-
-  @Override
   protected Ranker constructRanker() {
     return new OAPBPMRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet), config.getPNum(), config.getBernNum());
   }

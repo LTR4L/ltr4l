@@ -71,15 +71,6 @@ public class PRankTrainer extends AbstractTrainer<PRankTrainer.PRank, Config> {
     return new PointwiseLossCalc.StandardPointLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
   }
 
-  protected double calculateLoss(List<Query> queries) {
-    double loss = 0d;
-    for (Query query : queries) {
-      List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> errorFunc.error(ranker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
-    }
-    return loss / queries.size();
-  }
-
   @Override
   public Class<Config> getConfigClass() {
     return Config.class;

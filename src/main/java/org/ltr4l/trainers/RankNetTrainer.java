@@ -43,24 +43,10 @@ import org.ltr4l.tools.Error;
  */
 public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   protected final List<Document[][]> trainingPairs;
-  protected final List<Document[][]> validationPairs;
 
   RankNetTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
     super(training, validation, reader, override, true);
-
-    trainingPairs = new ArrayList<>();
-    for (int i = 0; i < trainingSet.size(); i++) {
-      Query query = trainingSet.get(i);
-      Document[][] documentPairs = query.orderDocPairs();
-      trainingPairs.add(documentPairs);                   //add even if null, as placeholder for query.
-    }
-
-    validationPairs = new ArrayList<>();
-    for (int i = 0; i < validationSet.size(); i++) {
-      Query query = validationSet.get(i);
-      Document[][] documentPairs = query.orderDocPairs();
-      validationPairs.add(documentPairs);
-    }
+    trainingPairs = ((PairwiseLossCalc) lossCalc).getTrainingPairs();
   }
 
   @Override
@@ -81,34 +67,6 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   @Override
   protected LossCalculator makeLossCalculator(){
     return new PairwiseLossCalc.RankNetLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
-  }
-
-  @Override
-  public double calculateLoss(List<Query> queries) {
-    List<Document[][]> docPairs;
-    if (queries == trainingSet)
-      docPairs = trainingPairs;
-    else if (queries == validationSet)
-      docPairs = validationPairs;
-    else
-      return -1d;
-    double loss = 0d;
-    int processedQueryNum = 0;
-    for (Document[][] query : docPairs) {
-      if (query == null)
-        continue;
-      processedQueryNum++;
-      double queryLoss = 0d;
-      for (Document[] pair : query) {
-        double s1 = ranker.forwardProp(pair[0]);
-        double s2 = ranker.forwardProp(pair[1]);
-        double output = Math.pow(1 + Math.exp(s2 - s1), -1); //double output = new Activation.Sigmoid().output(s1 - s2);
-        queryLoss += errorFunc.error(output, 1d);
-        //queryLoss += Math.log(1 + Math.exp(s2 - s1)); This is a derivation; equivalent to errorFunc.error.
-      }
-      loss += queryLoss / query.length;
-    }
-    return loss / processedQueryNum;
   }
 
   @Override

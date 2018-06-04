@@ -59,7 +59,7 @@ public class SortNetTrainer extends AbstractTrainer<SortNetMLP, MLPTrainer.MLPCo
 
   @Override
   protected LossCalculator makeLossCalculator(){
-    return new PairwiseLossCalc.SortNetLossCalc(ranker, trainingSet, validationSet, errorFunc, targets);
+    return new PairwiseLossCalc.SortNetLossCalc(ranker, trainingSet, validationSet, errorFunc, new double[][]{{1d,0d},{0d,1}});
   }
 
   @Override
@@ -104,26 +104,6 @@ public class SortNetTrainer extends AbstractTrainer<SortNetMLP, MLPTrainer.MLPCo
       }
     }
     if (batchSize != 0) ranker.updateWeights(lrRate, rgRate);
-  }
-
-  public double calculateLoss(List<Query> queries) {
-    double loss = 0d;
-    for (Query query : queries) {
-      Document[][] pairs = query.orderDocPairs();
-      if (pairs == null)
-        continue;
-      double queryLoss = 0d;
-      for (Document[] pair : pairs) {
-        List<Double> combinedFeatures = new ArrayList<>(pair[0].getFeatures());
-        combinedFeatures.addAll(pair[1].getFeatures());
-        ranker.forwardProp(combinedFeatures);
-        double[] outputs = ranker.getOutputs();
-        queryLoss += errorFunc.error(outputs[0], targets[0][0]);
-        queryLoss += errorFunc.error(outputs[1], targets[0][1]);
-      }
-      loss += queryLoss / (double) pairs.length;
-    }
-    return loss / (double) queries.size();
   }
 
   @Override

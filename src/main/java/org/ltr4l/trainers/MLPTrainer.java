@@ -79,16 +79,6 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends AbstractTrainer<
   }
 
   @Override
-  protected double calculateLoss(List<Query> queries) {
-    double loss = 0d;
-    for (Query query : queries) {
-      List<Document> docList = query.getDocList();
-      loss += docList.stream().mapToDouble(doc -> errorFunc.error(ranker.predict(doc.getFeatures()), doc.getLabel())).sum() / docList.size();
-    }
-    return loss / queries.size();
-  }
-
-  @Override
   public Class<MLPConfig> getConfigClass(){
     return getCC();
   }

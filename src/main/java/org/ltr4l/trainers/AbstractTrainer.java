@@ -55,7 +55,7 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
   protected final int evalK;
   protected final String modelFile;
   protected final RankEval eval;
-  private final  LossCalculator lossCalc;
+  protected final  LossCalculator lossCalc;
 
   AbstractTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
     this.config = getConfig(reader);
@@ -101,8 +101,6 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
   public R getRanker() {
     return ranker;
   }
-
-  abstract double calculateLoss(List<Query> queries);
 
   /**
    * This method is used to assign errorFunc.

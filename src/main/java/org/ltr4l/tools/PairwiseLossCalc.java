@@ -38,6 +38,14 @@ public abstract class PairwiseLossCalc<R extends Ranker> implements LossCalculat
     validationPairs = validationSet.stream().map(query -> query.orderDocPairs()).collect(Collectors.toList());
   }
 
+  public List<Document[][]> getValidationPairs() {
+    return validationPairs;
+  }
+
+  public List<Document[][]> getTrainingPairs() {
+    return trainingPairs;
+  }
+
   @Override
   public double calculateLoss(DataSet type){
     Objects.requireNonNull(type);

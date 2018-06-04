@@ -49,25 +49,6 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
   }
 
   @Override
-  double calculateLoss(List<Query> queries) { //TODO: Make a LossCalculation class to be used by all trainers
-    double loss = 0d;
-    int pairs = 0;
-    for(Query query : queries){
-      List<Document> qDocs = query.getDocList();
-      for(int i = 0; i < qDocs.size(); i++){ //TODO: Speed up
-        for(int j = 0; j < qDocs.size(); j++){
-          int lDiff = qDocs.get(i).getLabel() - qDocs.get(j).getLabel();
-          if(lDiff <= 0 ) continue;
-          double scoreDiff = ranker.predict(qDocs.get(i).getFeatures()) - ranker.predict(qDocs.get(j).getFeatures());
-          if(lDiff * scoreDiff <= 0d) loss++;
-          pairs++;
-        }
-      }
-    }
-    return loss / pairs;
-  }
-
-  @Override
   protected Error makeErrorFunc() {
    return new Error.Entropy();
   }

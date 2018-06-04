@@ -139,11 +139,6 @@ public class AbstractTrainerTest {
     }
 
     @Override
-    double calculateLoss(List<Query> queries) {
-      return 0;
-    }
-
-    @Override
     protected LossCalculator makeLossCalculator() {return null; }
 
     @Override

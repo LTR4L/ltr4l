@@ -42,7 +42,6 @@ import static org.ltr4l.boosting.TreeTools.findMinLossFeat;
 public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeConfig> {
   private final List<Document> trainingDocs;
   private final List<Document[][]> trainingPairs;
-  private final List<Document[][]> validationPairs;
   private final List<FeatureSortedDocs> featureSortedDocs;
   private final double[][] thresholds;
   private final int numTrees;
@@ -53,8 +52,7 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
   LambdaMartTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
     super(training, validation, reader, override);
     trainingDocs = DataProcessor.makeDocList(trainingSet);
-    trainingPairs = trainingSet.stream().map(query -> query.orderDocPairs()).collect(Collectors.toList());
-    validationPairs = validationSet.stream().map(query -> query.orderDocPairs()).collect(Collectors.toList());
+    trainingPairs = ((PairwiseLossCalc) lossCalc).getTrainingPairs(); //TODO: use generics over casting...
     numTrees = config.getNumTrees();
     numLeaves = config.getNumLeaves();
     lrRate = config.getLearningRate();
@@ -77,33 +75,6 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
   @Override
   protected Ensemble constructRanker() {
     return new Ensemble();
-  }
-
-  @Override
-  public double calculateLoss(List<Query> queries) {
-    List<Document[][]> docPairs;
-    if (queries == trainingSet)
-      docPairs = trainingPairs;
-    else if (queries == validationSet)
-      docPairs = validationPairs;
-    else
-      return -1d;
-    double loss = 0d;
-    int processedQueryNum = 0;
-    for (Document[][] query : docPairs) {
-      if (query == null)
-        continue;
-      processedQueryNum++;
-      double queryLoss = 0d;
-      for (Document[] pair : query) {
-        double s1 = ranker.predict(pair[0].getFeatures());
-        double s2 = ranker.predict(pair[1].getFeatures());
-        double output = Math.pow(1 + Math.exp(s2 - s1), -1); //double output = new Activation.Sigmoid().output(s1 - s2);
-        queryLoss += errorFunc.error(output, 1d);
-      }
-      loss += queryLoss / query.length;
-    }
-    return loss / processedQueryNum;
   }
 
   @Override
