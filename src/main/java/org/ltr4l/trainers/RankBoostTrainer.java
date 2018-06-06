@@ -22,10 +22,8 @@ import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.query.RankedDocs;
-import org.ltr4l.tools.Config;
+import org.ltr4l.tools.*;
 import org.ltr4l.tools.Error;
-import org.ltr4l.tools.LossCalculator;
-import org.ltr4l.tools.PairwiseLossCalc;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -50,7 +48,7 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
 
   @Override
   protected Error makeErrorFunc() {
-   return new Error.Entropy();
+   return StandardError.ENTROPY;
   }
 
   @Override

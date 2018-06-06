@@ -60,7 +60,7 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends AbstractTrainer<
 
   @Override
   protected Error makeErrorFunc(){
-    return new Error.Square(); //Default square error
+    return StandardError.SQUARE; //Default square error
   }
 
   @Override

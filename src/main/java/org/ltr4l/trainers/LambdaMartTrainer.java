@@ -79,7 +79,7 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
 
   @Override
   protected Error makeErrorFunc() {
-    return new Error.Entropy();
+    return StandardError.ENTROPY;
   }
 
   @Override

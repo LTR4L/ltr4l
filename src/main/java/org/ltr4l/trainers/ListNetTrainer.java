@@ -60,7 +60,7 @@ public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
 
   @Override
   protected Error makeErrorFunc(){
-    return new Error.Entropy();
+    return StandardError.ENTROPY;
   }
 
   @Override

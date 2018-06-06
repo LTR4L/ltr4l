@@ -23,7 +23,7 @@ public class ErrorTest {
 
   @Test
   public void testSquare() throws Exception {
-    Error error = new Error.Square();
+    Error error = StandardError.SQUARE;
 
     Assert.assertEquals(0, error.error(1, 1), 0.001);
     Assert.assertEquals(0.5, error.error(2, 1), 0.001);
@@ -40,7 +40,7 @@ public class ErrorTest {
 
   @Test
   public void testEntropy() throws Exception {
-    Error error = new Error.Entropy();
+    Error error = StandardError.ENTROPY;
 
     Assert.assertEquals(-2.302585, error.error(10, 1), 0.001);
     Assert.assertEquals(0, error.error(1, 1), 0.001);
@@ -53,13 +53,13 @@ public class ErrorTest {
 
   @Test(expected = AssertionError.class)
   public void testEntropyOutputAssertError() throws Exception {
-    Error error = new Error.Entropy();
-    error.error(-Error.Entropy.DELTA, 1);
+    Error error = StandardError.ENTROPY;
+    error.error(-1e-8, 1);
   }
 
   @Test(expected = AssertionError.class)
   public void testEntropyDerAssertError() throws Exception {
-    Error error = new Error.Entropy();
-    error.der(-Error.Entropy.DELTA,1);
+    Error error = StandardError.ENTROPY;
+    error.der(-1e-8,1);
   }
 }

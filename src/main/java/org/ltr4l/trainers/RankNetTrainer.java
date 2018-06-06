@@ -61,7 +61,7 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
 
   @Override
   protected Error makeErrorFunc(){
-    return new Error.Entropy();
+    return StandardError.ENTROPY;
   }
 
   @Override

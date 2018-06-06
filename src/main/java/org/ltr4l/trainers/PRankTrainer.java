@@ -30,10 +30,8 @@ import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Config;
+import org.ltr4l.tools.*;
 import org.ltr4l.tools.Error;
-import org.ltr4l.tools.LossCalculator;
-import org.ltr4l.tools.PointwiseLossCalc;
 
 /**
  * The implementation of AbstractTrainer which uses the
@@ -63,7 +61,7 @@ public class PRankTrainer extends AbstractTrainer<PRankTrainer.PRank, Config> {
 
   @Override
   protected Error makeErrorFunc(){
-    return new Error.Square();
+    return StandardError.SQUARE;
   }
 
   @Override
