@@ -54,7 +54,7 @@ public class SortNetTrainer extends AbstractTrainer<SortNetMLP, MLPTrainer.MLPCo
 
   @Override
   protected Error makeErrorFunc(){
-    return new Error.Square();
+    return StandardError.SQUARE;
   }
 
   @Override
