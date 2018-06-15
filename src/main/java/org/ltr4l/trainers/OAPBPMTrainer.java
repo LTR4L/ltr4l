@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
@@ -79,10 +80,12 @@ public class OAPBPMTrainer extends AbstractTrainer<OAPBPMTrainer.OAPBPMRank, OAP
 
   public static class OAPBPMConfig extends Config {
 
+    @JsonIgnore
     public int getPNum(){
       return getInt(params, "N", 1);   // TODO: default value 1 is appropriate?
     }
 
+    @JsonIgnore
     public double getBernNum(){
       return getDouble(params, "bernoulli", 0.03);
     }
