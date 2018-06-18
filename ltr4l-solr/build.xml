@@ -1,0 +1,105 @@
+<!--
+ 
+  Copyright 2018 org.LTR4L
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+ 
+-->
+<project name="org.LTR4L_solr-project"
+         xmlns:ivy="antlib:org.apache.ivy.ant"
+         default="compile" basedir=".">
+
+    <property file="../version.properties"/>
+    <property file="../build.properties"/>
+
+    <target name="compile" description="compile source and test code">
+        <mkdir dir="${cls.dir}"/>
+        <copy file="../version.properties" todir="${cls.dir}"/>
+        <javac srcdir="${src.dir}/main/java" destdir="${cls.dir}" debug="on" includes="**/*.java">
+            <classpath path="${cls.dir}"/>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+        </javac>
+        <javac srcdir="${src.dir}/test/java" destdir="${cls.dir}" debug="on" includes="**/*Test.java">
+            <classpath path="${cls.dir}"/>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="test" depends="compile" description="run all tests">
+        <mkdir dir="${test.result.dir}"/>
+        <junit printsummary="on"
+               haltonfailure="no"
+               errorProperty="tests.failed"
+               failureProperty="tests.failed"
+               dir="${src.dir}/test/resources">
+            <classpath path="${cls.dir}"/>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+            <jvmarg value="-ea"/>
+            <formatter type="plain"/>
+            <batchtest fork="yes" todir="${test.result.dir}" unless="testcase">
+                <fileset dir="${src.dir}/test/java" includes="**/*Test.java"/>
+            </batchtest>
+            <batchtest fork="yes" todir="${test.result.dir}" if="testcase">
+                <fileset dir="${src.dir}/test/java" includes="**/${testcase}.java"/>
+            </batchtest>
+        </junit>
+        <fail if="tests.failed">***** Tests failed! *****</fail>
+    </target>
+
+    <target name="jar" depends="compile" description="make jar file">
+        <property file="../ivy-jars.properties"/>
+        <jar destfile="${solr_product.jar}">
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Class-Path" value="${RUNTIME_JARS}"/>
+            </manifest>
+            <fileset dir="${cls.dir}">
+                <include name="**/*.class"/>
+                <include name="*.properties"/>
+            </fileset>
+            <fileset dir=".">
+                <include name="${lib.dir}/*.jar"/>
+                <exclude name="${lib.dir}/*-javadoc.jar"/>
+                <exclude name="${lib.dir}/*-sources.jar"/>
+                <exclude name="${lib.dir}/*jacoco*.jar"/>
+                <exclude name="${lib.dir}/*junit*.jar"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <target name="package" depends="jar" description="make package"/>
+
+    <target name="clean" description="clean all">
+        <delete dir="${cls.dir}"/>
+        <delete dir="${test.result.dir}"/>
+        <delete>
+            <fileset dir="." includes="${solr_product.jar}"/>
+        </delete>
+    </target>
+
+    <target name="ivy-bootstrap" description="--> retrieve dependencies with ivy">
+        <property file="../ivy-jars.properties"/>
+        <ivy:retrieve />
+    </target>
+
+    <target name="javadoc" description="generate documentation">
+        <javadoc sourcepath="${src.dir}/main/java" destdir="${doc.dir}" locale="en_US"/>
+    </target>
+
+</project>
