@@ -16,7 +16,6 @@
  
 -->
 <project name="org.LTR4L_solr-project"
-         xmlns:ivy="antlib:org.apache.ivy.ant"
          default="compile" basedir=".">
 
     <property file="../version.properties"/>
@@ -24,17 +23,18 @@
 
     <target name="compile" description="compile source and test code">
         <mkdir dir="${cls.dir}"/>
-        <copy file="../version.properties" todir="${cls.dir}"/>
         <javac srcdir="${src.dir}/main/java" destdir="${cls.dir}" debug="on" includes="**/*.java">
             <classpath path="${cls.dir}"/>
+	    <classpath path="../${cls.dir}"/>
             <classpath>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+		<fileset dir="../${lib.dir}" includes="**/*.jar"/>
             </classpath>
         </javac>
         <javac srcdir="${src.dir}/test/java" destdir="${cls.dir}" debug="on" includes="**/*Test.java">
             <classpath path="${cls.dir}"/>
+	    <classpath path="../${cls.dir}"/>
             <classpath>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+		    <fileset dir="../${lib.dir}" includes="**/*.jar"/>
             </classpath>
         </javac>
     </target>
@@ -48,7 +48,7 @@
                dir="${src.dir}/test/resources">
             <classpath path="${cls.dir}"/>
             <classpath>
-                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+		    <fileset dir="../${lib.dir}" includes="**/*.jar"/>
             </classpath>
             <jvmarg value="-ea"/>
             <formatter type="plain"/>
@@ -63,7 +63,6 @@
     </target>
 
     <target name="jar" depends="compile" description="make jar file">
-        <property file="../ivy-jars.properties"/>
         <jar destfile="${solr_product.jar}">
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
@@ -74,11 +73,11 @@
                 <include name="*.properties"/>
             </fileset>
             <fileset dir=".">
-                <include name="${lib.dir}/*.jar"/>
-                <exclude name="${lib.dir}/*-javadoc.jar"/>
-                <exclude name="${lib.dir}/*-sources.jar"/>
-                <exclude name="${lib.dir}/*jacoco*.jar"/>
-                <exclude name="${lib.dir}/*junit*.jar"/>
+		    <include name="../${lib.dir}/*.jar"/>
+		    <exclude name="../${lib.dir}/*-javadoc.jar"/>
+		    <exclude name="../${lib.dir}/*-sources.jar"/>
+		    <exclude name="../${lib.dir}/*jacoco*.jar"/>
+		    <exclude name="../${lib.dir}/*junit*.jar"/>
             </fileset>
         </jar>
     </target>
@@ -91,11 +90,6 @@
         <delete>
             <fileset dir="." includes="${solr_product.jar}"/>
         </delete>
-    </target>
-
-    <target name="ivy-bootstrap" description="--> retrieve dependencies with ivy">
-        <property file="../ivy-jars.properties"/>
-        <ivy:retrieve />
     </target>
 
     <target name="javadoc" description="generate documentation">

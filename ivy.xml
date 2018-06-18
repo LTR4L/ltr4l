@@ -38,16 +38,32 @@
       <artifact name="${ivy.jar.jackson-annotations.name}" type="jar"
                 url="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/${ivy.jar.jackson-annotations.name}/${ivy.jar.jackson.rev}/${ivy.jar.jackson-annotations.name}-${ivy.jar.jackson.rev}.jar"/>
     </dependency>
+    <dependency org="${ivy.jar.slf4j.org}" name="${ivy.jar.slf4j-api.name}" rev="${ivy.jar.slf4j.rev}">
+      <artifact name="${ivy.jar.slf4j-api.name}" type="jar"
+                url="http://central.maven.org/maven2/org/slf4j/${ivy.jar.slf4j-api.name}/${ivy.jar.slf4j.rev}/${ivy.jar.slf4j-api.name}-${ivy.jar.slf4j.rev}.jar"/>
+    </dependency>
+    <dependency org="${ivy.jar.slf4j.org}" name="${ivy.jar.slf4j-simple.name}" rev="${ivy.jar.slf4j.rev}">
+      <artifact name="${ivy.jar.slf4j-simple.name}" type="jar"
+                url="http://central.maven.org/maven2/org/slf4j/${ivy.jar.slf4j-simple.name}/${ivy.jar.slf4j.rev}/${ivy.jar.slf4j-simple.name}-${ivy.jar.slf4j.rev}.jar"/>
+    </dependency>
     <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-core.name}" rev="${ivy.jar.lucene.rev}">
       <artifact name="${ivy.jar.lucene-core.name}" type="jar"
                 url="http://repo1.maven.org/maven2/org/apache/lucene/${ivy.jar.lucene-core.name}/${ivy.jar.lucene.rev}/${ivy.jar.lucene-core.name}-${ivy.jar.lucene.rev}.jar"/>
     </dependency>
+    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-analyzers-common.name}" rev="${ivy.jar.lucene.rev}">
+      <artifact name="${ivy.jar.lucene-analyzers-common.name}" type="jar"
+                url="http://repo1.maven.org/maven2/org/apache/lucene/${ivy.jar.lucene-analyzers-common.name}/${ivy.jar.lucene.rev}/${ivy.jar.lucene-analyzers-common.name}-${ivy.jar.lucene.rev}.jar"/>
+    </dependency>
     <dependency org="${ivy.jar.solr.org}" name="${ivy.jar.solr-core.name}" rev="${ivy.jar.solr.rev}">
-      <artifact name="{ivy.jar.solr-core.name}" type="jar"
+      <artifact name="${ivy.jar.solr-core.name}" type="jar"
                 url="http://repo1.maven.org/maven2/org/apache/solr/${ivy.jar.solr-core.name}/${ivy.jar.solr.rev}/${ivy.jar.solr-core.name}-${ivy.jar.solr.rev}.jar"/>
     </dependency>
+    <dependency org="${ivy.jar.solr.org}" name="${ivy.jar.solr-solrj.name}" rev="${ivy.jar.solr.rev}">
+      <artifact name="${ivy.jar.solr-solrj.name}" type="jar"
+                url="http://repo1.maven.org/maven2/org/apache/solr/${ivy.jar.solr-solrj.name}/${ivy.jar.solr.rev}/${ivy.jar.solr-solrj.name}-${ivy.jar.solr.rev}.jar"/>
+    </dependency>
     <dependency org="${ivy.jar.restlet.org}" name="${ivy.jar.restlet.name}" rev="${ivy.jar.restlet.rev}">
-      <artifact name="{ivy.jar.restlet.name}" type="jar"
+      <artifact name="${ivy.jar.restlet.name}" type="jar"
                 url="http://maven.restlet.com/org/restlet/jee/${ivy.jar.restlet.name}/${ivy.jar.restlet.rev}/${ivy.jar.restlet.name}-${ivy.jar.restlet.rev}.jar"/>
     </dependency>
     <dependency org="${ivy.jar.restlet.org}" name="${ivy.jar.restlet-ext.name}" rev="${ivy.jar.restlet.rev}">
@@ -58,10 +74,13 @@
       <artifact name="${ivy.jar.commons-lang.name}" type="jar"
                 url="http://repo1.maven.org/maven2/org/apache/commons/${ivy.jar.commons-lang.name}/${ivy.jar.commons-lang.rev}/${ivy.jar.commons-lang.name}-${ivy.jar.commons-lang.rev}.jar"/>
     </dependency>
+    <dependency org="${ivy.jar.commons-io.org}" name="${ivy.jar.commons-io.name}" rev="${ivy.jar.commons-io.rev}">
+      <artifact name="${ivy.jar.commons-io.name}" type="jar"
+                url="http://central.maven.org/maven2/commons-io/${ivy.jar.commons-io.name}/${ivy.jar.commons-io.rev}/${ivy.jar.commons-io.name}-${ivy.jar.commons-io.rev}.jar"/>
+    </dependency>
     <dependency org="${ivy.jar.commons-cli.org}" name="${ivy.jar.commons-cli.name}" rev="${ivy.jar.commons-cli.rev}">
       <artifact name="${ivy.jar.commons-cli.name}" type="jar"
                 url="http://repo1.maven.org/maven2/commons-cli/${ivy.jar.commons-cli.name}/${ivy.jar.commons-cli.rev}/${ivy.jar.commons-cli.name}-${ivy.jar.commons-cli.rev}.jar"/>
     </dependency>
   </dependencies>
 </ivy-module>
-
