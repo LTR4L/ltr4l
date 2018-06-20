@@ -46,6 +46,14 @@
       <artifact name="${ivy.jar.slf4j-simple.name}" type="jar"
                 url="http://central.maven.org/maven2/org/slf4j/${ivy.jar.slf4j-simple.name}/${ivy.jar.slf4j.rev}/${ivy.jar.slf4j-simple.name}-${ivy.jar.slf4j.rev}.jar"/>
     </dependency>
+    <dependency org="${ivy.jar.httpcomponents.org}" name="${ivy.jar.httpcomponents-core.name}" rev="${ivy.jar.httpcomponents-core.rev}">
+      <artifact name="${ivy.jar.httpcomponents-core.name}" type="jar"
+                url="http://central.maven.org/maven2/org/apache/httpcomponents/${ivy.jar.httpcomponents-core.name}/${ivy.jar.httpcomponents-core.rev}/${ivy.jar.httpcomponents-core.name}-${ivy.jar.httpcomponents-core.rev}.jar"/>
+    </dependency>
+    <dependency org="${ivy.jar.httpcomponents.org}" name="${ivy.jar.httpcomponents-client.name}" rev="${ivy.jar.httpcomponents-client.rev}">
+      <artifact name="${ivy.jar.httpcomponents-client.name}" type="jar"
+                url="http://central.maven.org/maven2/org/apache/httpcomponents/${ivy.jar.httpcomponents-client.name}/${ivy.jar.httpcomponents-client.rev}/${ivy.jar.httpcomponents-client.name}-${ivy.jar.httpcomponents-client.rev}.jar"/>
+    </dependency>
     <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-core.name}" rev="${ivy.jar.lucene.rev}">
       <artifact name="${ivy.jar.lucene-core.name}" type="jar"
                 url="http://repo1.maven.org/maven2/org/apache/lucene/${ivy.jar.lucene-core.name}/${ivy.jar.lucene.rev}/${ivy.jar.lucene-core.name}-${ivy.jar.lucene.rev}.jar"/>

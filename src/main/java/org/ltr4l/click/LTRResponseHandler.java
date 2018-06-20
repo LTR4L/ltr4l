@@ -26,7 +26,7 @@ import java.util.Objects;
 public class LTRResponseHandler {
   protected final LTRResponse response;
 
-  protected LTRResponseHandler(Reader reader) throws IOException{
+  public LTRResponseHandler(Reader reader) throws IOException{
     ObjectMapper mapper = new ObjectMapper();
     response = mapper.readValue(reader, LTRResponse.class);
   }
