@@ -25,16 +25,16 @@ public class Distribution {
   private final double[][] dist;
   protected double normFactor;
 
-  public Distribution(List<Query> queries){
+  public Distribution(List<RankedDocs> queries){ //TODO: doesn't have to be RankedDocs for AdaBoost...
     dist = new double[queries.size()][];
     initialize(queries);
     normFactor = 1d;
   }
 
-  protected void initialize(List<Query> queries){
-    int totalDocs = queries.stream().mapToInt(q -> q.getDocList().stream().mapToInt(doc -> 1).sum()).sum();
+  protected void initialize(List<RankedDocs> queries){
+    int totalDocs = queries.stream().mapToInt(q -> q.stream().mapToInt(doc -> 1).sum()).sum();
     for(int i = 0; i < queries.size(); i++){
-      List<Document> queryDocs = queries.get(i).getDocList();
+      List<Document> queryDocs = queries.get(i);
       dist[i] = new double[queryDocs.size()];
       for(int j = 0; j < queryDocs.size(); j++)
         dist[i][j] = 1d/totalDocs;

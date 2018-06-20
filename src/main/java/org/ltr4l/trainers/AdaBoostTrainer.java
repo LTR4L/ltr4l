@@ -42,7 +42,7 @@ public class AdaBoostTrainer extends AbstractTrainer<AdaBoost, RankBoost.RankBoo
       if(rDocs.getLabel(0) == rDocs.getLabel(rDocs.size() - 1)) continue;
       rTrainingSet.add(rDocs);
     }
-    distribution = new Distribution(trainingSet);
+    distribution = new Distribution(rTrainingSet);
   }
 
   @Override
