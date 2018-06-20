@@ -29,16 +29,20 @@ public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
   private final double threshold;
   private double alpha;
 
-  public static WeakLearner findWeakLearner(RBDistribution dist, List<RankedDocs> queries, int numSteps){ // Here we want to find alpha and criteria for new weak learner
+  public static WeakLearner findWeakLearner(RBDistribution dist, List<RankedDocs> queries, int numSteps){ //For RankBoost
+    // Here we want to find alpha and criteria for new weak learner
     //Note: The implementation here uses an approximation; see the third method of 3.2 in the original paper.
-    double[][] potential = dist.calcPotential();
-    RankBoostTools tools = new RankBoostTools(potential, queries);
+    return findWeakLearner(dist.calcPotential(), queries, numSteps);
+  }
+
+  public static WeakLearner findWeakLearner(double[][] distribution, List<RankedDocs> queries, int numSteps){ //For Adaboost.
+    RankBoostTools tools = new RankBoostTools(distribution, queries);
     List<Document> docs = new ArrayList<>();
     queries.forEach(docs::addAll);
-    OptimalLeafLoss optloss = tools.findMinLeafThreshold(docs, numSteps);
-    double r = 1 / optloss.getMinLoss();
+    OptimalLeafLoss optLoss = tools.findMinLeafThreshold(docs, numSteps);
+    double r = 1 / optLoss.getMinLoss();
     double alpha = 0.5 * Math.log((1 + r) / (1 - r));
-    return new WeakLearner(optloss.getOptimalFeature(), optloss.getOptimalThreshold(), alpha);
+    return new WeakLearner(optLoss.getOptimalFeature(), optLoss.getOptimalThreshold(), alpha);
   }
 
 

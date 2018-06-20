@@ -32,6 +32,7 @@ public class AdaBoost extends Ranker<RankBoost.RankBoostConfig> {
   public AdaBoost(){
     learners = new ArrayList<>();
   }
+  public AdaBoost(Reader reader){learners = readModel(reader); }
 
   @Override
   public void writeModel(RankBoost.RankBoostConfig config, Writer writer) throws IOException {
@@ -62,5 +63,9 @@ public class AdaBoost extends Ranker<RankBoost.RankBoostConfig> {
       throw new RuntimeException(e);
     }
     return wls;
+  }
+
+  public void addLearner(WeakLearner wl){
+    learners.add(wl);
   }
 }

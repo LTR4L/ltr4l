@@ -17,6 +17,7 @@ package org.ltr4l.boosting;
 
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
+import org.ltr4l.query.RankedDocs;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class Distribution {
   private final double[][] dist;
   protected double normFactor;
 
-  protected Distribution(List<Query> queries){
+  public Distribution(List<Query> queries){
     dist = new double[queries.size()][];
     initialize(queries);
     normFactor = 1d;
@@ -40,10 +41,10 @@ public class Distribution {
     }
   }
 
-  public void update(WeakLearner wl, List<Query> queries ){
+  public void update(WeakLearner wl, List<RankedDocs> queries ){ //TODO: Does not have to be ordered; matched with RBDist
     double newNormFactor = 0d;
     for(int qid = 0; qid < queries.size(); qid++){
-      newNormFactor += updateQuery(wl, qid, queries.get(qid).getDocList());
+      newNormFactor += updateQuery(wl, qid, queries.get(qid));
     }
     normalize(newNormFactor);
     normFactor = newNormFactor;
@@ -66,6 +67,22 @@ public class Distribution {
         dist[qid][i] /= normFactor;
     }
     this.normFactor = normFactor;
+  }
+
+  public double[][] getFullDist(){
+    return dist;
+  }
+
+  public double[] getQueryDist(int i){
+    return dist[i];
+  }
+
+  public void setQueryDist(int i, double[] newDist){
+    dist[i] = newDist;
+  }
+
+  public double getNormFactor() {
+    return normFactor;
   }
 
 
