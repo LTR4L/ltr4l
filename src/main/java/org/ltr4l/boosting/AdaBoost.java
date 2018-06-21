@@ -48,8 +48,9 @@ public class AdaBoost extends Ranker<RankBoost.RankBoostConfig> {
   @Override
   public double predict(List<Double> features) {
     //For binary prediction
-    //return Math.signum(learners.stream().mapToDouble(learner -> learner.predict(features)).sum());
-    return learners.stream().mapToDouble(learner -> learner.predict(features)).sum() / learners.size();
+    //TODO: Confirm correct implementation
+    return Math.signum(learners.stream().mapToDouble(learner -> learner.predict(features)).sum());
+    //return learners.stream().mapToDouble(learner -> learner.predict(features)).sum() / learners.size();
   }
 
   public List<WeakLearner> readModel(Reader reader){

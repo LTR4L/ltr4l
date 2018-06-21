@@ -25,9 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
-  private final int fid;
-  private final double threshold;
-  private double alpha;
+  protected final int fid;
+  protected final double threshold;
+  protected final double alpha;
 
   public static WeakLearner findWeakLearner(RBDistribution dist, List<RankedDocs> queries, int numSteps){ //For RankBoost
     // Here we want to find alpha and criteria for new weak learner

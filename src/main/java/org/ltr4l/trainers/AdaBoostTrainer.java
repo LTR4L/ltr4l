@@ -15,10 +15,7 @@
  */
 package org.ltr4l.trainers;
 
-import org.ltr4l.boosting.AdaBoost;
-import org.ltr4l.boosting.Distribution;
-import org.ltr4l.boosting.RankBoost;
-import org.ltr4l.boosting.WeakLearner;
+import org.ltr4l.boosting.*;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.query.RankedDocs;
@@ -57,8 +54,7 @@ public class AdaBoostTrainer extends AbstractTrainer<AdaBoost, RankBoost.RankBoo
 
   @Override
   public void train() {
-    //One iteration of training.
-    WeakLearner wl = WeakLearner.findWeakLearner(distribution.getFullDist(), rTrainingSet, config.getNumSteps());
+    WeakLearner wl = AdaWeakLearner.findWeakLearner(distribution.getFullDist(), rTrainingSet, config.getNumSteps());
     ranker.addLearner(wl);
     distribution.update(wl, rTrainingSet);
   }
