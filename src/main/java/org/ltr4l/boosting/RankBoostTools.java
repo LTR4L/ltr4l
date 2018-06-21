@@ -78,7 +78,7 @@ public class RankBoostTools extends TreeTools {
       double r = Math.abs(L - (q * R));
       //This statement is to get the algorithm to look at other features; when r maxes at 1 for a certain feature,
       //it continues to be chosen.
-      if(r > maxr && r < 0.98){ //TODO: Keep set of already selected features to ensure other features are not skipped.
+      if(r > maxr && r < 0.98){ //TODO: Use a set or make this a user defined number
         finalThreshold = threshold;
         maxr = r;
         qdef = q;

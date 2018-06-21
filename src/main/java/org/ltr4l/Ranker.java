@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ltr4l.boosting.AdaBoost;
 import org.ltr4l.boosting.Ensemble;
 import org.ltr4l.boosting.RankBoost;
 import org.ltr4l.nn.*;
@@ -159,6 +160,8 @@ public abstract class Ranker<C extends Config> {
             return new Ensemble(reader);
           case "rankboost":
             return new RankBoost(reader);
+          case "adaboost":
+            return new AdaBoost(reader);
           default:
             throw new IllegalArgumentException("Specified algorithm does not exist.");
         }

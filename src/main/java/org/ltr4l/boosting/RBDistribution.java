@@ -33,7 +33,7 @@ public class RBDistribution {
     return iDist;
   }
 
-  public static int getCorrectPairNumber(RankedDocs docs){
+  private static int getCorrectPairNumber(RankedDocs docs){
     int correctPairs = 0;
     for(int i = 0; i < docs.size() - 1; i++){
       if(docs.getLabel(i) == 0) return correctPairs;

@@ -206,6 +206,8 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
             return new LambdaMartTrainer(trainingSet, validationSet, reader, override);
           case "rankboost":
             return new RankBoostTrainer(trainingSet, validationSet, reader, override);
+          case "adaboost":
+            return new AdaBoostTrainer(trainingSet, validationSet, reader, override);
           default:
             throw new IllegalArgumentException();
         }
