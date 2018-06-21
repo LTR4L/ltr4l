@@ -1,5 +1,5 @@
 {
-  "algorithm": "rankboost",
+  "algorithm": "adaboost",
   "numIterations": 100,
   "verbose": true,
   "params": {
@@ -16,7 +16,7 @@
   },
   "model": {
     "format": "json",
-    "file": "model/rankboost-model.json"
+    "file": "model/adaboost-model.json"
   },
   "evaluation": {
     "evaluator": "NDCG",
@@ -26,6 +26,6 @@
   },
   "report": {
     "format": "csv",
-    "file": "report/rankboost-report.csv"
+    "file": "report/adaboost-report.csv"
   }
 }
