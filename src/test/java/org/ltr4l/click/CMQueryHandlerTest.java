@@ -39,7 +39,7 @@ public class CMQueryHandlerTest {
 
 
   private static final String TARGET_JSON = "{\n" +
-      "  \"idField\" : \"url\",\n" +
+      "  \"idField\" : \"id\",\n" +
       "  \"queries\" : [ {\n" +
       "    \"qid\" : 0,\n" +
       "    \"query\" : \"iPhone\",\n" +
