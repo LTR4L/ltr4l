@@ -16,7 +16,6 @@
 
 package org.ltr4l.lucene.solr.server;
 
-import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
@@ -28,13 +27,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class NeuralNetworkQuery extends AbstractLTRQuery {
-  GenericObjectPool<Ranker> rankerPool;
-//  private Ranker ranker;
-//  public NeuralNetworkQuery(List<FieldFeatureExtractorFactory> featuresSpec, Ranker ranker){
-  public NeuralNetworkQuery(List<FieldFeatureExtractorFactory> featuresSpec, GenericObjectPool<Ranker> rankerPool){
+public class DefaultLTRQuery extends AbstractLTRQuery {
+  private Ranker ranker;
+  public DefaultLTRQuery(List<FieldFeatureExtractorFactory> featuresSpec, Ranker ranker){
     super(featuresSpec);
-    this.rankerPool = rankerPool;
+    this.ranker = ranker;
   }
 
   @Override
@@ -47,12 +44,12 @@ public class NeuralNetworkQuery extends AbstractLTRQuery {
 
   @Override
   public Weight createWeight(IndexSearcher searcher, boolean needsScores, float boost) throws IOException {
-    return new NeuralNetworkQuery.NeuralNetworkWeight(this);
+    return new DefaultLTRQuery.DefaultLTRWeight(this);
   }
 
-  public final class NeuralNetworkWeight extends Weight {
+  public final class DefaultLTRWeight extends Weight {
 
-    protected NeuralNetworkWeight(Query query){
+    protected DefaultLTRWeight(Query query){
       super(query);
     }
 
@@ -74,7 +71,7 @@ public class NeuralNetworkQuery extends AbstractLTRQuery {
 
     @Override
     public Explanation explain(LeafReaderContext leafReaderContext, int doc) throws IOException {
-      NeuralNetworkDefaultScorer scorer = (NeuralNetworkDefaultScorer)scorer(leafReaderContext);
+      DefaultLTRScorer scorer = (DefaultLTRScorer)scorer(leafReaderContext);
       if(scorer != null){
         int newDoc = scorer.iterator().advance(doc);
         if (newDoc == doc) {
@@ -99,8 +96,7 @@ public class NeuralNetworkQuery extends AbstractLTRQuery {
       if(allDocs.size() == 0) {
         return null;
       } else {
-//        return new NeuralNetworkDefaultScorer(this, spec, getIterator(allDocs), ranker);
-        return new NeuralNetworkDefaultScorer(this, spec, getIterator(allDocs), rankerPool);
+        return new DefaultLTRScorer(this, spec, getIterator(allDocs), ranker);
       }
     }
 

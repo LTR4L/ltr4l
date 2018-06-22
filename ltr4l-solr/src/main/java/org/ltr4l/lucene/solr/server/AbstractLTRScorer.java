@@ -27,20 +27,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractNeuralNetworkScorer extends Scorer {
+public abstract class AbstractLTRScorer extends Scorer {
 
   protected final List<FieldFeatureExtractor[]> featuresSpec;
   protected final DocIdSetIterator iterator;
-  GenericObjectPool<Ranker> rankerPool;
-//  protected final Ranker ranker;
+  protected final Ranker ranker;
 
-  public AbstractNeuralNetworkScorer(Weight luceneWeight, List<FieldFeatureExtractor[]> featuresSpec,
-                                     DocIdSetIterator iterator, GenericObjectPool<Ranker> rankerPool){
-//                                     DocIdSetIterator iterator, Ranker ranker){
+  public AbstractLTRScorer(Weight luceneWeight, List<FieldFeatureExtractor[]> featuresSpec,
+                                     DocIdSetIterator iterator, Ranker ranker){
     super(luceneWeight);
     this.featuresSpec = featuresSpec;
     this.iterator = iterator;
-    this.rankerPool = rankerPool;
+    this.ranker = ranker;
   }
 
   public List<Explanation> subExplanations(int target) throws IOException {
@@ -82,16 +80,6 @@ public abstract class AbstractNeuralNetworkScorer extends Scorer {
       idx++;
     }
 
-    Ranker ranker;
-    try {
-      ranker = rankerPool.borrowObject();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return 0.0f;
-    }
-    float score = (float)ranker.predict(features);
-    rankerPool.returnObject(ranker);
-
-    return score;
+    return (float)ranker.predict(features);
   }
 }

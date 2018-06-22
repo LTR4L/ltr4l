@@ -16,26 +16,23 @@
 
 package org.ltr4l.lucene.solr.server;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.lucene.util.IOUtils;
 import org.apache.solr.core.SolrResourceLoader;
 import org.ltr4l.Ranker;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 
-public class NeuralNetworkModelReader extends AbstractConfigReader {
+public class DefaultLTRModelReader extends AbstractConfigReader {
   protected static String solrHome;
   protected static String fileName;
 
-  public NeuralNetworkModelReader(String fileName) throws IOException {
+  public DefaultLTRModelReader(String fileName) throws IOException {
     this(null, fileName);
   }
 
-  public NeuralNetworkModelReader(SolrResourceLoader loader, String fileName) throws IOException {
+  public DefaultLTRModelReader(SolrResourceLoader loader, String fileName) throws IOException {
     super(loader, fileName);
     this.fileName = fileName;
   }

@@ -16,8 +16,6 @@
 
 package org.ltr4l.lucene.solr.server;
 
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.search.Query;
@@ -34,9 +32,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NeuralNetworkQParserPlugin extends QParserPlugin {
+public class DefaultLTRQParserPlugin extends QParserPlugin {
   List<FieldFeatureExtractorFactory> featuresSpec = new ArrayList<FieldFeatureExtractorFactory>();
-  GenericObjectPool<Ranker> rankerPool;
+  Ranker ranker;
 
   @Override
   public void init(NamedList args){
@@ -45,12 +43,11 @@ public class NeuralNetworkQParserPlugin extends QParserPlugin {
     String modelFileName = (String)settings.get("model");
     int poolSize = Integer.valueOf((String)settings.get("poolSize"));
 
-    FeaturesConfigReader fcReader = null;
-    NeuralNetworkModelReader nnmReader = null;
-
+    FeaturesConfigReader fcReader;
+    DefaultLTRModelReader dlmReader;
     try {
       fcReader = new FeaturesConfigReader(featuresFileName);
-      nnmReader = new NeuralNetworkModelReader(modelFileName);
+      dlmReader = new DefaultLTRModelReader(modelFileName);
 
       FeaturesConfigReader.FeatureDesc[] featureDescs = fcReader.getFeatureDescs();
       for (FeaturesConfigReader.FeatureDesc featureDesc : featureDescs) {
@@ -62,7 +59,7 @@ public class NeuralNetworkQParserPlugin extends QParserPlugin {
         FieldFeatureExtractorFactory dfeFactory = FeaturesConfigReader.loadFactory(featureDesc);
         featuresSpec.add(dfeFactory);
       }
-      createRankerPool(poolSize, nnmReader);
+      ranker = dlmReader.getRanker();
     } catch (IOException ioe) {
       ioe.printStackTrace();
     }
@@ -70,49 +67,16 @@ public class NeuralNetworkQParserPlugin extends QParserPlugin {
 
   @Override
   public QParser createParser(String query, SolrParams localParams, SolrParams params, SolrQueryRequest req) {
-/*
+    //TODO implements Ranker#deepCopy()
+//    return new DefaultLTRQParser(query, localParams, params, req, ranker.deepCopy());
+    return new DefaultLTRQParser(query, localParams, params, req, ranker);
+  }
+
+  public class DefaultLTRQParser extends QParser {
     Ranker ranker;
-    try {
-      ranker = rankerPool.borrowObject();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null;
-    }
-*/
-//    return new NeuralNetworkQParser(query, localParams, params, req, ranker);
-    return new NeuralNetworkQParser(query, localParams, params, req, rankerPool);
-
-  }
-
-  private void createRankerPool(int poolSize, NeuralNetworkModelReader nnmReader) {
-    GenericObjectPoolConfig genericObjectPoolConfig = new GenericObjectPoolConfig();
-    genericObjectPoolConfig.setMaxTotal(poolSize);
-    genericObjectPoolConfig.setBlockWhenExhausted(false);
-
-    rankerPool = new GenericObjectPool<>(new PooledRankerFactory(nnmReader), genericObjectPoolConfig);
-
-    //TODO: Smarter code.
-    List<Ranker> rankerList = new ArrayList<>(poolSize);
-    try {
-      for (int i = 0; i< poolSize; i++) {
-        rankerList.add(rankerPool.borrowObject());
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    for (Ranker ranker : rankerList) {
-      rankerPool.returnObject(ranker);
-    }
-  }
-
-
-  public class NeuralNetworkQParser extends QParser {
-//    Ranker ranker;
-//    public NeuralNetworkQParser(String query, SolrParams localParams, SolrParams params, SolrQueryRequest req, Ranker ranker) {
-    GenericObjectPool<Ranker> rankerPool;
-    public NeuralNetworkQParser(String query, SolrParams localParams, SolrParams params, SolrQueryRequest req, GenericObjectPool<Ranker> rankerPool) {
+    public DefaultLTRQParser(String query, SolrParams localParams, SolrParams params, SolrQueryRequest req, Ranker ranker) {
       super(query, localParams, params, req);
-      this.rankerPool = rankerPool;
+      this.ranker = ranker;
     }
 
     @Override
@@ -125,8 +89,7 @@ public class NeuralNetworkQParserPlugin extends QParserPlugin {
         factory.init(context, FieldFeatureExtractorFactory.terms(fieldName, qstr, analyzer));
       }
 
-//      return new NeuralNetworkQuery(featuresSpec, ranker);
-      return new NeuralNetworkQuery(featuresSpec, rankerPool);
+      return new DefaultLTRQuery(featuresSpec, ranker);
     }
   }
 

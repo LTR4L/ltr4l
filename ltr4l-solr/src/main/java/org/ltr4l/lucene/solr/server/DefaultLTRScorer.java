@@ -16,19 +16,16 @@
 
 package org.ltr4l.lucene.solr.server;
 
-import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Weight;
 import org.ltr4l.Ranker;
 
 import java.util.List;
 
-public class NeuralNetworkDefaultScorer extends AbstractNeuralNetworkScorer {
+public class DefaultLTRScorer extends AbstractLTRScorer {
 
-  public NeuralNetworkDefaultScorer(Weight luceneWeight, List<FieldFeatureExtractor[]> featuresSpec,
-                                    DocIdSetIterator iterator, GenericObjectPool<Ranker> rankerPool){
-//                                    DocIdSetIterator iterator, Ranker ranker){
-//    super(luceneWeight, featuresSpec, iterator, ranker);
-    super(luceneWeight, featuresSpec, iterator, rankerPool);
+  public DefaultLTRScorer(Weight luceneWeight, List<FieldFeatureExtractor[]> featuresSpec,
+                                    DocIdSetIterator iterator, Ranker ranker){
+    super(luceneWeight, featuresSpec, iterator, ranker);
   }
 }
