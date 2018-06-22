@@ -26,8 +26,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 public abstract class AbstractConfigReader {
-
-  protected static Map configMap = null;
+  protected Map configMap = null;
 
   public AbstractConfigReader(SolrResourceLoader loader, String fileName) throws IOException {
     this(loader, fileName, null);

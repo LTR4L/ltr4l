@@ -52,7 +52,7 @@ public class CMQueryHandler {
     public List<CMQuery> queries;
 
     public CMQueries(Map<String, Map<String, Float>> clickRates){
-      idField = "url";
+      idField = "id";
       queries = new ArrayList<>();
       int qid = 0; //TODO: ok to start qid from 0?
       for(String query : clickRates.keySet()){
@@ -63,6 +63,46 @@ public class CMQueryHandler {
         qid++;
       }
     }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder();
+      sb.append("{\"idField\": \"");
+      sb.append(this.idField);
+      sb.append("\", \"queries\": [ ");
+
+      List<CMQuery> queries = this.queries;
+      int querylen = queries.size();
+      for (int i = 0; ; ) {
+        CMQuery cmQuery = queries.get(i);
+        sb.append("{ \"qid\": " + String.valueOf(cmQuery.qid) + ", \"query\": \"" + cmQuery.query + "\", \"docs\": [ ");
+
+        String[] docs = cmQuery.docs;
+        int doclen = docs.length;
+
+        for (int j = 0; ; ) {
+          sb.append("\"" + docs[j] + "\"");
+          j++;
+          if (j < doclen) {
+            sb.append(", ");
+          } else {
+            break;
+          }
+        }
+
+        i++;
+        if (i < querylen) {
+          sb.append("] }, ");
+        } else {
+          sb.append("] } ");
+          break;
+        }
+      }
+      sb.append("] }");
+
+      return sb.toString();
+    }
+
 
     public static class CMQuery{
       public int qid;

@@ -37,7 +37,7 @@ public class LTRResponse {
   }
 
   public static class Data {
-    public String[] feature;
+    public String[] lucene;
     public LQuery[] queries;
   }
 
@@ -48,7 +48,7 @@ public class LTRResponse {
   }
 
   public static class Doc {
-    public double[] feature;
+    public double[] lucene;
     public String id;
     @JsonIgnore
     private float clickrate;
