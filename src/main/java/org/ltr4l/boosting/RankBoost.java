@@ -28,45 +28,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class RankBoost extends Ranker<RankBoost.RankBoostConfig> {
-  private final List<WeakLearner> learners;
+public class RankBoost extends AdaBoost {
 
   public RankBoost(){
-    learners = new ArrayList<>();
+    super();
   }
 
   public RankBoost(Reader reader){
-    learners = readModel(reader);
-  }
-
-  public void addLearner(WeakLearner wl){
-    learners.add(wl);
-  }
-
-  @Override
-  public void writeModel(RankBoostConfig config, Writer writer) throws IOException {
-    int[] features = learners.stream().mapToInt(l -> l.getFid()).toArray();
-    double[] thresholds = learners.stream().mapToDouble(l -> l.getThreshold()).toArray();
-    double[] alphas = learners.stream().mapToDouble(l -> l.getAlpha()).toArray();
-    SavedModel model = new SavedModel(config, features, thresholds, alphas);
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.enable(SerializationFeature.INDENT_OUTPUT);
-    mapper.writeValue(writer, model);
-  }
-
-  public List<WeakLearner> readModel(Reader reader){
-    List<WeakLearner> wls = new ArrayList<>();
-    try{
-      Objects.requireNonNull(reader);
-      ObjectMapper mapper = new ObjectMapper();
-      SavedModel model = mapper.readValue(reader, SavedModel.class);
-      model.assertLengths();
-      for(int i = 0; i < model.thresholds.length; i++)
-        wls.add(new WeakLearner(model.features[i], model.thresholds[i], model.weights[i]));
-    } catch(IOException e){
-      throw new RuntimeException(e);
-    }
-    return wls;
+    super(reader);
   }
 
   @Override

@@ -16,74 +16,91 @@
 package org.ltr4l.boosting;
 
 import org.ltr4l.query.Document;
-import org.ltr4l.query.Query;
 import org.ltr4l.query.RankedDocs;
 
 import java.util.List;
 
-public class Distribution {
-  private final double[][] dist;
+public abstract class Distribution {
   protected double normFactor;
 
-  public Distribution(List<RankedDocs> queries){ //TODO: doesn't have to be RankedDocs for AdaBoost...
-    dist = new double[queries.size()][];
-    initialize(queries);
+  Distribution(){
     normFactor = 1d;
   }
 
-  protected void initialize(List<RankedDocs> queries){
-    int totalDocs = queries.stream().mapToInt(q -> q.stream().mapToInt(doc -> 1).sum()).sum();
-    for(int i = 0; i < queries.size(); i++){
-      List<Document> queryDocs = queries.get(i);
-      dist[i] = new double[queryDocs.size()];
-      for(int j = 0; j < queryDocs.size(); j++)
-        dist[i][j] = 1d/totalDocs;
-    }
-  }
+  protected abstract void initialize(List<RankedDocs> queries);
+  protected abstract double updateQuery(WeakLearner wl, int qid, List<Document> queryDocs);
+  protected abstract void normalize(double normFactor);
 
-  public void update(WeakLearner wl, List<RankedDocs> queries ){ //TODO: Does not have to be ordered; matched with RBDist
+  public void update(WeakLearner wl, List<RankedDocs> queries ){
     double newNormFactor = 0d;
     for(int qid = 0; qid < queries.size(); qid++){
-      newNormFactor += updateQuery(wl, qid, queries.get(qid));
+      newNormFactor += updateQuery(wl, qid, queries.get(qid).getRankedDocs());
     }
     normalize(newNormFactor);
-    normFactor = newNormFactor;
   }
 
-  protected double updateQuery(WeakLearner wl, int qid, List<Document> queryDocs){ //returns the query normalization factor
-    double newNormFactor = 0d;
-    for(int i = 0; i < queryDocs.size() - 1; i++){
-      Document doc = queryDocs.get(i);
-      //Adaboost distribution considers only two classes; i.e. relevant or irrelevant
-      dist[qid][i] *= Math.exp(-wl.getAlpha() * (doc.getLabel() <= 0 ? -1 : 1) * wl.predict(doc.getFeatures()));
-      newNormFactor += dist[qid][i];
+
+  public static abstract class D2 extends Distribution{
+    protected final double[][] dist;
+
+    public D2(List<RankedDocs> queries){
+      dist = new double[queries.size()][];
+      initialize(queries);
     }
-    return newNormFactor;
-  }
 
-  private void normalize(double normFactor){
-    for(int qid = 0; qid < dist.length; qid++){
-      for(int i = 0; i < dist[qid].length; i++)
-        dist[qid][i] /= normFactor;
+    @Override
+    protected void normalize(double normFactor){
+      for(int qid = 0; qid < dist.length; qid++){
+        for(int i = 0; i < dist[qid].length; i++)
+          dist[qid][i] /= normFactor;
+      }
+      this.normFactor = normFactor;
     }
-    this.normFactor = normFactor;
+
+    public double[][] getFullDist(){
+      return dist;
+    }
+    public double[] getQueryDist(int i){
+      return dist[i];
+    }
+    public void setQueryDist(int i, double[] newDist){
+      dist[i] = newDist;
+    }
   }
 
-  public double[][] getFullDist(){
-    return dist;
+  /**
+   * 3-Dimensional distribution used for boosting. R
+   * means that RankedDocs is required (Documents must be
+   * sorted in order of descending label)
+   */
+  public static abstract class D3R extends Distribution{
+    protected final double[][][] dist;
+
+    public D3R(List<RankedDocs> rQueries){
+      dist = new double[rQueries.size()][][];
+      initialize(rQueries);
+    }
+
+    protected void normalize(double normFactor){
+      for(int qid = 0; qid < dist.length; qid++){
+        for(int i = 0; i < dist[qid].length; i++)
+          for(int j = 0; j < dist[qid][i].length; j++) //Note: could be sped up
+            dist[qid][i][j] /= normFactor;
+      }
+      this.normFactor = normFactor;
+    }
+
+    public double[][][] getFullDist(){
+      return dist;
+    }
+    public double[][] getQueryDist(int i){
+      return dist[i];
+    }
+    public void setQueryDist(int i, double[][] newDist){
+      dist[i] = newDist;
+    }
+    public double getNormFactor() {
+      return normFactor;
+    }
   }
-
-  public double[] getQueryDist(int i){
-    return dist[i];
-  }
-
-  public void setQueryDist(int i, double[] newDist){
-    dist[i] = newDist;
-  }
-
-  public double getNormFactor() {
-    return normFactor;
-  }
-
-
 }

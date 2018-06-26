@@ -38,7 +38,7 @@ public class WeakLearner extends Ranker<RankBoost.RankBoostConfig> {
   public static WeakLearner findWeakLearner(double[][] distribution, List<RankedDocs> queries, int numSteps){ //For Adaboost.
     RankBoostTools tools = new RankBoostTools(distribution, queries);
     List<Document> docs = new ArrayList<>();
-    queries.forEach(docs::addAll);
+    queries.forEach(rd -> docs.addAll(rd.getRankedDocs()));
     OptimalLeafLoss optLoss = tools.findMinLeafThreshold(docs, numSteps);
     double r = 1 / optLoss.getMinLoss();
     double alpha = 0.5 * Math.log((1 + r) / (1 - r));

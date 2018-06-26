@@ -10,12 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
 import static org.ltr4l.boosting.RBDistributionTest.assertRankedDocs;
 import static org.ltr4l.boosting.TreeToolsTest.addLabels;
 import static org.ltr4l.boosting.TreeToolsTest.makeDocsWithFeatures;
 
-public class DistributionTest {
+public class ABDistributionTest {
   private List<RankedDocs> queries;
 
   @Before
@@ -59,8 +58,8 @@ public class DistributionTest {
 
   @Test
   public void testInitialize() throws Exception {
-    Distribution distribution = new Distribution(queries);
-    double[][] dist = distribution.getFullDist();
+    ABDistribution ABDistribution = new ABDistribution(queries);
+    double[][] dist = ABDistribution.getFullDist();
     for(double[] qDist : dist)
       for(double d : qDist)
         Assert.assertEquals(1d/15, d, 0.01);
@@ -72,11 +71,11 @@ public class DistributionTest {
 
   @Test
   public void testUpdateQuery() {
-    Distribution distribution = new Distribution(queries);
+    ABDistribution ABDistribution = new ABDistribution(queries);
     WeakLearner wl = new AdaWeakLearner(4, 10.0,2);
     int qid = 0;
-    double newNormFactor = distribution.updateQuery(wl, qid, queries.get(qid));
-    double[] qDist = distribution.getQueryDist(qid);
+    double newNormFactor = ABDistribution.updateQuery(wl, qid, queries.get(qid).getRankedDocs());
+    double[] qDist = ABDistribution.getQueryDist(qid);
     Assert.assertEquals(Math.exp(2)/15, qDist[0], 0.000001);
     Assert.assertEquals(Math.exp(-2)/15, qDist[1], 0.000001);
     Assert.assertEquals(Math.exp(-2)/15, qDist[2], 0.000001);
