@@ -89,5 +89,18 @@ public abstract class Distribution {
       }
       this.normFactor = normFactor;
     }
+
+    public double[][][] getFullDist(){
+      return dist;
+    }
+    public double[][] getQueryDist(int i){
+      return dist[i];
+    }
+    public void setQueryDist(int i, double[][] newDist){
+      dist[i] = newDist;
+    }
+    public double getNormFactor() {
+      return normFactor;
+    }
   }
 }

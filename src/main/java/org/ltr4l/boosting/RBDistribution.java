@@ -15,14 +15,13 @@
  */
 package org.ltr4l.boosting;
 
+import org.ltr4l.query.Document;
 import org.ltr4l.query.RankedDocs;
 import org.ltr4l.trainers.RankBoostTrainer;
 
 import java.util.List;
 
-public class RBDistribution {
-  private final double[][][] dist;
-  private double normFactor;
+public class RBDistribution extends Distribution.D3R {
 
   private static int getCorrectPairNumber(RankedDocs docs){
     int correctPairs = 0;
@@ -50,12 +49,7 @@ public class RBDistribution {
   }
 
   public RBDistribution(List<RankedDocs> rQueries){
-    int correctPairNum = 0;
-    for(RankedDocs query : rQueries)
-      correctPairNum += getCorrectPairNumber(query);
-    dist = new double[rQueries.size()][][];
-    normFactor = 1d;
-    initialize(rQueries);
+    super(rQueries);
   }
 
   protected double[][] calcPotential(){
@@ -66,18 +60,12 @@ public class RBDistribution {
       for(int i = 0; i < qDist.length; i++) {  //Note: because of how RBDistribution is created, this can be sped up.
         for(int j = 0; j < qDist.length; j++)
           potential[qid][i] += qDist[j][i] - qDist[i][j];
-/*        double p = 0d;
-        for (int k = i + 1; k < qDist.length; k++)
-          p += qDist[i][k];
-        for(int k = 0; k < i; k++)
-          p -= qDist[k][i];
-        potential[qid][i] = p;*/
       }
     }
     return potential;
   }
 
-  private void initialize(List<RankedDocs> rQueries){
+  protected void initialize(List<RankedDocs> rQueries){
     int correctPairNum = 0;
     for(RankedDocs query : rQueries)
       correctPairNum += getCorrectPairNumber(query);
@@ -85,18 +73,8 @@ public class RBDistribution {
       dist[i] = initQueryDist(rQueries.get(i), correctPairNum);
   }
 
-
-
-  public void update(WeakLearner wl, List<RankedDocs> queries ){
-    double newNormFactor = 0d;
-    for(int qid = 0; qid < queries.size(); qid++){
-      newNormFactor += updateQuery(wl, qid, queries.get(qid));
-    }
-    normalize(newNormFactor);
-    normFactor = newNormFactor;
-  }
-
-  protected double updateQuery(WeakLearner wl, int qid, RankedDocs rankedDocs){ //returns the query normalization factor
+  @Override
+  protected double updateQuery(WeakLearner wl, int qid, List<Document> rankedDocs) {
     double newNormFactor = 0d;
     for(int i = 0; i < rankedDocs.size() - 1; i++){
       for(int j = rankedDocs.size() - 1; j >= i + 1; j--){ //Speedup. Go back until equivalent label is reached.
@@ -108,28 +86,7 @@ public class RBDistribution {
     return newNormFactor;
   }
 
-  private void normalize(double normFactor){
-    for(int qid = 0; qid < dist.length; qid++){
-      for(int i = 0; i < dist[qid].length; i++)
-        for(int j = 0; j < dist[qid][i].length; j++) //Note: could be sped up
-          dist[qid][i][j] /= normFactor;
-    }
-    this.normFactor = normFactor;
-  }
-
-  public double[][][] getFullDist(){
-    return dist;
-  }
-
-  public double[][] getQueryDist(int i){
-    return dist[i];
-  }
-
-  public void setQueryDist(int i, double[][] newDist){
-    dist[i] = newDist;
-  }
-
-  public double getNormFactor() {
-    return normFactor;
+  protected double updateQuery(WeakLearner wl, int qid, RankedDocs rankedDocs){ //returns the query normalization factor
+    return updateQuery(wl, qid, rankedDocs.getRankedDocs());
   }
 }
