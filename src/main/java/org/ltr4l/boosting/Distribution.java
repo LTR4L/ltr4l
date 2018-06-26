@@ -34,7 +34,7 @@ public abstract class Distribution {
   public void update(WeakLearner wl, List<RankedDocs> queries ){
     double newNormFactor = 0d;
     for(int qid = 0; qid < queries.size(); qid++){
-      newNormFactor += updateQuery(wl, qid, queries.get(qid));
+      newNormFactor += updateQuery(wl, qid, queries.get(qid).getRankedDocs());
     }
     normalize(newNormFactor);
   }

@@ -225,7 +225,7 @@ public class RBDistributionTest {
 
   public static void assertRankedDocs(RankedDocs rDocs) throws Exception{
     int label = rDocs.getLabel(0);
-    for(Document doc : rDocs){
+    for(Document doc : rDocs.getRankedDocs()){
       assert(doc.getLabel() <= label);
       label = doc.getLabel();
     }

@@ -53,7 +53,7 @@ public class RankBoostToolsTest {
     queries.add(rDocs2);
     queries.add(rDocs3);
     allDocs = new ArrayList<>();
-    queries.forEach(rd -> allDocs.addAll(rd));
+    queries.forEach(rd -> allDocs.addAll(rd.getRankedDocs()));
 
     RBDistribution distribution = new RBDistribution(queries);
     rbt = new RankBoostTools(distribution.calcPotential(), queries);
