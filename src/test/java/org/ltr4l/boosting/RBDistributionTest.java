@@ -58,7 +58,7 @@ public class RBDistributionTest {
 
   @Test
   public void testGetInitDist() throws Exception{
-    RBDistribution distribution = RBDistribution.getInitDist(queries);
+    RBDistribution distribution = new RBDistribution(queries);
     double[][] qDist = distribution.getQueryDist(0);
     Assert.assertEquals(qDist[0][0], 0d, 0.01);
     Assert.assertEquals(qDist[0][1], 1d/24, 0.01);
@@ -118,7 +118,7 @@ public class RBDistributionTest {
 
   @Test
   public void testUpdateQuery() throws Exception{
-    RBDistribution distribution = RBDistribution.getInitDist(queries);
+    RBDistribution distribution = new RBDistribution(queries);
     WeakLearner wl = new WeakLearner(4, 10.0,2);
     int qid = 0;
     double newNormFactor = distribution.updateQuery(wl, qid, queries.get(qid));
@@ -145,7 +145,7 @@ public class RBDistributionTest {
 
 /*  @Test
   public void testNormalize() throws Exception{
-    RBDistribution distribution = RBDistribution.getInitDist(queries);
+    RBDistribution distribution = new RBDistribution(queries);
     distribution.normalize(2d);
     double[][] qDist = distribution.getQueryDist(0);
     Assert.assertEquals(qDist[0][0], 0d, 0.01);
@@ -202,7 +202,7 @@ public class RBDistributionTest {
 
   @Test
   public void testCalcPotential() throws Exception{
-    RBDistribution dist = RBDistribution.getInitDist(queries);
+    RBDistribution dist = new RBDistribution(queries);
     double[][] potential = dist.calcPotential();
     Assert.assertEquals(-1d/6, potential[0][0], 0.01);
     Assert.assertEquals(-1d/24, potential[0][1], 0.01);

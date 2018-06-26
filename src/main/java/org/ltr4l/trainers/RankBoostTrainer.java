@@ -43,7 +43,7 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
       if(rDocs.getLabel(0) == rDocs.getLabel(rDocs.size() - 1)) continue;
       rTrainingSet.add(rDocs);
     }
-    distribution = RBDistribution.getInitDist(rTrainingSet);
+    distribution = new RBDistribution(rTrainingSet);
   }
 
   @Override

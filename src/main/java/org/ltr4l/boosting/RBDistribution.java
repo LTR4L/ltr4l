@@ -24,15 +24,6 @@ public class RBDistribution {
   private final double[][][] dist;
   private double normFactor;
 
-  public static RBDistribution getInitDist(List<RankedDocs> rQueries){
-    int correctPairNum = 0;
-    for(RankedDocs query : rQueries)
-      correctPairNum += getCorrectPairNumber(query);
-    RBDistribution iDist = new RBDistribution(rQueries.size());
-    iDist.initialize(rQueries, correctPairNum);
-    return iDist;
-  }
-
   private static int getCorrectPairNumber(RankedDocs docs){
     int correctPairs = 0;
     for(int i = 0; i < docs.size() - 1; i++){
@@ -44,10 +35,27 @@ public class RBDistribution {
     return correctPairs;
   }
 
+  private static double[][] initQueryDist(RankedDocs rDocs, int correctPairNum){
+    assert(rDocs.size() >= 2);
+    int size = rDocs.size();
+    double[][] D_0 = new double[size][size];
+    for(int i = 0; i < size - 1; i++){
+      if(rDocs.getLabel(i) == 0) return D_0; //Speedup. As the list is ranked, there should be no valid pairs after 0.
+      for(int j = i + 1; j < size; j++){
+        if(rDocs.getLabel(i) > rDocs.getLabel(j))
+          D_0[i][j] = 1d / correctPairNum;
+      }
+    }
+    return D_0;
+  }
 
-  protected RBDistribution(int queryNum){
-    dist = new double[queryNum][][];
-    normFactor = 1d; //normFactor will change depending on iteration of the distribution. Initially, it should be 1.
+  public RBDistribution(List<RankedDocs> rQueries){
+    int correctPairNum = 0;
+    for(RankedDocs query : rQueries)
+      correctPairNum += getCorrectPairNumber(query);
+    dist = new double[rQueries.size()][][];
+    normFactor = 1d;
+    initialize(rQueries);
   }
 
   protected double[][] calcPotential(){
@@ -69,24 +77,15 @@ public class RBDistribution {
     return potential;
   }
 
-  private void initialize(List<RankedDocs> rQueries, int correctPairNum){
+  private void initialize(List<RankedDocs> rQueries){
+    int correctPairNum = 0;
+    for(RankedDocs query : rQueries)
+      correctPairNum += getCorrectPairNumber(query);
     for(int i = 0; i < rQueries.size(); i++)
       dist[i] = initQueryDist(rQueries.get(i), correctPairNum);
   }
 
-  private static double[][] initQueryDist(RankedDocs rDocs, int correctPairNum){
-    assert(rDocs.size() >= 2);
-    int size = rDocs.size();
-    double[][] D_0 = new double[size][size];
-    for(int i = 0; i < size - 1; i++){
-      if(rDocs.getLabel(i) == 0) return D_0; //Speedup. As the list is ranked, there should be no valid pairs after 0.
-      for(int j = i + 1; j < size; j++){
-        if(rDocs.getLabel(i) > rDocs.getLabel(j))
-          D_0[i][j] = 1d / correctPairNum;
-      }
-    }
-    return D_0;
-  }
+
 
   public void update(WeakLearner wl, List<RankedDocs> queries ){
     double newNormFactor = 0d;

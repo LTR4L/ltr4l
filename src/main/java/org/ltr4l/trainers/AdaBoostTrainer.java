@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdaBoostTrainer extends AbstractTrainer<AdaBoost, RankBoost.RankBoostConfig> {
-  private final Distribution distribution;
+  private final ABDistribution ABDistribution;
   private final List<RankedDocs> rTrainingSet; //Contains doc lists sorted by label. Queries with no pairs of differing labels should be removed.
 
   public AdaBoostTrainer(QuerySet training, QuerySet validation, Reader reader, Config override){
@@ -39,7 +39,7 @@ public class AdaBoostTrainer extends AbstractTrainer<AdaBoost, RankBoost.RankBoo
       if(rDocs.getLabel(0) == rDocs.getLabel(rDocs.size() - 1)) continue;
       rTrainingSet.add(rDocs);
     }
-    distribution = new Distribution(rTrainingSet);
+    ABDistribution = new ABDistribution(rTrainingSet);
   }
 
   @Override
@@ -54,9 +54,9 @@ public class AdaBoostTrainer extends AbstractTrainer<AdaBoost, RankBoost.RankBoo
 
   @Override
   public void train() {
-    WeakLearner wl = AdaWeakLearner.findWeakLearner(distribution.getFullDist(), rTrainingSet, config.getNumSteps());
+    WeakLearner wl = AdaWeakLearner.findWeakLearner(ABDistribution.getFullDist(), rTrainingSet, config.getNumSteps());
     ranker.addLearner(wl);
-    distribution.update(wl, rTrainingSet);
+    ABDistribution.update(wl, rTrainingSet);
   }
 
   @Override
