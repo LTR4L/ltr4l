@@ -16,7 +16,6 @@
 
 package org.ltr4l.lucene.solr.server;
 
-import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Scorer;

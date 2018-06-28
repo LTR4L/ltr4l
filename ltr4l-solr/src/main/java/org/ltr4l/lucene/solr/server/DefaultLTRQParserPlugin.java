@@ -41,7 +41,6 @@ public class DefaultLTRQParserPlugin extends QParserPlugin {
     NamedList settings = (NamedList)args.get("settings");
     String featuresFileName = (String)settings.get("features");
     String modelFileName = (String)settings.get("model");
-    int poolSize = Integer.valueOf((String)settings.get("poolSize"));
 
     FeaturesConfigReader fcReader;
     DefaultLTRModelReader dlmReader;
@@ -67,8 +66,6 @@ public class DefaultLTRQParserPlugin extends QParserPlugin {
 
   @Override
   public QParser createParser(String query, SolrParams localParams, SolrParams params, SolrQueryRequest req) {
-    //TODO implements Ranker#deepCopy()
-//    return new DefaultLTRQParser(query, localParams, params, req, ranker.deepCopy());
     return new DefaultLTRQParser(query, localParams, params, req, ranker);
   }
 
