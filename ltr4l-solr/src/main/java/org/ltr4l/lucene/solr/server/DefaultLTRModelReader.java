@@ -19,14 +19,13 @@ package org.ltr4l.lucene.solr.server;
 import org.apache.solr.core.SolrResourceLoader;
 import org.ltr4l.Ranker;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.Map;
 
 public class DefaultLTRModelReader extends AbstractConfigReader {
-  protected static String solrHome;
-  protected static String fileName;
+  protected String solrHome;
+  protected String algorithm;
+  protected Reader reader;
 
   public DefaultLTRModelReader(String fileName) throws IOException {
     this(null, fileName);
@@ -34,14 +33,30 @@ public class DefaultLTRModelReader extends AbstractConfigReader {
 
   public DefaultLTRModelReader(SolrResourceLoader loader, String fileName) throws IOException {
     super(loader, fileName);
-    this.fileName = fileName;
+    String algorithm = (String)((Map)configMap.get("config")).get("algorithm");
+
+    if (loader == null) {
+      loader = new SolrResourceLoader();
+    }
+    solrHome = loader.locateSolrHome().toString();
+
+    // To avoid opening model files every time when getting ranker.
+    StringBuilder sb = new StringBuilder();
+    try (InputStream is = new FileInputStream(solrHome + "/" + fileName);
+         InputStreamReader iReader = new InputStreamReader(is, "UTF-8")){
+      char buf[] = new char[8192];
+      int numRead;
+      while(0 <= (numRead = reader.read(buf))) {
+        sb.append(buf, 0, numRead);
+      }
+    } catch (IOException ioe) {
+      throw ioe;
+    }
+
+    reader = new CharArrayReader(sb.toString().toCharArray());
   }
 
   public Ranker getRanker() throws IOException{
-    String algorithm = (String)((Map)configMap.get("config")).get("algorithm");
-    SolrResourceLoader loader = new SolrResourceLoader();
-    solrHome = loader.locateSolrHome().toString();
-    Reader reader = new FileReader(solrHome + "/" + fileName);
     return Ranker.RankerFactory.getFromModel(algorithm, reader);
   }
 }

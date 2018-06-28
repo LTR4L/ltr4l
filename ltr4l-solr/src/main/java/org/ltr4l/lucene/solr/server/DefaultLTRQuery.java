@@ -75,10 +75,8 @@ public class DefaultLTRQuery extends AbstractLTRQuery {
       if(scorer != null){
         int newDoc = scorer.iterator().advance(doc);
         if (newDoc == doc) {
-          StringBuilder sb = new StringBuilder();
-          return Explanation.match(scorer.score(),
-            String.format("is the index of %s > %f sum of:", sb.toString()),
-            scorer.subExplanations(doc));
+          return Explanation.match(scorer.score(), "is the ranker score"); // TODO Create suitable explanation.
+//          return Explanation.match(scorer.score(), String.format("is the ranker score was %f :", scorer.predict()), scorer.subExplanations(doc));
         }
       }
       return Explanation.noMatch("no matching terms");

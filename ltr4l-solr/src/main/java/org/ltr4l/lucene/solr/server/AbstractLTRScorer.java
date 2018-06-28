@@ -41,20 +41,33 @@ public abstract class AbstractLTRScorer extends Scorer {
     this.ranker = ranker;
   }
 
+  //TODO correct explanation
   public List<Explanation> subExplanations(int target) throws IOException {
     List<Explanation> expls = new ArrayList<Explanation>();
-    int idx = 0;
     for(FieldFeatureExtractor[] extractors: featuresSpec){
       float feature = 0;
       List<Explanation> subExpls = new ArrayList<Explanation>();
       for(FieldFeatureExtractor extractor: extractors){
-        feature += extractor.feature(target);
         subExpls.add(extractor.explain(target));
       }
-      expls.add(Explanation.match(score(), "lucene: " + feature + " sum of:", subExpls));
-      idx++;
+      expls.add(Explanation.match(0f, "feature: " + feature + " sum of:", subExpls));
     }
     return expls;
+  }
+
+  public float predict() throws IOException {
+    final int target = docID();
+    int idx = 0;
+    List<Double> features = new ArrayList<>();
+    for (FieldFeatureExtractor[] extractors : featuresSpec) {
+      for(FieldFeatureExtractor extractor: extractors){
+        // Cast features because predict function only supports double-type features.
+        features.add((double)extractor.feature(target)); // Need to check the order of extracted features?
+      }
+      idx++;
+    }
+
+    return (float)ranker.predict(features);
   }
 
   @Override
@@ -69,17 +82,6 @@ public abstract class AbstractLTRScorer extends Scorer {
 
   @Override
   public float score() throws IOException {
-    final int target = docID();
-    int idx = 0;
-    List<Double> features = new ArrayList<>();
-    for (FieldFeatureExtractor[] extractors : featuresSpec) {
-      for(FieldFeatureExtractor extractor: extractors){
-        // Cast features because predict function only supports double-type features.
-        features.add((double)extractor.feature(target)); // Need to check the order of extracted features?
-      }
-      idx++;
-    }
-
-    return (float)ranker.predict(features);
+    return predict();
   }
 }
