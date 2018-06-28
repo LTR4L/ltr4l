@@ -82,10 +82,6 @@
       <artifact name="${ivy.jar.commons-lang.name}" type="jar"
                 url="http://repo1.maven.org/maven2/org/apache/commons/${ivy.jar.commons-lang.name}/${ivy.jar.commons-lang.rev}/${ivy.jar.commons-lang.name}-${ivy.jar.commons-lang.rev}.jar"/>
     </dependency>
-    <dependency org="${ivy.jar.commons.org}" name="${ivy.jar.commons-pool.name}" rev="${ivy.jar.commons-pool.rev}">
-      <artifact name="${ivy.jar.commons-pool.name}" type="jar"
-                url="http://repo1.maven.org/maven2/org/apache/commons/${ivy.jar.commons-pool.name}/${ivy.jar.commons-pool.rev}/${ivy.jar.commons-pool.name}-${ivy.jar.commons-pool.rev}.jar"/>
-    </dependency>
 
     <dependency org="${ivy.jar.commons-logging.org}" name="${ivy.jar.commons-logging.name}" rev="${ivy.jar.commons-logging.rev}">
       <artifact name="${ivy.jar.commons-logging.name}" type="jar"
