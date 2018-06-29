@@ -22,10 +22,6 @@
       <artifact name="${ivy.jar.junit.name}" type="jar"
                 url="http://repo1.maven.org/maven2/junit/${ivy.jar.junit.name}/${ivy.jar.junit.rev}/${ivy.jar.junit.name}-${ivy.jar.junit.rev}.jar"/>
     </dependency>
-    <dependency org="${ivy.jar.hamcrest.org}" name="${ivy.jar.hamcrest.name}" rev="${ivy.jar.hamcrest.rev}">
-      <artifact name="${ivy.jar.hamcrest.name}" type="jar"
-                url="http://repo1.maven.org/maven2/org/hamcrest/${ivy.jar.hamcrest.name}/${ivy.jar.hamcrest.rev}/${ivy.jar.hamcrest.name}-${ivy.jar.hamcrest.rev}.jar"/>
-    </dependency>
     <dependency org="${ivy.jar.jackson-core.org}" name="${ivy.jar.jackson-core.name}" rev="${ivy.jar.jackson.rev}">
       <artifact name="${ivy.jar.jackson-core.name}" type="jar"
                 url="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/${ivy.jar.jackson-core.name}/${ivy.jar.jackson.rev}/${ivy.jar.jackson-core.name}-${ivy.jar.jackson.rev}.jar"/>
@@ -70,24 +66,10 @@
       <artifact name="${ivy.jar.solr-solrj.name}" type="jar"
                 url="http://repo1.maven.org/maven2/org/apache/solr/${ivy.jar.solr-solrj.name}/${ivy.jar.solr.rev}/${ivy.jar.solr-solrj.name}-${ivy.jar.solr.rev}.jar"/>
     </dependency>
-    <dependency org="${ivy.jar.restlet.org}" name="${ivy.jar.restlet.name}" rev="${ivy.jar.restlet.rev}">
-      <artifact name="${ivy.jar.restlet.name}" type="jar"
-                url="http://maven.restlet.com/org/restlet/jee/${ivy.jar.restlet.name}/${ivy.jar.restlet.rev}/${ivy.jar.restlet.name}-${ivy.jar.restlet.rev}.jar"/>
-    </dependency>
-    <dependency org="${ivy.jar.restlet.org}" name="${ivy.jar.restlet-ext.name}" rev="${ivy.jar.restlet.rev}">
-      <artifact name="${ivy.jar.restlet-ext.name}" type="jar"
-                url="http://maven.restlet.com/org/restlet/jee/${ivy.jar.restlet-ext.name}/${ivy.jar.restlet.rev}/${ivy.jar.restlet-ext.name}-${ivy.jar.restlet.rev}.jar"/>
-    </dependency>
     <dependency org="${ivy.jar.commons.org}" name="${ivy.jar.commons-lang.name}" rev="${ivy.jar.commons-lang.rev}">
       <artifact name="${ivy.jar.commons-lang.name}" type="jar"
                 url="http://repo1.maven.org/maven2/org/apache/commons/${ivy.jar.commons-lang.name}/${ivy.jar.commons-lang.rev}/${ivy.jar.commons-lang.name}-${ivy.jar.commons-lang.rev}.jar"/>
     </dependency>
-
-    <dependency org="${ivy.jar.commons-logging.org}" name="${ivy.jar.commons-logging.name}" rev="${ivy.jar.commons-logging.rev}">
-      <artifact name="${ivy.jar.commons-logging.name}" type="jar"
-                url="http://central.maven.org/maven2/commons-logging/${ivy.jar.commons-logging.name}/${ivy.jar.commons-logging.rev}/${ivy.jar.commons-logging.name}-${ivy.jar.commons-logging.rev}.jar"/>
-    </dependency>
-
     <dependency org="${ivy.jar.commons-io.org}" name="${ivy.jar.commons-io.name}" rev="${ivy.jar.commons-io.rev}">
       <artifact name="${ivy.jar.commons-io.name}" type="jar"
                 url="http://central.maven.org/maven2/commons-io/${ivy.jar.commons-io.name}/${ivy.jar.commons-io.rev}/${ivy.jar.commons-io.name}-${ivy.jar.commons-io.rev}.jar"/>
