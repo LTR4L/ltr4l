@@ -22,6 +22,10 @@
       <artifact name="${ivy.jar.junit.name}" type="jar"
                 url="http://repo1.maven.org/maven2/junit/${ivy.jar.junit.name}/${ivy.jar.junit.rev}/${ivy.jar.junit.name}-${ivy.jar.junit.rev}.jar"/>
     </dependency>
+    <dependency org="${ivy.jar.hamcrest.org}" name="${ivy.jar.hamcrest.name}" rev="${ivy.jar.hamcrest.rev}">
+      <artifact name="${ivy.jar.hamcrest.name}" type="jar"
+                url="http://repo1.maven.org/maven2/org/hamcrest/${ivy.jar.hamcrest.name}/${ivy.jar.hamcrest.rev}/${ivy.jar.hamcrest.name}-${ivy.jar.hamcrest.rev}.jar"/>
+    </dependency>
     <dependency org="${ivy.jar.jackson-core.org}" name="${ivy.jar.jackson-core.name}" rev="${ivy.jar.jackson.rev}">
       <artifact name="${ivy.jar.jackson-core.name}" type="jar"
                 url="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/${ivy.jar.jackson-core.name}/${ivy.jar.jackson.rev}/${ivy.jar.jackson-core.name}-${ivy.jar.jackson.rev}.jar"/>
