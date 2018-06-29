@@ -85,7 +85,7 @@ public class FeaturesExtractorManager {
 
   SimpleOrderedMap<Object> parseData(Map data){
     SimpleOrderedMap<Object> result = new SimpleOrderedMap<Object>();
-    result.add("lucene", (List<String>)data.get("lucene"));
+    result.add("featuresSet", (List<String>)data.get("featuresSet"));
     result.add("queries", parseQueries((List<Map>)data.get("queries")));
     return result;
   }
@@ -117,7 +117,7 @@ public class FeaturesExtractorManager {
   SimpleOrderedMap<Object> parseDoc(Map doc){
     SimpleOrderedMap<Object> result = new SimpleOrderedMap<Object>();
     result.add("id", (String)doc.get("id"));
-    result.add("lucene", (List<Double>)doc.get("lucene"));
+    result.add("features", (List<Double>)doc.get("features"));
     return result;
   }
 }

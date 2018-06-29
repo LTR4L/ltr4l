@@ -33,7 +33,7 @@ public class DefaultLTRModelReader extends AbstractConfigReader {
 
   public DefaultLTRModelReader(SolrResourceLoader loader, String fileName) throws IOException {
     super(loader, fileName);
-    String algorithm = (String)((Map)configMap.get("config")).get("algorithm");
+    algorithm = (String)((Map)configMap.get("config")).get("algorithm");
 
     if (loader == null) {
       loader = new SolrResourceLoader();
@@ -46,7 +46,7 @@ public class DefaultLTRModelReader extends AbstractConfigReader {
          InputStreamReader iReader = new InputStreamReader(is, "UTF-8")){
       char buf[] = new char[8192];
       int numRead;
-      while(0 <= (numRead = reader.read(buf))) {
+      while(0 <= (numRead = iReader.read(buf))) {
         sb.append(buf, 0, numRead);
       }
     } catch (IOException ioe) {

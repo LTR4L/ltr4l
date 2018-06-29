@@ -74,5 +74,11 @@
       <artifact name="${ivy.jar.commons-cli.name}" type="jar"
                 url="http://repo1.maven.org/maven2/commons-cli/${ivy.jar.commons-cli.name}/${ivy.jar.commons-cli.rev}/${ivy.jar.commons-cli.name}-${ivy.jar.commons-cli.rev}.jar"/>
     </dependency>
+    <!-- For HttpClients -->
+    <dependency org="${ivy.jar.commons-logging.org}" name="${ivy.jar.commons-logging.name}" rev="${ivy.jar.commons-logging.rev}">
+      <artifact name="${ivy.jar.commons-logging.name}" type="jar"
+                url="http://central.maven.org/maven2/commons-logging/${ivy.jar.commons-logging.name}/${ivy.jar.commons-logging.rev}/${ivy.jar.commons-logging.name}-${ivy.jar.commons-logging.rev}.jar"/>
+    </dependency>
+
   </dependencies>
 </ivy-module>

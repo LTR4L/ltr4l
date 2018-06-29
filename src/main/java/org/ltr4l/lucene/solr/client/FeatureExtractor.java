@@ -140,7 +140,7 @@ public class FeatureExtractor {
       LTRResponse.Doc[] docs = entry.getValue();
       for (LTRResponse.Doc doc : docs) {
         sb.append(String.valueOf(crc.classify(doc.getClickrate())) + " " + "qid:" + String.valueOf(qid));
-        double[] features = doc.lucene;
+        double[] features = doc.features;
         int len = features.length;
         for (int i = 0; i < len; i++) {
           sb.append(" " + String.valueOf(i+1) + ":" + String.valueOf(features[i]));
