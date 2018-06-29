@@ -72,12 +72,16 @@
                 <include name="**/*.class"/>
                 <include name="*.properties"/>
             </fileset>
-            <fileset dir=".">
-		    <include name="../${lib.dir}/*.jar"/>
-		    <exclude name="../${lib.dir}/*-javadoc.jar"/>
-		    <exclude name="../${lib.dir}/*-sources.jar"/>
-		    <exclude name="../${lib.dir}/*jacoco*.jar"/>
-		    <exclude name="../${lib.dir}/*junit*.jar"/>
+            <fileset dir="../${lib.dir}">
+		    <include name="**/*.jar"/>
+		    <exclude name="*-javadoc.jar"/>
+		    <exclude name="*-sources.jar"/>
+		    <exclude name="*jacoco*.jar"/>
+		    <exclude name="*junit*.jar"/>
+            </fileset>
+            <fileset dir="../${cls.dir}">
+                <include name="**/*.class"/>
+                <include name="*.properties"/>
             </fileset>
         </jar>
     </target>

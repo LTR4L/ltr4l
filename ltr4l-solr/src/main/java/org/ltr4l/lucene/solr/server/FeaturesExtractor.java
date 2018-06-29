@@ -63,7 +63,7 @@ public class FeaturesExtractor implements Callable<Integer> {
     try {
       pw = new PrintWriter(featuresFile);
       pw.println("{");
-      pw.print("  lucene: [");
+      pw.print("  featuresSet: [");
       int cntFE = 0;
       for(FieldFeatureExtractorFactory factory: featuresSpec){
         if(cntFE > 0){
@@ -181,8 +181,7 @@ public class FeaturesExtractor implements Callable<Integer> {
               Document luceneDoc = req.getSearcher().doc(docId);
               String idValue = luceneDoc.get(idField);
               pw.printf("          id: \"%s\",\n", idValue);
-              // output each lucene
-              pw.print("          lucene: [");
+              pw.print("          features: [");
               int cntF = 0;
               for(FieldFeatureExtractor[] extractors: spec){
                 float feature = 0;

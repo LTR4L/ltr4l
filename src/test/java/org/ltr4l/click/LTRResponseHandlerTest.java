@@ -21,7 +21,7 @@ public class LTRResponseHandlerTest {
       "        \"procId\": 1476600502540, \n" +
       "        \"result\": {\n" +
       "            \"data\": {\n" +
-      "                \"feature\": [\n" +
+      "                \"featuresSet\": [\n" +
       "                    \"TF in name\", \n" +
       "                    \"TF in features\", \n" +
       "                    \"IDF in name\", \n" +
@@ -31,7 +31,7 @@ public class LTRResponseHandlerTest {
       "                    {\n" +
       "                        \"docs\": [\n" +
       "                            {\n" +
-      "                                \"feature\": [\n" +
+      "                                \"features\": [\n" +
       "                                    1, \n" +
       "                                    0, \n" +
       "                                    2.397895, \n" +
@@ -40,7 +40,7 @@ public class LTRResponseHandlerTest {
       "                                \"id\": \"F8V7067-APL-KIT\"\n" +
       "                            }, \n" +
       "                            {\n" +
-      "                                \"feature\": [\n" +
+      "                                \"features\": [\n" +
       "                                    2, \n" +
       "                                    1, \n" +
       "                                    2.397895, \n" +
@@ -49,7 +49,7 @@ public class LTRResponseHandlerTest {
       "                                \"id\": \"IW-02\"\n" +
       "                            }, \n" +
       "                            {\n" +
-      "                                \"feature\": [\n" +
+      "                                \"features\": [\n" +
       "                                    1, \n" +
       "                                    0, \n" +
       "                                    2.397895, \n" +
@@ -64,7 +64,7 @@ public class LTRResponseHandlerTest {
       "                    {\n" +
       "                        \"docs\": [\n" +
       "                            {\n" +
-      "                                \"feature\": [\n" +
+      "                                \"features\": [\n" +
       "                                    1, \n" +
       "                                    0, \n" +
       "                                    2.397895, \n" +
@@ -73,7 +73,7 @@ public class LTRResponseHandlerTest {
       "                                \"id\": \"TWINX2048-3200PRO\"\n" +
       "                            }, \n" +
       "                            {\n" +
-      "                                \"feature\": [\n" +
+      "                                \"features\": [\n" +
       "                                    1, \n" +
       "                                    0, \n" +
       "                                    2.397895, \n" +
@@ -82,7 +82,7 @@ public class LTRResponseHandlerTest {
       "                                \"id\": \"VS1GB400C3\"\n" +
       "                            }, \n" +
       "                            {\n" +
-      "                                \"feature\": [\n" +
+      "                                \"features\": [\n" +
       "                                    1, \n" +
       "                                    0, \n" +
       "                                    2.397895, \n" +
@@ -91,7 +91,7 @@ public class LTRResponseHandlerTest {
       "                                \"id\": \"VDBDB1A16\"\n" +
       "                            }, \n" +
       "                            {\n" +
-      "                                \"feature\": [\n" +
+      "                                \"features\": [\n" +
       "                                    0, \n" +
       "                                    3, \n" +
       "                                    2.397895, \n" +
@@ -100,7 +100,7 @@ public class LTRResponseHandlerTest {
       "                                \"id\": \"0579B002\"\n" +
       "                            }, \n" +
       "                            {\n" +
-      "                                \"feature\": [\n" +
+      "                                \"features\": [\n" +
       "                                    0, \n" +
       "                                    1, \n" +
       "                                    2.397895, \n" +
@@ -158,7 +158,7 @@ public class LTRResponseHandlerTest {
       "    \"procId\": 1476600502540,\n" +
       "    \"result\": {\n" +
       "      \"data\": {\n" +
-      "        \"feature\": [\n" +
+      "        \"featuresSet\": [\n" +
       "          \"TF in name\",\n" +
       "          \"TF in features\",\n" +
       "          \"IDF in name\",\n" +
@@ -168,7 +168,7 @@ public class LTRResponseHandlerTest {
       "          {\n" +
       "            \"docs\": [\n" +
       "              {\n" +
-      "                \"feature\": [\n" +
+      "                \"features\": [\n" +
       "                  1,\n" +
       "                  0,\n" +
       "                  2.397895,\n" +
@@ -177,7 +177,7 @@ public class LTRResponseHandlerTest {
       "                \"id\": \"docA\"\n" +
       "              },\n" +
       "              {\n" +
-      "                \"feature\": [\n" +
+      "                \"features\": [\n" +
       "                  2,\n" +
       "                  1,\n" +
       "                  2.397895,\n" +
@@ -186,7 +186,7 @@ public class LTRResponseHandlerTest {
       "                \"id\": \"docB\"\n" +
       "              },\n" +
       "              {\n" +
-      "                \"feature\": [\n" +
+      "                \"features\": [\n" +
       "                  1,\n" +
       "                  0,\n" +
       "                  2.397895,\n" +
@@ -195,7 +195,7 @@ public class LTRResponseHandlerTest {
       "                \"id\": \"docC\"\n" +
       "              },\n" +
       "              {\n" +
-      "                \"feature\": [\n" +
+      "                \"features\": [\n" +
       "                  1,\n" +
       "                  0,\n" +
       "                  2.397895,\n" +
@@ -204,7 +204,7 @@ public class LTRResponseHandlerTest {
       "                \"id\": \"docD\"\n" +
       "              },\n" +
       "              {\n" +
-      "                \"feature\": [\n" +
+      "                \"features\": [\n" +
       "                  1,\n" +
       "                  0,\n" +
       "                  2.397895,\n" +
@@ -219,7 +219,7 @@ public class LTRResponseHandlerTest {
       "          {\n" +
       "            \"docs\": [\n" +
       "              {\n" +
-      "                \"feature\": [\n" +
+      "                \"features\": [\n" +
       "                  1,\n" +
       "                  0,\n" +
       "                  2.397895,\n" +
@@ -228,7 +228,7 @@ public class LTRResponseHandlerTest {
       "                \"id\": \"docA\"\n" +
       "              },\n" +
       "              {\n" +
-      "                \"feature\": [\n" +
+      "                \"features\": [\n" +
       "                  1,\n" +
       "                  0,\n" +
       "                  2.397895,\n" +
@@ -237,7 +237,7 @@ public class LTRResponseHandlerTest {
       "                \"id\": \"docB\"\n" +
       "              },\n" +
       "              {\n" +
-      "                \"feature\": [\n" +
+      "                \"features\": [\n" +
       "                  1,\n" +
       "                  0,\n" +
       "                  2.397895,\n" +
@@ -246,7 +246,7 @@ public class LTRResponseHandlerTest {
       "                \"id\": \"docC\"\n" +
       "              },\n" +
       "              {\n" +
-      "                \"feature\": [\n" +
+      "                \"features\": [\n" +
       "                  0,\n" +
       "                  3,\n" +
       "                  2.397895,\n" +
@@ -255,7 +255,7 @@ public class LTRResponseHandlerTest {
       "                \"id\": \"docD\"\n" +
       "              },\n" +
       "              {\n" +
-      "                \"feature\": [\n" +
+      "                \"features\": [\n" +
       "                  0,\n" +
       "                  1,\n" +
       "                  2.397895,\n" +
@@ -283,61 +283,61 @@ public class LTRResponseHandlerTest {
 
     LTRResponse.Doc doc = docs[0];
     Assert.assertEquals(doc.id, "F8V7067-APL-KIT");
-    Assert.assertEquals(doc.feature[0], 1, 0.01);
-    Assert.assertEquals(doc.feature[1], 0, 0.01);
-    Assert.assertEquals(doc.feature[2], 2.397895, 0.01);
-    Assert.assertEquals(doc.feature[3], 3.496508, 0.01);
+    Assert.assertEquals(doc.features[0], 1, 0.01);
+    Assert.assertEquals(doc.features[1], 0, 0.01);
+    Assert.assertEquals(doc.features[2], 2.397895, 0.01);
+    Assert.assertEquals(doc.features[3], 3.496508, 0.01);
 
     doc = docs[1];
     Assert.assertEquals(doc.id, "IW-02");
-    Assert.assertEquals(doc.feature[0], 2, 0.01);
-    Assert.assertEquals(doc.feature[1], 1, 0.01);
-    Assert.assertEquals(doc.feature[2], 2.397895, 0.01);
-    Assert.assertEquals(doc.feature[3], 3.496508, 0.01);
+    Assert.assertEquals(doc.features[0], 2, 0.01);
+    Assert.assertEquals(doc.features[1], 1, 0.01);
+    Assert.assertEquals(doc.features[2], 2.397895, 0.01);
+    Assert.assertEquals(doc.features[3], 3.496508, 0.01);
 
     doc = docs[2];
-    Assert.assertEquals(doc.feature[0], 1, 0.01);
-    Assert.assertEquals(doc.feature[1], 0, 0.01);
-    Assert.assertEquals(doc.feature[2], 2.397895, 0.01);
-    Assert.assertEquals(doc.feature[3], 3.496508, 0.01);
+    Assert.assertEquals(doc.features[0], 1, 0.01);
+    Assert.assertEquals(doc.features[1], 0, 0.01);
+    Assert.assertEquals(doc.features[2], 2.397895, 0.01);
+    Assert.assertEquals(doc.features[3], 3.496508, 0.01);
 
     docs = qMap.get("memory");
     Assert.assertEquals(docs.length, 5);
 
     doc = docs[0];
     Assert.assertEquals(doc.id, "TWINX2048-3200PRO");
-    Assert.assertEquals(doc.feature[0], 1, 0.01);
-    Assert.assertEquals(doc.feature[1], 0, 0.01);
-    Assert.assertEquals(doc.feature[2], 2.397895, 0.01);
-    Assert.assertEquals(doc.feature[3], 2.80336, 0.01);
+    Assert.assertEquals(doc.features[0], 1, 0.01);
+    Assert.assertEquals(doc.features[1], 0, 0.01);
+    Assert.assertEquals(doc.features[2], 2.397895, 0.01);
+    Assert.assertEquals(doc.features[3], 2.80336, 0.01);
 
     doc = docs[1];
     Assert.assertEquals(doc.id, "VS1GB400C3");
-    Assert.assertEquals(doc.feature[0], 1, 0.01);
-    Assert.assertEquals(doc.feature[1], 0, 0.01);
-    Assert.assertEquals(doc.feature[2], 2.397895, 0.01);
-    Assert.assertEquals(doc.feature[3], 2.80336, 0.01);
+    Assert.assertEquals(doc.features[0], 1, 0.01);
+    Assert.assertEquals(doc.features[1], 0, 0.01);
+    Assert.assertEquals(doc.features[2], 2.397895, 0.01);
+    Assert.assertEquals(doc.features[3], 2.80336, 0.01);
 
     doc = docs[2];
     Assert.assertEquals(doc.id, "VDBDB1A16");
-    Assert.assertEquals(doc.feature[0], 1, 0.01);
-    Assert.assertEquals(doc.feature[1], 0, 0.01);
-    Assert.assertEquals(doc.feature[2], 2.397895, 0.01);
-    Assert.assertEquals(doc.feature[3], 2.80336, 0.01);
+    Assert.assertEquals(doc.features[0], 1, 0.01);
+    Assert.assertEquals(doc.features[1], 0, 0.01);
+    Assert.assertEquals(doc.features[2], 2.397895, 0.01);
+    Assert.assertEquals(doc.features[3], 2.80336, 0.01);
 
     doc = docs[3];
     Assert.assertEquals(doc.id, "0579B002");
-    Assert.assertEquals(doc.feature[0], 0, 0.01);
-    Assert.assertEquals(doc.feature[1], 3, 0.01);
-    Assert.assertEquals(doc.feature[2], 2.397895, 0.01);
-    Assert.assertEquals(doc.feature[3], 2.80336, 0.01);
+    Assert.assertEquals(doc.features[0], 0, 0.01);
+    Assert.assertEquals(doc.features[1], 3, 0.01);
+    Assert.assertEquals(doc.features[2], 2.397895, 0.01);
+    Assert.assertEquals(doc.features[3], 2.80336, 0.01);
 
     doc = docs[4];
     Assert.assertEquals(doc.id, "EN7800GTX/2DHTV/256M");
-    Assert.assertEquals(doc.feature[0], 0, 0.01);
-    Assert.assertEquals(doc.feature[1], 1, 0.01);
-    Assert.assertEquals(doc.feature[2], 2.397895, 0.01);
-    Assert.assertEquals(doc.feature[3], 2.80336, 0.01);
+    Assert.assertEquals(doc.features[0], 0, 0.01);
+    Assert.assertEquals(doc.features[1], 1, 0.01);
+    Assert.assertEquals(doc.features[2], 2.397895, 0.01);
+    Assert.assertEquals(doc.features[3], 2.80336, 0.01);
   }
 
   @Test

@@ -28,6 +28,7 @@ import org.apache.http.util.EntityUtils;
 import org.ltr4l.click.CMQueryHandler;
 import org.ltr4l.click.LTRResponse;
 import org.ltr4l.click.LTRResponseHandler;
+import org.ltr4l.click.ClickRateClassifier;
 
 import java.io.InputStreamReader;
 import java.util.*;
@@ -91,7 +92,7 @@ public class FeatureExtractor {
     long duration = 0;
 
     //TODO: smarter code
-    while (progress < 100 || duration > extractionTimeout * 10000) {
+    while (progress < 100 && duration < extractionTimeout * 10000) {
       HttpResponse response = httpClient.execute(httpGet);
       HttpEntity entity = response.getEntity();
       if (entity != null) {
@@ -102,6 +103,8 @@ public class FeatureExtractor {
       } else {
         return false;
       }
+      Thread.sleep(1000);
+      duration = System.nanoTime() - startTime;
     }
     return progress == 100;
   }
@@ -123,9 +126,11 @@ public class FeatureExtractor {
   }
 
   //TODO: Large training data may cause OOM, we should parse & write Doc into output file one by one.
-  public String getMSFormatTrainingData() {
+  public String getMSFormatTrainingData(String borderListStr) {
     if (ltrResponseHandler == null)
       return null;
+
+    ClickRateClassifier crc = new ClickRateClassifier(borderListStr);
 
     Map<String, LTRResponse.Doc[]> trainingData = ltrResponseHandler.mergeClickRates(cmQueryHandler.getClickRates());
     StringBuilder sb = new StringBuilder();
@@ -134,8 +139,8 @@ public class FeatureExtractor {
     for (Map.Entry<String, LTRResponse.Doc[]> entry : trainingData.entrySet()) {
       LTRResponse.Doc[] docs = entry.getValue();
       for (LTRResponse.Doc doc : docs) {
-        sb.append(String.valueOf(doc.getClickrate()) + " " + "qid:" + String.valueOf(qid));
-        double[] features = doc.feature;
+        sb.append(String.valueOf(crc.classify(doc.getClickrate())) + " " + "qid:" + String.valueOf(qid));
+        double[] features = doc.features;
         int len = features.length;
         for (int i = 0; i < len; i++) {
           sb.append(" " + String.valueOf(i+1) + ":" + String.valueOf(features[i]));
@@ -146,4 +151,5 @@ public class FeatureExtractor {
     }
     return sb.toString();
   }
+
 }

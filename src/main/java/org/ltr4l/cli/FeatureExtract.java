@@ -26,7 +26,7 @@ import java.lang.invoke.MethodHandles;
 
 public class FeatureExtract {
 
-  private static final String REQUIRED_ARG = "<solrUrl> <configFile> <impressionLogFile> <outputFile>";
+  private static final String REQUIRED_ARG = "<solrUrl> <configFile> <impressionLogFile> <outputFile> <borders>";
   private static String outputFile;
 
   public static void main (String args[]) throws Exception{
@@ -45,7 +45,7 @@ public class FeatureExtract {
       System.err.printf("No required argument %s specified", REQUIRED_ARG);
       printUsage(options);
     }
-    else if(params.length > 4){
+    else if(params.length > 5){
       System.err.printf("Too many argument is specified: %s", params[4]);
       printUsage(options);
     }
@@ -54,8 +54,9 @@ public class FeatureExtract {
     String configFile = line.hasOption("configFile") ? line.getOptionValue("configFile") : params[1];
     String impressionLogFile = line.hasOption("impressionLog") ? line.getOptionValue("impressionLog") : params[2];
     outputFile = line.hasOption("outputFile") ? line.getOptionValue("outputFile") : params[3];
+    String bordersListStr = line.hasOption("borders") ? line.getOptionValue("borders") : params[4];
 
-    String trainingData = extract(url, configFile, impressionLogFile);
+    String trainingData = extract(url, configFile, impressionLogFile, bordersListStr);
     writeTrainingData(trainingData);
   }
 
@@ -78,7 +79,7 @@ public class FeatureExtract {
 
   private static void printUsage(Options options){
     HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp( "score " + REQUIRED_ARG,
+    formatter.printHelp( REQUIRED_ARG,
       "\nExecute feature extraction with Apache Solr. Required argument json file name for job configuration.\n\n",
       options, null, true );
     System.exit(0);
@@ -100,7 +101,7 @@ public class FeatureExtract {
     return line;
   }
 
-  private static String extract(String url, String confFile, String impressionLogFileName) throws Exception {
+  private static String extract(String url, String confFile, String impressionLogFileName, String bordersListStr) throws Exception {
     File impressionLogFile = new File(impressionLogFileName);
     if (!impressionLogFile.canRead()) {
       System.err.printf("Cannot read impression log file: %s\n\n", impressionLogFile);
@@ -111,7 +112,7 @@ public class FeatureExtract {
 
     FeatureExtractor featureExtractor = new FeatureExtractor(url, confFile, cmQueryHandler);
     featureExtractor.execute();
-    return featureExtractor.getMSFormatTrainingData();
+    return featureExtractor.getMSFormatTrainingData(bordersListStr);
   }
 
   private static void writeTrainingData(String trainingData) {
