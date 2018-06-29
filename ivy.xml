@@ -38,10 +38,6 @@
       <artifact name="${ivy.jar.slf4j-api.name}" type="jar"
                 url="http://central.maven.org/maven2/org/slf4j/${ivy.jar.slf4j-api.name}/${ivy.jar.slf4j.rev}/${ivy.jar.slf4j-api.name}-${ivy.jar.slf4j.rev}.jar"/>
     </dependency>
-    <dependency org="${ivy.jar.slf4j.org}" name="${ivy.jar.slf4j-simple.name}" rev="${ivy.jar.slf4j.rev}">
-      <artifact name="${ivy.jar.slf4j-simple.name}" type="jar"
-                url="http://central.maven.org/maven2/org/slf4j/${ivy.jar.slf4j-simple.name}/${ivy.jar.slf4j.rev}/${ivy.jar.slf4j-simple.name}-${ivy.jar.slf4j.rev}.jar"/>
-    </dependency>
     <dependency org="${ivy.jar.httpcomponents.org}" name="${ivy.jar.httpcomponents-core.name}" rev="${ivy.jar.httpcomponents-core.rev}">
       <artifact name="${ivy.jar.httpcomponents-core.name}" type="jar"
                 url="http://central.maven.org/maven2/org/apache/httpcomponents/${ivy.jar.httpcomponents-core.name}/${ivy.jar.httpcomponents-core.rev}/${ivy.jar.httpcomponents-core.name}-${ivy.jar.httpcomponents-core.rev}.jar"/>
@@ -65,10 +61,6 @@
     <dependency org="${ivy.jar.solr.org}" name="${ivy.jar.solr-solrj.name}" rev="${ivy.jar.solr.rev}">
       <artifact name="${ivy.jar.solr-solrj.name}" type="jar"
                 url="http://repo1.maven.org/maven2/org/apache/solr/${ivy.jar.solr-solrj.name}/${ivy.jar.solr.rev}/${ivy.jar.solr-solrj.name}-${ivy.jar.solr.rev}.jar"/>
-    </dependency>
-    <dependency org="${ivy.jar.commons.org}" name="${ivy.jar.commons-lang.name}" rev="${ivy.jar.commons-lang.rev}">
-      <artifact name="${ivy.jar.commons-lang.name}" type="jar"
-                url="http://repo1.maven.org/maven2/org/apache/commons/${ivy.jar.commons-lang.name}/${ivy.jar.commons-lang.rev}/${ivy.jar.commons-lang.name}-${ivy.jar.commons-lang.rev}.jar"/>
     </dependency>
     <dependency org="${ivy.jar.commons-io.org}" name="${ivy.jar.commons-io.name}" rev="${ivy.jar.commons-io.rev}">
       <artifact name="${ivy.jar.commons-io.name}" type="jar"
