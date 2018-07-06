@@ -102,7 +102,7 @@ public abstract class Ranker<C extends Config> {
           MLPTrainer.MLPConfig mlpConfig = getConfig(reader, MLPTrainer.MLPConfig.class);
           mlpConfig.overrideBy(override);
           NetworkShape networkShape = mlpConfig.getNetworkShape();
-          networkShape.add(maxLabel + 1, new Activation.Sigmoid());
+          networkShape.add(maxLabel + 1, Activation.Type.Sigmoid);
           return new NNMLP(featLength, networkShape, mlpConfig.getOptFact(), mlpConfig.getReguFunction(), mlpConfig.getWeightInit());
         // The algorithms below do not require max label, however they can still be specified.
         default:

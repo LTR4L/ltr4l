@@ -111,7 +111,7 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
     HashMap<Document, Double> lambdas = new HashMap<>();
     HashMap<Document, Double> logs = new HashMap<>();
     HashMap<Document, Double> lambdaDers = new HashMap<>();
-    Activation.Sigmoid sigmoid = new Activation.Sigmoid();
+    Activation sigmoid = Activation.Type.Sigmoid;
 
     for (int t = 1; t <= numTrees; t++){
       int minLossFeat = findMinLossFeat(thresholds, minLoss);

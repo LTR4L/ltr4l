@@ -26,8 +26,8 @@ public class NetworkShapeTest {
     NetworkShape ns1 = NetworkShape.parseSetting("3,Identity");
     Assert.assertEquals(1, ns1.size());
     Assert.assertEquals(3, ns1.getLayerSetting(0).getNum());
-    Assert.assertTrue(ns1.getLayerSetting(0).getActivation() instanceof Activation.Identity);
-    Assert.assertEquals("[(org.ltr4l.nn.Activation.Identity,3)]", ns1.toString());
+    Assert.assertTrue(ns1.getLayerSetting(0).getActivation() == Activation.Type.Identity);
+    Assert.assertEquals("[(org.ltr4l.nn.Activation.Type.Identity,3)]", ns1.toString());
   }
 
   @Test
@@ -35,10 +35,10 @@ public class NetworkShapeTest {
     NetworkShape ns1 = NetworkShape.parseSetting("3,Identity 5,Sigmoid");
     Assert.assertEquals(2, ns1.size());
     Assert.assertEquals(3, ns1.getLayerSetting(0).getNum());
-    Assert.assertTrue(ns1.getLayerSetting(0).getActivation() instanceof Activation.Identity);
+    Assert.assertTrue(ns1.getLayerSetting(0).getActivation() == Activation.Type.Identity);
     Assert.assertEquals(5, ns1.getLayerSetting(1).getNum());
-    Assert.assertTrue(ns1.getLayerSetting(1).getActivation() instanceof Activation.Sigmoid);
-    Assert.assertEquals("[(org.ltr4l.nn.Activation.Identity,3), (org.ltr4l.nn.Activation.Sigmoid,5)]", ns1.toString());
+    Assert.assertTrue(ns1.getLayerSetting(1).getActivation() == Activation.Type.Sigmoid);
+    Assert.assertEquals("[(org.ltr4l.nn.Activation.Type.Identity,3), (org.ltr4l.nn.Activation.Type.Sigmoid,5)]", ns1.toString());
   }
 
   @Test
@@ -46,12 +46,12 @@ public class NetworkShapeTest {
     NetworkShape ns1 = NetworkShape.parseSetting("9,ReLU 4,Identity 10,Sigmoid");
     Assert.assertEquals(3, ns1.size());
     Assert.assertEquals(9, ns1.getLayerSetting(0).getNum());
-    Assert.assertTrue(ns1.getLayerSetting(0).getActivation() instanceof Activation.ReLU);
+    Assert.assertTrue(ns1.getLayerSetting(0).getActivation() == Activation.Type.ReLU);
     Assert.assertEquals(4, ns1.getLayerSetting(1).getNum());
-    Assert.assertTrue(ns1.getLayerSetting(1).getActivation() instanceof Activation.Identity);
+    Assert.assertTrue(ns1.getLayerSetting(1).getActivation() == Activation.Type.Identity);
     Assert.assertEquals(10, ns1.getLayerSetting(2).getNum());
-    Assert.assertTrue(ns1.getLayerSetting(2).getActivation() instanceof Activation.Sigmoid);
-    Assert.assertEquals("[(org.ltr4l.nn.Activation.ReLU,9), (org.ltr4l.nn.Activation.Identity,4), (org.ltr4l.nn.Activation.Sigmoid,10)]",
+    Assert.assertTrue(ns1.getLayerSetting(2).getActivation() == Activation.Type.Sigmoid);
+    Assert.assertEquals("[(org.ltr4l.nn.Activation.Type.ReLU,9), (org.ltr4l.nn.Activation.Type.Identity,4), (org.ltr4l.nn.Activation.Type.Sigmoid,10)]",
         ns1.toString());
   }
 }

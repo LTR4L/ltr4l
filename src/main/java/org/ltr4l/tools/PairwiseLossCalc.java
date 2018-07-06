@@ -82,7 +82,7 @@ public abstract class PairwiseLossCalc<R extends Ranker> implements LossCalculat
         for (Document[] pair : query) {
           double s1 = ranker.predict(pair[0].getFeatures());
           double s2 = ranker.predict(pair[1].getFeatures());
-          double output = Math.pow(1 + Math.exp(s2 - s1), -1); //double output = new Activation.Sigmoid().output(s1 - s2);
+          double output = Math.pow(1 + Math.exp(s2 - s1), -1); //double output = Activation.Type.Sigmoid().output(s1 - s2);
           queryLoss += errorFunc.error(output, 1d);
         }
         loss += queryLoss / query.length;

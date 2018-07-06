@@ -85,13 +85,13 @@ public class SortNetMLPTest {
 
     Assert.assertTrue(mlp.regularization instanceof Regularization.L1);
 
-    // SortNetMLP always adds an output AbstractNode with Activation.Sigmoid
+    // SortNetMLP always adds an output AbstractNode with Activation.Type.Sigmoid
     Assert.assertEquals(3, mlp.network.size());
     Assert.assertEquals(2, mlp.getLayer(2).size());
     SortNetMLP.SNode outputNode0 = mlp.getNode(2, 0);
     SortNetMLP.SNode outputNode1 = mlp.getNode(2, 1);
-    Assert.assertTrue(outputNode0.getActivation() instanceof Activation.Sigmoid);
-    Assert.assertTrue(outputNode1.getActivation() instanceof Activation.Sigmoid);
+    Assert.assertTrue(outputNode0.getActivation() == Activation.Type.Sigmoid);
+    Assert.assertTrue(outputNode1.getActivation() == Activation.Type.Sigmoid);
     Assert.assertEquals(0, outputNode0.getGroup());
     Assert.assertEquals(1, outputNode1.getGroup());
 
@@ -99,14 +99,14 @@ public class SortNetMLPTest {
     Assert.assertEquals(2, mlp.getLayer(1).size());
     SortNetMLP.SNode inputNode0 = mlp.getNode(0, 0);
     SortNetMLP.SNode inputNode1 = mlp.getNode(0, 1);
-    Assert.assertTrue(inputNode0.getActivation() instanceof Activation.Identity);
-    Assert.assertTrue(inputNode1.getActivation() instanceof Activation.Identity);
+    Assert.assertTrue(inputNode0.getActivation() == Activation.Type.Identity);
+    Assert.assertTrue(inputNode1.getActivation() == Activation.Type.Identity);
     Assert.assertEquals(0, inputNode0.getGroup());
     Assert.assertEquals(1, inputNode1.getGroup());
     SortNetMLP.SNode hiddenNode0 = mlp.getNode(1, 0);
     SortNetMLP.SNode hiddenNode1 = mlp.getNode(1, 1);
-    Assert.assertTrue(hiddenNode0.getActivation() instanceof Activation.Sigmoid);
-    Assert.assertTrue(hiddenNode1.getActivation() instanceof Activation.Sigmoid);
+    Assert.assertTrue(hiddenNode0.getActivation() == Activation.Type.Sigmoid);
+    Assert.assertTrue(hiddenNode1.getActivation() == Activation.Type.Sigmoid);
     Assert.assertEquals(0, hiddenNode0.getGroup());
     Assert.assertEquals(1, hiddenNode1.getGroup());
     Assert.assertEquals(0, inputNode0.getInputEdges().size());
@@ -197,13 +197,13 @@ public class SortNetMLPTest {
 
     Assert.assertTrue(mlp.regularization instanceof Regularization.L2);
 
-    // SortNetMLP always adds an output AbstractNode with Activation.Sigmoid
+    // SortNetMLP always adds an output AbstractNode with Activation.Type.Sigmoid
     Assert.assertEquals(3, mlp.network.size());
     Assert.assertEquals(2, mlp.getLayer(2).size());
     SortNetMLP.SNode outputNode0 = mlp.getNode(2, 0);
     SortNetMLP.SNode outputNode1 = mlp.getNode(2, 1);
-    Assert.assertTrue(outputNode0.getActivation() instanceof Activation.Sigmoid);
-    Assert.assertTrue(outputNode1.getActivation() instanceof Activation.Sigmoid);
+    Assert.assertTrue(outputNode0.getActivation() == Activation.Type.Sigmoid);
+    Assert.assertTrue(outputNode1.getActivation() == Activation.Type.Sigmoid);
     Assert.assertEquals(0, outputNode0.getGroup());
     Assert.assertEquals(1, outputNode1.getGroup());
 
@@ -213,10 +213,10 @@ public class SortNetMLPTest {
     SortNetMLP.SNode inputNode1 = mlp.getNode(0, 1);
     SortNetMLP.SNode inputNode2 = mlp.getNode(0, 2);
     SortNetMLP.SNode inputNode3 = mlp.getNode(0, 3);
-    Assert.assertTrue(inputNode0.getActivation() instanceof Activation.Identity);
-    Assert.assertTrue(inputNode1.getActivation() instanceof Activation.Identity);
-    Assert.assertTrue(inputNode2.getActivation() instanceof Activation.Identity);
-    Assert.assertTrue(inputNode3.getActivation() instanceof Activation.Identity);
+    Assert.assertTrue(inputNode0.getActivation() == Activation.Type.Identity);
+    Assert.assertTrue(inputNode1.getActivation() == Activation.Type.Identity);
+    Assert.assertTrue(inputNode2.getActivation() == Activation.Type.Identity);
+    Assert.assertTrue(inputNode3.getActivation() == Activation.Type.Identity);
     Assert.assertEquals(0, inputNode0.getGroup());
     Assert.assertEquals(0, inputNode1.getGroup());
     Assert.assertEquals(1, inputNode2.getGroup());
@@ -225,10 +225,10 @@ public class SortNetMLPTest {
     SortNetMLP.SNode hiddenNode1 = mlp.getNode(1, 1);
     SortNetMLP.SNode hiddenNode2 = mlp.getNode(1, 2);
     SortNetMLP.SNode hiddenNode3 = mlp.getNode(1, 3);
-    Assert.assertTrue(hiddenNode0.getActivation() instanceof Activation.ReLU);
-    Assert.assertTrue(hiddenNode1.getActivation() instanceof Activation.ReLU);
-    Assert.assertTrue(hiddenNode2.getActivation() instanceof Activation.ReLU);
-    Assert.assertTrue(hiddenNode3.getActivation() instanceof Activation.ReLU);
+    Assert.assertTrue(hiddenNode0.getActivation() == Activation.Type.ReLU);
+    Assert.assertTrue(hiddenNode1.getActivation() == Activation.Type.ReLU);
+    Assert.assertTrue(hiddenNode2.getActivation() == Activation.Type.ReLU);
+    Assert.assertTrue(hiddenNode3.getActivation() == Activation.Type.ReLU);
     Assert.assertEquals(0, hiddenNode0.getGroup());
     Assert.assertEquals(0, hiddenNode1.getGroup());
     Assert.assertEquals(1, hiddenNode2.getGroup());
@@ -357,13 +357,13 @@ public class SortNetMLPTest {
 
     Assert.assertTrue(mlp.regularization instanceof Regularization.L1);
 
-    // SortNetMLP always adds an output MNode with Activation.Sigmoid
+    // SortNetMLP always adds an output MNode with Activation.Type.Sigmoid
     Assert.assertEquals(4, mlp.network.size());
     Assert.assertEquals(2, mlp.getLayer(3).size());
     SortNetMLP.SNode outputNode0 = mlp.getNode(3, 0);
     SortNetMLP.SNode outputNode1 = mlp.getNode(3, 1);
-    Assert.assertTrue(outputNode0.getActivation() instanceof Activation.Sigmoid);
-    Assert.assertTrue(outputNode1.getActivation() instanceof Activation.Sigmoid);
+    Assert.assertTrue(outputNode0.getActivation() == Activation.Type.Sigmoid);
+    Assert.assertTrue(outputNode1.getActivation() == Activation.Type.Sigmoid);
     Assert.assertEquals(0, outputNode0.getGroup());
     Assert.assertEquals(1, outputNode1.getGroup());
 
@@ -372,18 +372,18 @@ public class SortNetMLPTest {
     Assert.assertEquals(2, mlp.getLayer(2).size());
     SortNetMLP.SNode inputNode0 = mlp.getNode(0, 0);
     SortNetMLP.SNode inputNode1 = mlp.getNode(0, 1);
-    Assert.assertTrue(inputNode0.getActivation() instanceof Activation.Identity);
-    Assert.assertTrue(inputNode1.getActivation() instanceof Activation.Identity);
+    Assert.assertTrue(inputNode0.getActivation() == Activation.Type.Identity);
+    Assert.assertTrue(inputNode1.getActivation() == Activation.Type.Identity);
     Assert.assertEquals(0, inputNode0.getGroup());
     Assert.assertEquals(1, inputNode1.getGroup());
     SortNetMLP.SNode hiddenNode0 = mlp.getNode(1, 0);
     SortNetMLP.SNode hiddenNode1 = mlp.getNode(1, 1);
-    Assert.assertTrue(hiddenNode0.getActivation() instanceof Activation.Sigmoid);
-    Assert.assertTrue(hiddenNode1.getActivation() instanceof Activation.Sigmoid);
+    Assert.assertTrue(hiddenNode0.getActivation() == Activation.Type.Sigmoid);
+    Assert.assertTrue(hiddenNode1.getActivation() == Activation.Type.Sigmoid);
     SortNetMLP.SNode hiddenNode2 = mlp.getNode(2, 0);
     SortNetMLP.SNode hiddenNode3 = mlp.getNode(2, 1);
-    Assert.assertTrue(hiddenNode2.getActivation() instanceof Activation.ReLU);
-    Assert.assertTrue(hiddenNode3.getActivation() instanceof Activation.ReLU);
+    Assert.assertTrue(hiddenNode2.getActivation() == Activation.Type.ReLU);
+    Assert.assertTrue(hiddenNode3.getActivation() == Activation.Type.ReLU);
     Assert.assertEquals(0, inputNode0.getInputEdges().size());
     Assert.assertEquals(0, inputNode1.getInputEdges().size());
     Assert.assertEquals(2, inputNode0.getOutputEdges().size());

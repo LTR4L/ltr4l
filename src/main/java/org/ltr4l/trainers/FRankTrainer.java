@@ -62,7 +62,7 @@ public class FRankTrainer extends RankNetTrainer {
 
       for (Document[] pair : trainingPairs.get(iq)) {
         double diff = ranks.get(pair[1]) - ranks.get(pair[0]);  //- (si - sj)
-        double lambda = new Activation.Sigmoid().output(diff);
+        double lambda = Activation.Type.Sigmoid.output(diff);
         lambdas.put(pair[0], lambdas.get(pair[0]) - lambda); //λ1 = λ1 - dλ
         lambdas.put(pair[1], lambdas.get(pair[1]) + lambda); //λ2 = λ2 - dλ
       }
