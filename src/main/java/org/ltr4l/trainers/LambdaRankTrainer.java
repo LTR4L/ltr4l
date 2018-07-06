@@ -72,7 +72,7 @@ public class LambdaRankTrainer extends RankNetTrainer {
       for (Document[] pair : trainingPairs.get(iq)) {
         double dNCG = (pws.get(pair[0]) - pws.get(pair[1])) * (logs.get(pair[0]) - logs.get(pair[1])) / N;
         double diff = ranks.get(pair[1]) - ranks.get(pair[0]);  //- (si - sj)
-        double lambda = Math.abs(new Activation.Sigmoid().output(diff) * dNCG); //TODO: Make static method or class variable
+        double lambda = Math.abs(Activation.Type.Sigmoid.output(diff) * dNCG); //TODO: Make static method or class variable
         lambdas.put(pair[0], lambdas.get(pair[0]) - lambda); //λ1 = λ1 - dλ
         lambdas.put(pair[1], lambdas.get(pair[1]) + lambda); //λ2 = λ2 - dλ
       }

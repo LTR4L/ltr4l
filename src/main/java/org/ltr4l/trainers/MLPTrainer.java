@@ -111,7 +111,7 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends AbstractTrainer<
       for(Map<String, Object> params: layers){
         int num = getReqInt(params, "num");
         String activation = getString(params, "activator", "identity");
-        Activation actFunc = Activation.ActivationFactory.getActivator(Activation.Type.valueOf(activation));
+        Activation actFunc = Activation.ActivationFactory.getActivator(activation);
         layerSettings.add(new NetworkShape.LayerSetting(num, actFunc));
       }
 

@@ -26,63 +26,49 @@ public interface Activation {
 
   double derivative(double input);
 
-  class Identity implements Activation {
-
-    @Override
-    public double output(double input) {
-      return input;
-    }
-
-    @Override
-    public double derivative(double input) {
-      return 1;
-    }
-  }
-
-  class Sigmoid implements Activation {
-
-    @Override
-    public double output(double input) {
-      return 1 / (1 + Math.exp(-input));
-    }
-
-    @Override
-    public double derivative(double input) {
-      double output = output(input);
-      return (output) * (1 - output);
-    }
-  }
-
-  class ReLU implements Activation {
-
-    @Override
-    public double output(double input) {
-      return Math.max(0.01, input);
-    }
-
-    @Override
-    public double derivative(double input) {
-      return input <= 0 ? 0 : 1;
-    }
-  }
-
   class ActivationFactory {
-    public static Activation getActivator(Type type) {
-      switch (type) {
-        case Identity:
-          return new Identity();
-        case Sigmoid:
-          return new Sigmoid();
-        case ReLU:
-          return new ReLU();
-        default:
-          return new Identity();
+    public static Activation getActivator(String type) {
+      for(Activation act : Type.values())
+        if(type.toLowerCase().equals(act.toString().toLowerCase()))
+          return act;
+      return Type.Identity;
+      }
+  }
+
+  public static enum Type implements Activation{
+    Identity{
+      @Override
+      public double output(double input){
+        return input;
+      }
+
+      @Override
+      public double derivative(double input){
+        return 1;
+      }
+    },
+    Sigmoid{
+      @Override
+      public double output(double input){
+        return 1 / (1 + Math.exp(-input));
+      }
+      @Override
+      public double derivative(double input) {
+        double output = output(input);
+        return (output) * (1 - output);
+      }
+
+    },
+    ReLU{
+      @Override
+      public double output(double input) {
+        return Math.max(0.01, input);
+      }
+      @Override
+      public double derivative(double input) {
+        return input <= 0 ? 0 : 1;
       }
     }
-  }
-
-  public enum Type {
-    Identity, Sigmoid, ReLU;
   }
 }
 

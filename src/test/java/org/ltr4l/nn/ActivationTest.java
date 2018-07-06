@@ -23,7 +23,7 @@ public class ActivationTest {
 
   @Test
   public void testIdentity() throws Exception {
-    Activation act = Activation.ActivationFactory.getActivator(Activation.Type.Identity);
+    Activation act = Activation.Type.Identity;
 
     Assert.assertEquals(10, act.output(10), 0.001);
     Assert.assertEquals(-100, act.output(-100), 0.001);
@@ -36,7 +36,7 @@ public class ActivationTest {
 
   @Test
   public void testSigmoid() throws Exception {
-    Activation act = Activation.ActivationFactory.getActivator(Activation.Type.Sigmoid);
+    Activation act = Activation.Type.Sigmoid;
 
     Assert.assertEquals(0.731059, act.output(1), 0.001);
     Assert.assertEquals(0.5, act.output(0), 0.001);
@@ -45,7 +45,7 @@ public class ActivationTest {
 
   @Test
   public void testReLU() throws Exception {
-    Activation act = Activation.ActivationFactory.getActivator(Activation.Type.ReLU);
+    Activation act = Activation.Type.ReLU;
 
     Assert.assertEquals(10, act.output(10), 0.001);
     Assert.assertEquals(0.01, act.output(0), 0.001);

@@ -30,7 +30,7 @@ public class NetworkShape {
   @Deprecated
   public static NetworkShape parseSetting(String layers){
     if(layers == null){
-      return new NetworkShape(new NetworkShape.LayerSetting(1, new Activation.Identity()));
+      return new NetworkShape(new NetworkShape.LayerSetting(1, Activation.Type.Identity));
     }
     else{
       String[] layersInfo = layers.split(" ");
@@ -43,7 +43,7 @@ public class NetworkShape {
           nodeNum = 1;
         }
 
-        Activation actFunc = Activation.ActivationFactory.getActivator(Activation.Type.valueOf(layerShape[1]));
+        Activation actFunc = Activation.ActivationFactory.getActivator(layerShape[1]);
         nShape.add(nodeNum, actFunc);
       }
       return nShape;

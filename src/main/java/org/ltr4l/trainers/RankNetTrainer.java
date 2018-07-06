@@ -90,7 +90,7 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
         double delta = si - sj;
 
         if (delta < threshold) {
-          double sigma = new Activation.Sigmoid().output(-delta);
+          double sigma = Activation.Type.Sigmoid.output(-delta);
           ranker.backProp(sigma);
           ranker.forwardProp(docA);
           ranker.backProp(-sigma);
