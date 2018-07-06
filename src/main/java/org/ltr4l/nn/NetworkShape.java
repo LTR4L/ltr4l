@@ -105,7 +105,18 @@ public class NetworkShape {
 
     @Override
     public String toString(){
-      return String.format("(%s,%d)", actFunc.getClass().getCanonicalName(), num);
+      String className = actFunc.getClass().getTypeName();
+      if(className.contains("$")){
+        int lastIdx = className.lastIndexOf("$");
+        try{
+          String subStr = className.substring(lastIdx + 1);
+          int valueId = Integer.parseInt(subStr);
+          String typeName =  Activation.Type.values()[valueId - 1].name();
+          className = className.replaceAll("\\$",".").substring(0, lastIdx + 1) + typeName;
+        }
+        catch(NumberFormatException ignored){ }
+      }
+      return String.format("(%s,%d)", className, num);
     }
   }
 }
