@@ -39,7 +39,7 @@ public class VectorMathTest {
 
   @Test
   public void dot() throws Exception {
-    Assert.assertEquals(100d, VectorMath.dot(A, B), 0.01);
+    Assert.assertEquals(90d, VectorMath.dot(A, B), 0.01);
   }
 
   @Test
