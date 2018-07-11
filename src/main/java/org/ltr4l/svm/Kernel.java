@@ -60,7 +60,7 @@ public interface Kernel {
     POLYNOMIAL{
       @Override
       public double similarityK(List<Double> U, List<Double> V, KernelParams params) {
-        return Math.pow(VectorMath.dot(U, V) + params.getC(), params.getD());
+        return Math.pow((params.getSigma() * VectorMath.dot(U, V)) + params.getC(), params.getD());
       }
     },
     GAUSSIAN{

@@ -24,14 +24,14 @@ public class VectorMath {
   private static void checkVectors(List<Double> A, List<Double> B) {
     Objects.requireNonNull(A);
     Objects.requireNonNull(B);
-    assert(A.size() > B.size());
+    assert(A.size() == B.size());
   }
 
   public static double dot(List<Double> A, List<Double> B) {
     checkVectors(A, B);
     double dotProd = 0;
     for(int i = 0; i < A.size(); i++)
-      dotProd += A.get(0) * B.get(0);
+      dotProd += A.get(i) * B.get(i);
     return dotProd;
   }
 

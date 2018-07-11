@@ -26,16 +26,19 @@ public class KernelParams {
     d = 2d;
   }
 
-  public void setC(double c) {
+  public KernelParams setC(double c) {
     this.c = c;
+    return this;
   }
 
-  public void setD(double d) {
+  public KernelParams setD(double d) {
     this.d = d;
+    return this;
   }
 
-  public void setSigma(double sigma) {
+  public KernelParams setSigma(double sigma) {
     this.sigma = sigma;
+    return this;
   }
 
   public double getC() {
