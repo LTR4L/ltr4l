@@ -32,10 +32,13 @@ public interface Kernel {
 
   public static Kernel getKernel(String kernelType){
     Objects.requireNonNull(kernelType);
-    for(Kernel.Type type : Kernel.Type.values())
-      if(type.name().equals(kernelType.toUpperCase()))
-        return type;
-    return Type.LINEAR;
+    try {
+      return Type.valueOf(kernelType.toUpperCase());
+    } catch(IllegalArgumentException e){
+      System.err.println("Specified kernel type does not exist; check spelling." +
+          "Will use default Kernel (Linear)");
+      return Type.LINEAR;
+    }
   }
 
   public static enum Type implements Kernel {
