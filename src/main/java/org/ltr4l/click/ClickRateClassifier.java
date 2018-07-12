@@ -18,11 +18,11 @@ package org.ltr4l.click;
 
 public class ClickRateClassifier {
 
-  protected final Double[] borders;
+  protected final double[] borders;
 
   public ClickRateClassifier(String borderListStr) throws ClassCastException {
     String[] bordersStr = borderListStr.replace(" ", "").split(",");
-    borders = new Double[borderListStr.length()];
+    borders = new double[bordersStr.length];
 
     for (int i = 0; i < bordersStr.length; i++) {
       borders[i] = Double.valueOf(bordersStr[i]);
@@ -31,15 +31,17 @@ public class ClickRateClassifier {
   }
 
   public int classify(double value) {
-    if (value <= borders[0]) {
+    if (borders.length == 0) {
       return 0;
     }
-    for (int i = 1; i < borders.length; i++) {
-      if (value <= borders[i] && value > borders[i - 1]) {
-        return i;
+
+    int i = 0;
+    for (; i < borders.length; i++) {
+      if (value <= borders[i]) {
+        break;
       }
     }
-    return borders.length;
+    return i;
   }
 
   public int classify(float value) {
@@ -54,7 +56,7 @@ public class ClickRateClassifier {
     return classify((double)value);
   }
 
-  private void sort(Double[] borders) {
+  private void sort(double[] borders) {
     //TODO: write sort
   }
 }

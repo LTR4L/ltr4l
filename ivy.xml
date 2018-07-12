@@ -50,22 +50,11 @@
       <artifact name="${ivy.jar.httpcomponents-client.name}" type="jar"
                 url="http://central.maven.org/maven2/org/apache/httpcomponents/${ivy.jar.httpcomponents-client.name}/${ivy.jar.httpcomponents-client.rev}/${ivy.jar.httpcomponents-client.name}-${ivy.jar.httpcomponents-client.rev}.jar"/>
     </dependency>
-    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-core.name}" rev="${ivy.jar.lucene.rev}">
-      <artifact name="${ivy.jar.lucene-core.name}" type="jar"
-                url="http://repo1.maven.org/maven2/org/apache/lucene/${ivy.jar.lucene-core.name}/${ivy.jar.lucene.rev}/${ivy.jar.lucene-core.name}-${ivy.jar.lucene.rev}.jar"/>
-    </dependency>
-    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-analyzers-common.name}" rev="${ivy.jar.lucene.rev}">
-      <artifact name="${ivy.jar.lucene-analyzers-common.name}" type="jar"
-                url="http://repo1.maven.org/maven2/org/apache/lucene/${ivy.jar.lucene-analyzers-common.name}/${ivy.jar.lucene.rev}/${ivy.jar.lucene-analyzers-common.name}-${ivy.jar.lucene.rev}.jar"/>
-    </dependency>
-    <dependency org="${ivy.jar.solr.org}" name="${ivy.jar.solr-core.name}" rev="${ivy.jar.solr.rev}">
-      <artifact name="${ivy.jar.solr-core.name}" type="jar"
-                url="http://repo1.maven.org/maven2/org/apache/solr/${ivy.jar.solr-core.name}/${ivy.jar.solr.rev}/${ivy.jar.solr-core.name}-${ivy.jar.solr.rev}.jar"/>
-    </dependency>
-    <dependency org="${ivy.jar.solr.org}" name="${ivy.jar.solr-solrj.name}" rev="${ivy.jar.solr.rev}">
-      <artifact name="${ivy.jar.solr-solrj.name}" type="jar"
-                url="http://repo1.maven.org/maven2/org/apache/solr/${ivy.jar.solr-solrj.name}/${ivy.jar.solr.rev}/${ivy.jar.solr-solrj.name}-${ivy.jar.solr.rev}.jar"/>
-    </dependency>
+    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-core.name}" rev="${ivy.jar.lucene.rev}"/>
+    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-analyzers-common.name}" rev="${ivy.jar.lucene.rev}"/>
+    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-test-framework.name}" rev="${ivy.jar.lucene.rev}"/>
+    <dependency org="${ivy.jar.solr.org}" name="${ivy.jar.solr-solrj.name}" rev="${ivy.jar.solr.rev}"/>
+    <dependency org="${ivy.jar.solr.org}" name="${ivy.jar.solr-test-framework.name}" rev="${ivy.jar.solr.rev}"/>
     <dependency org="${ivy.jar.commons-io.org}" name="${ivy.jar.commons-io.name}" rev="${ivy.jar.commons-io.rev}">
       <artifact name="${ivy.jar.commons-io.name}" type="jar"
                 url="http://central.maven.org/maven2/commons-io/${ivy.jar.commons-io.name}/${ivy.jar.commons-io.rev}/${ivy.jar.commons-io.name}-${ivy.jar.commons-io.rev}.jar"/>
@@ -80,5 +69,23 @@
                 url="http://central.maven.org/maven2/commons-logging/${ivy.jar.commons-logging.name}/${ivy.jar.commons-logging.rev}/${ivy.jar.commons-logging.name}-${ivy.jar.commons-logging.rev}.jar"/>
     </dependency>
 
+    <!-- For testing ltr4l-solr -->
+    <dependency org="com.carrotsearch.randomizedtesting" name="randomizedtesting-runner" rev="2.6.3"/>
+    <dependency org="org.apache.zookeeper" name="zookeeper" rev="3.4.10">
+      <artifact name="zookeeper" type="jar"/>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.noggit/noggit -->
+    <dependency org="org.noggit" name="noggit" rev="0.8"/>
+    <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-codecs -->
+    <dependency org="org.apache.lucene" name="lucene-codecs" rev="7.3.0"/>
+    <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-queries -->
+    <dependency org="org.apache.lucene" name="lucene-queries" rev="7.3.0"/>
+    <!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-util -->
+    <dependency org="org.eclipse.jetty" name="jetty-util" rev="9.4.11.v20180605"/>
+    <!-- https://mvnrepository.com/artifact/xerces/xercesImpl -->
+    <dependency org="xerces" name="xercesImpl" rev="2.11.0"/>
+    <!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload -->
+    <dependency org="commons-fileupload" name="commons-fileupload" rev="1.3.3"/>
   </dependencies>
 </ivy-module>

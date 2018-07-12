@@ -44,11 +44,11 @@
         <junit printsummary="on"
                haltonfailure="no"
                errorProperty="tests.failed"
-               failureProperty="tests.failed"
-               dir="${src.dir}/test/resources">
+               failureProperty="tests.failed">
             <classpath path="${cls.dir}"/>
+            <classpath path="../${cls.dir}"/>
             <classpath>
-		    <fileset dir="../${lib.dir}" includes="**/*.jar"/>
+		      <fileset dir="../${lib.dir}" includes="**/*.jar"/>
             </classpath>
             <jvmarg value="-ea"/>
             <formatter type="plain"/>

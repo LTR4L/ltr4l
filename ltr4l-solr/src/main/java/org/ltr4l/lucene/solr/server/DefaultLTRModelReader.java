@@ -37,9 +37,12 @@ public class DefaultLTRModelReader extends AbstractConfigReader {
 
     if (loader == null) {
       loader = new SolrResourceLoader();
+      solrHome = loader.locateSolrHome().toString();
+    } else {
+      solrHome = loader.getInstancePath().toString();
     }
-    solrHome = loader.locateSolrHome().toString();
 
+    System.err.println("solrHome : " + solrHome);
     // To avoid opening model files every time when getting ranker.
     StringBuilder sb = new StringBuilder();
     try (InputStream is = new FileInputStream(solrHome + "/" + fileName);
@@ -58,5 +61,9 @@ public class DefaultLTRModelReader extends AbstractConfigReader {
 
   public Ranker getRanker() throws IOException{
     return Ranker.RankerFactory.getFromModel(algorithm, reader);
+  }
+
+  public String getAlgorithm() {
+    return algorithm;
   }
 }
