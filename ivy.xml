@@ -52,6 +52,8 @@
     </dependency>
     <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-core.name}" rev="${ivy.jar.lucene.rev}"/>
     <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-analyzers-common.name}" rev="${ivy.jar.lucene.rev}"/>
+    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-codecs.name}" rev="${ivy.jar.lucene.rev}"/>
+    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-queries.name}" rev="${ivy.jar.lucene.rev}"/>
     <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-test-framework.name}" rev="${ivy.jar.lucene.rev}"/>
     <dependency org="${ivy.jar.solr.org}" name="${ivy.jar.solr-solrj.name}" rev="${ivy.jar.solr.rev}"/>
     <dependency org="${ivy.jar.solr.org}" name="${ivy.jar.solr-test-framework.name}" rev="${ivy.jar.solr.rev}"/>
@@ -70,22 +72,11 @@
     </dependency>
 
     <!-- For testing ltr4l-solr -->
-    <dependency org="com.carrotsearch.randomizedtesting" name="randomizedtesting-runner" rev="2.6.3"/>
-    <dependency org="org.apache.zookeeper" name="zookeeper" rev="3.4.10">
-      <artifact name="zookeeper" type="jar"/>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.noggit/noggit -->
-    <dependency org="org.noggit" name="noggit" rev="0.8"/>
-    <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-codecs -->
-    <dependency org="org.apache.lucene" name="lucene-codecs" rev="7.3.0"/>
-    <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-queries -->
-    <dependency org="org.apache.lucene" name="lucene-queries" rev="7.3.0"/>
-    <!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-util -->
-    <dependency org="org.eclipse.jetty" name="jetty-util" rev="9.4.11.v20180605"/>
-    <!-- https://mvnrepository.com/artifact/xerces/xercesImpl -->
-    <dependency org="xerces" name="xercesImpl" rev="2.11.0"/>
-    <!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload -->
-    <dependency org="commons-fileupload" name="commons-fileupload" rev="1.3.3"/>
+    <dependency org="${ivy.jar.randomizedtesting.org}" name="${ivy.jar.randomizedtesting.name}" rev="${ivy.jar.randomizedtesting.rev}"/>
+    <dependency org="${ivy.jar.zookeeper.org}" name="${ivy.jar.zookeeper.name}" rev="${ivy.jar.zookeeper.rev}"/>
+    <dependency org="${ivy.jar.noggit.org}" name="${ivy.jar.noggit.name}" rev="${ivy.jar.noggit.rev}"/>
+    <dependency org="${ivy.jar.jetty.org}" name="${ivy.jar.jetty.name}" rev="${ivy.jar.jetty.rev}"/>
+    <dependency org="${ivy.jar.xerces.org}" name="${ivy.jar.xerces.name}" rev="${ivy.jar.xerces.rev}"/>
+    <dependency org="${ivy.jar.commons-fileupload.org}" name="${ivy.jar.commons-fileupload.name}" rev="${ivy.jar.commons-fileupload.rev}"/>
   </dependencies>
 </ivy-module>
