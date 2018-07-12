@@ -50,7 +50,7 @@
             <classpath>
 		      <fileset dir="../${lib.dir}" includes="**/*.jar"/>
             </classpath>
-            <jvmarg value="-ea"/>
+            <jvmarg line="-ea -Djava.security.egd=file:/dev/./urandom"/>
             <formatter type="plain"/>
             <batchtest fork="yes" todir="${test.result.dir}" unless="testcase">
                 <fileset dir="${src.dir}/test/java" includes="**/*Test.java"/>
