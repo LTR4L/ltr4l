@@ -70,12 +70,5 @@
       <artifact name="${ivy.jar.commons-logging.name}" type="jar"
                 url="http://central.maven.org/maven2/commons-logging/${ivy.jar.commons-logging.name}/${ivy.jar.commons-logging.rev}/${ivy.jar.commons-logging.name}-${ivy.jar.commons-logging.rev}.jar"/>
     </dependency>
-
-    <!-- For testing ltr4l-solr -->
-    <dependency org="${ivy.jar.randomizedtesting.org}" name="${ivy.jar.randomizedtesting.name}" rev="${ivy.jar.randomizedtesting.rev}"/>
-    <dependency org="${ivy.jar.zookeeper.org}" name="${ivy.jar.zookeeper.name}" rev="${ivy.jar.zookeeper.rev}"/>
-    <dependency org="${ivy.jar.noggit.org}" name="${ivy.jar.noggit.name}" rev="${ivy.jar.noggit.rev}"/>
-    <dependency org="${ivy.jar.jetty.org}" name="${ivy.jar.jetty.name}" rev="${ivy.jar.jetty.rev}"/>
-    <dependency org="${ivy.jar.commons-fileupload.org}" name="${ivy.jar.commons-fileupload.name}" rev="${ivy.jar.commons-fileupload.rev}"/>
   </dependencies>
 </ivy-module>
