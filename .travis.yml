@@ -21,3 +21,4 @@ script:
   - ant clean compile test
   - cd ltr4l-solr
   - ant clean compile test
+  - cat test-result/*
