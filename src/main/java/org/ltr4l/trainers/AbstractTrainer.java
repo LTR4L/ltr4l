@@ -59,16 +59,16 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
   protected final RankEval eval;
   protected final  LossCalculator lossCalc;
 
-  AbstractTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
+  AbstractTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, R ranker, Error errorFunc, LossCalculator lossCalc) {
     this.config = getConfig(reader);
     config.overrideBy(override);     // TODO: want to use generic C instead of Config
     epochNum = config.numIterations;
-    trainingSet = training.getQueries();
-    validationSet = validation.getQueries();
+    trainingSet = training;
+    validationSet = validation;
     maxScore = 0d;
-    ranker = constructRanker(); //TODO: ranker, errorFunc, and lossCalc assignments are done in child classes by implementing methods...
-    errorFunc = makeErrorFunc();
-    lossCalc = makeLossCalculator(); //TODO: In child classes, requires that ranker and errorFunc be created already...
+    this.ranker = ranker; //TODO: ranker, errorFunc, and lossCalc assignments are done in child classes by implementing methods...
+    this.errorFunc = errorFunc;
+    this.lossCalc = lossCalc; //TODO: In child classes, requires that ranker and errorFunc be created already...
     assert(config.batchSize >= 0);
     batchSize = config.batchSize;
     eval = getEvaluator(config);
@@ -104,17 +104,8 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
     return ranker;
   }
 
-  /**
-   * This method is used to assign errorFunc.
-   * Child classes must specify which error they will use.
-   * @return Implementation of Error
-   */
-  protected abstract Error makeErrorFunc();
-
-  protected abstract LossCalculator makeLossCalculator();
-
   public double[] calculateLoss() {
-    return new double[]{lossCalc.calculateLoss(TRAINING), lossCalc.calculateLoss(VALIDATION)};
+    return new double[]{lossCalc.calculateLoss(TRAINING, ranker), lossCalc.calculateLoss(VALIDATION, ranker)};
   }
 
   public void validate(int iter, int pos) {
@@ -231,30 +222,32 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
      * @return new class which implements trainer.
      */
     public static AbstractTrainer getTrainer(String algorithm, QuerySet trainingSet, QuerySet validationSet, Reader reader, Config override) {
+      List<Query> training = trainingSet.getQueries();
+      List<Query> validation = validationSet.getQueries();
       try{
         switch (algorithm.toLowerCase()) {
           case "prank":
-            return new PRankTrainer(trainingSet, validationSet, reader, override);
+            return new PRankTrainer(training, validation, reader, override);
           case "oap":
-            return new OAPBPMTrainer(trainingSet, validationSet, reader, override);
+            return new OAPBPMTrainer(training, validation, reader, override);
           case "ranknet":
-            return new RankNetTrainer(trainingSet, validationSet, reader, override);
+            return new RankNetTrainer(training, validation, reader, override);
           case "franknet":
-            return new FRankTrainer(trainingSet, validationSet, reader, override);
+            return new FRankTrainer(training, validation, reader, override);
           case "lambdarank":
-            return new LambdaRankTrainer(trainingSet, validationSet, reader, override);
+            return new LambdaRankTrainer(training, validation, reader, override);
           case "nnrank":
-            return new NNRankTrainer(trainingSet, validationSet, reader, override);
+            return new NNRankTrainer(training, validation, reader, override);
           case "sortnet":
-            return new SortNetTrainer(trainingSet, validationSet, reader, override);
+            return new SortNetTrainer(training, validation, reader, override);
           case "listnet":
-            return new ListNetTrainer(trainingSet, validationSet, reader, override);
+            return new ListNetTrainer(training, validation, reader, override);
           case "lambdamart":
-            return new LambdaMartTrainer(trainingSet, validationSet, reader, override);
+            return new LambdaMartTrainer(training, validation, reader, override);
           case "rankboost":
-            return new RankBoostTrainer(trainingSet, validationSet, reader, override);
+            return new RankBoostTrainer(training, validation, reader, override);
           case "adaboost":
-            return new AdaBoostTrainer(trainingSet, validationSet, reader, override);
+            return new AdaBoostTrainer(training, validation, reader, override);
           default:
             throw new IllegalArgumentException();
         }

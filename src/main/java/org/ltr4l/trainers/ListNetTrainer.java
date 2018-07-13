@@ -41,11 +41,16 @@ public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
   private double lrRate;
   private double rgRate;
 
-  ListNetTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-    super(training, validation, reader, override);
+  ListNetTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, ListNetMLP ranker, Error errorFunc, LossCalculator<ListNetMLP> lossCalc) {
+    super(training, validation, reader, override, ranker, errorFunc, lossCalc);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
+  }
+
+  ListNetTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, ListNetMLP ranker){
+    this(training,validation, reader, override, ranker, StandardError.ENTROPY,
+        new PointwiseLossCalc.ListNetLossCalc(training, validation, StandardError.ENTROPY));
   }
 
   @Override
@@ -56,16 +61,6 @@ public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
     Regularization regularization = config.getReguFunction();
     String weightModel = config.getWeightInit();
     return new ListNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
-  }
-
-  @Override
-  protected Error makeErrorFunc(){
-    return StandardError.ENTROPY;
-  }
-
-  @Override
-  protected LossCalculator makeLossCalculator(){
-    return new PointwiseLossCalc.ListNetLossCalc(ranker, trainingSet, validationSet, errorFunc);
   }
 
   @Override

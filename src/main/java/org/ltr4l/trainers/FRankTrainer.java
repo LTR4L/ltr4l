@@ -18,11 +18,12 @@ package org.ltr4l.trainers;
 
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.List;
 
 import org.ltr4l.nn.Activation;
+import org.ltr4l.nn.RankNetMLP;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
 
 /**
@@ -38,8 +39,8 @@ import org.ltr4l.tools.Config;
 public class FRankTrainer extends RankNetTrainer {
 
 
-  FRankTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-    super(training, validation, reader, override);
+  FRankTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, RankNetMLP ranker) {
+    super(training, validation, reader, override, ranker);
   }
 
   @Override

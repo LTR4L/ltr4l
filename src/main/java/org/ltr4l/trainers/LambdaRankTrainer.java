@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.ltr4l.nn.Activation;
+import org.ltr4l.nn.RankNetMLP;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
@@ -39,8 +40,8 @@ import org.ltr4l.tools.Config;
  * */
 public class LambdaRankTrainer extends RankNetTrainer {
 
-  LambdaRankTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-    super(training, validation, reader, override);
+  LambdaRankTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, RankNetMLP ranker) {
+    super(training, validation, reader, override, ranker);
   }
 
   @Override

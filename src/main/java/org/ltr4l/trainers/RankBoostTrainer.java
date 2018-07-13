@@ -34,8 +34,8 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
   private final RBDistribution distribution;
   private final List<RankedDocs> rTrainingSet; //Contains doc lists sorted by label. Queries with no pairs of differing labels should be removed.
 
-  public RankBoostTrainer(QuerySet training, QuerySet validation, Reader reader, Config override){
-    super(training, validation, reader, override);
+  public RankBoostTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, RankBoost ranker){
+    super(training, validation, reader, override, ranker, StandardError.ENTROPY, new PairwiseLossCalc.RankBoostLossCalc(training, validation));
     rTrainingSet = new ArrayList<>();
     for(Query query : trainingSet) {
       //Sort into correct rank. This is not just for initialization, but also for later calculation.
@@ -44,16 +44,6 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
       rTrainingSet.add(rDocs);
     }
     distribution = new RBDistribution(rTrainingSet);
-  }
-
-  @Override
-  protected Error makeErrorFunc() {
-   return StandardError.ENTROPY;
-  }
-
-  @Override
-  protected LossCalculator makeLossCalculator(){
-    return new PairwiseLossCalc.RankBoostLossCalc<>(ranker, trainingSet, validationSet);
   }
 
   @Override

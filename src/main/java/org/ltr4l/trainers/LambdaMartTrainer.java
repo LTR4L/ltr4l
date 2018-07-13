@@ -49,8 +49,8 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
   private final int numSteps;
   private final double lrRate;
 
-  LambdaMartTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-    super(training, validation, reader, override);
+  LambdaMartTrainer(List<Query> training, List<Query> validation, Reader reader, Config override) {
+    super(training, validation, reader, override, new Ensemble(), StandardError.ENTROPY, new PairwiseLossCalc.RankNetLossCalc(training, validation, StandardError.ENTROPY));
     trainingDocs = DataProcessor.makeDocList(trainingSet);
     trainingPairs = ((PairwiseLossCalc) lossCalc).getTrainingPairs(); //TODO: use generics over casting...
     numTrees = config.getNumTrees();
@@ -64,9 +64,10 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
     // {threshold, calculateScore}, //Feature 1
     // ...
     //}
-    thresholds = new double[training.getFeatureLength()][2];
+    int featLength = training.get(0).getFeatureLength();
+    thresholds = new double[featLength][2];
     TreeTools treeTools = new RegressionTreeTools();
-    for (int feat = 0; feat < training.getFeatureLength(); feat++) {
+    for (int feat = 0; feat < featLength; feat++) {
       featureSortedDocs.add(FeatureSortedDocs.get(trainingDocs, feat));
       thresholds[feat] = treeTools.findThreshold(featureSortedDocs.get(feat));
     }
@@ -75,16 +76,6 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
   @Override
   protected Ensemble constructRanker() {
     return new Ensemble();
-  }
-
-  @Override
-  protected Error makeErrorFunc() {
-    return StandardError.ENTROPY;
-  }
-
-  @Override
-  protected LossCalculator makeLossCalculator(){
-    return new PairwiseLossCalc.RankNetLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
   }
 
   @Override

@@ -44,8 +44,8 @@ public class PRankTrainer extends AbstractTrainer<PRankTrainer.PRank, Config> {
 
   private final  List<Document> trainingDocList;
 
-  PRankTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-    super(training, validation, reader, override);
+  PRankTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, PRank ranker) {
+    super(training, validation, reader, override, ranker, StandardError.SQUARE, new PointwiseLossCalc.StandardPointLossCalc<PRank>(training, validation, StandardError.SQUARE));
     maxScore = 0.0;
     trainingDocList = new ArrayList<>();
     for (Query query : trainingSet)
@@ -57,16 +57,6 @@ public class PRankTrainer extends AbstractTrainer<PRankTrainer.PRank, Config> {
     Collections.shuffle(trainingDocList);
     for (Document doc : trainingDocList)
       ranker.updateWeights(doc);
-  }
-
-  @Override
-  protected Error makeErrorFunc(){
-    return StandardError.SQUARE;
-  }
-
-  @Override
-  protected LossCalculator makeLossCalculator() {
-    return new PointwiseLossCalc.StandardPointLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
   }
 
   @Override

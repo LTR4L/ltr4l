@@ -45,27 +45,15 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends AbstractTrainer<
   protected double rgRate;
   //protected Config config;
 
-  MLPTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-    this(training, validation, reader, override, false);
+  MLPTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, M ranker) {
+    this(training, validation, reader, override, ranker, StandardError.SQUARE, new PointwiseLossCalc.StandardPointLossCalc<M>(training, validation, StandardError.SQUARE));
   }
 
-  //This constructor exists solely for the purpose of child classes
-  //It gives child classes the ability to assign an extended MLP.
-  MLPTrainer(QuerySet training, QuerySet validation, Reader reader, Config override, boolean hasOtherMLP) {
-    super(training, validation, reader, override);
+  MLPTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, M ranker, Error errorFunc, LossCalculator<M> lossCalc) {
+    super(training, validation, reader, override, ranker, errorFunc, lossCalc);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
-  }
-
-  @Override
-  protected Error makeErrorFunc(){
-    return StandardError.SQUARE; //Default square error
-  }
-
-  @Override
-  protected LossCalculator makeLossCalculator(){
-    return new PointwiseLossCalc.StandardPointLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
   }
 
   @Override

@@ -30,8 +30,19 @@ public class AdaBoostTrainer extends AbstractTrainer<AdaBoost, RankBoost.RankBoo
   private final ABDistribution ABDistribution;
   private final List<RankedDocs> rTrainingSet; //Contains doc lists sorted by label. Queries with no pairs of differing labels should be removed.
 
-  public AdaBoostTrainer(QuerySet training, QuerySet validation, Reader reader, Config override){
-    super(training, validation, reader, override);
+  public AdaBoostTrainer(List<Query> training,
+                         List<Query> validation,
+                         Reader reader,
+                         Config override,
+                         AdaBoost ranker
+                         ){
+    super(training,
+        validation,
+        reader,
+        override,
+        ranker,
+        StandardError.ENTROPY,
+        new PointwiseLossCalc.StandardPointLossCalc<AdaBoost>(training, validation, StandardError.SQUARE ));
     rTrainingSet = new ArrayList<>();
     for(Query query : trainingSet) {
       //Sort into correct rank. This is not just for initialization, but also for later calculation.
@@ -40,16 +51,6 @@ public class AdaBoostTrainer extends AbstractTrainer<AdaBoost, RankBoost.RankBoo
       rTrainingSet.add(rDocs);
     }
     ABDistribution = new ABDistribution(rTrainingSet);
-  }
-
-  @Override
-  protected Error makeErrorFunc() {
-    return StandardError.ENTROPY;
-  }
-
-  @Override
-  protected LossCalculator makeLossCalculator(){
-    return new PointwiseLossCalc.StandardPointLossCalc<>(ranker, trainingSet, validationSet, StandardError.SQUARE);
   }
 
   @Override
