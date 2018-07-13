@@ -51,7 +51,7 @@ public class LambdaMartTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
     QuerySet validSet = rdg.getRandomQuerySet(2, 10, 2);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("lambdamart", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 
@@ -81,7 +81,7 @@ public class LambdaMartTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
     QuerySet validSet = rdg.getRandomQuerySet(2, 10, 2);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("lambdamart", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 
@@ -111,7 +111,7 @@ public class LambdaMartTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
     QuerySet validSet = rdg.getRandomQuerySet(2, 10, 2);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("lambdamart", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 
@@ -141,7 +141,7 @@ public class LambdaMartTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
     QuerySet validSet = rdg.getRandomQuerySet(2, 10, 2);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("lambdamart", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 

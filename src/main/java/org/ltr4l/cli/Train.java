@@ -66,7 +66,7 @@ public class Train {
     QuerySet trainingSet = QuerySet.create(optionalConfig.dataSet.training);
     QuerySet validationSet = QuerySet.create(optionalConfig.dataSet.validation);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(params[0], trainingSet, validationSet, configPath, optionalConfig);
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(trainingSet, validationSet, configPath, optionalConfig);
     long startTime = System.currentTimeMillis();
     trainer.trainAndValidate();
     long endTime = System.currentTimeMillis();

@@ -20,7 +20,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.Ranker;
 import org.ltr4l.evaluation.DCG;
@@ -157,6 +159,30 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
 
     /**
      * This returns the appropriate implementation of Trainer depending on the algorithm.
+     * @param trainingSet The QuerySet containing the data to be used for training.
+     * @param validationSet The QuerySet containing the data to be used for validation.
+     * @param configFile The Config file containing parameters needed for Ranker class.
+     * @param override Set another Config that overrides configFile.
+     * @return new class which implements trainer.
+     */
+    public static AbstractTrainer getTrainer(QuerySet trainingSet, QuerySet validationSet, String configFile, Config override) {
+      String algorithm;
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
+      try{
+        Reader reader = new FileReader(configFile);
+        Map model = mapper.readValue(reader, Map.class);
+        algorithm = ((String)model.get("algorithm")).toLowerCase();
+        reader.reset();
+        return getTrainer(algorithm, trainingSet, validationSet, reader, override);
+      }
+      catch (IOException e){
+        throw new IllegalArgumentException(e);
+      }
+    }
+
+    /**
+     * This returns the appropriate implementation of Trainer depending on the algorithm.
      * @param algorithm Algorithm/implementation to be used.
      * @param trainingSet The QuerySet containing the data to be used for training.
      * @param validationSet The QuerySet containing the data to be used for validation.
@@ -173,7 +199,28 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
         throw new IllegalArgumentException(e);
       }
     }
-
+    /**
+     * This returns the appropriate implementation of Trainer depending on the algorithm.
+     * @param trainingSet The QuerySet containing the data to be used for training.
+     * @param validationSet The QuerySet containing the data to be used for validation.
+     * @param reader The Config Reader containing parameters needed for Ranker class.
+     * @param override Set another Config that overrides reader Config.
+     * @return new class which implements trainer.
+     */
+    public static AbstractTrainer getTrainer(QuerySet trainingSet, QuerySet validationSet, Reader reader, Config override) {
+      String algorithm;
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
+      try{
+        Map model = mapper.readValue(reader, Map.class);
+        algorithm = ((String)model.get("algorithm")).toLowerCase();
+        reader.reset();
+        return getTrainer(algorithm, trainingSet, validationSet, reader, override);
+      }
+      catch (IOException e){
+        throw new IllegalArgumentException(e);
+      }
+    }
     /**
      * This returns the appropriate implementation of Trainer depending on the algorithm.
      * @param algorithm Algorithm/implementation to be used.
