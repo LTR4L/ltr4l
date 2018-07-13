@@ -15,9 +15,11 @@
  */
 package org.ltr4l.tools;
 
-public interface LossCalculator {
+import org.ltr4l.Ranker;
 
-  public double calculateLoss(DataSet type);
+public interface LossCalculator<R extends Ranker> {
+
+  public double calculateLoss(DataSet type, R ranker);
 
   public static enum DataSet{
     TRAINING,VALIDATION

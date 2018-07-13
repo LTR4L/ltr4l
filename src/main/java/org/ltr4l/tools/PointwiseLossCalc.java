@@ -23,42 +23,40 @@ import org.ltr4l.query.Query;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class PointwiseLossCalc<R extends Ranker> implements LossCalculator{
-  protected final R ranker;
+public abstract class PointwiseLossCalc<R extends Ranker> implements LossCalculator<R> {
   protected final List<Query> trainingSet;
   protected final List<Query> validationSet;
 
-  protected PointwiseLossCalc(R ranker, List<Query> trainingSet, List<Query> validationSet){
-    this.ranker = ranker;
+  protected PointwiseLossCalc(List<Query> trainingSet, List<Query> validationSet){
     this.trainingSet = trainingSet;
     this.validationSet = validationSet;
   }
 
   @Override
-  public double calculateLoss(DataSet type){
+  public double calculateLoss(DataSet type, R ranker){
     Objects.requireNonNull(type);
     switch(type){
       case TRAINING:
-        return calculateLoss(trainingSet);
+        return calculateLoss(trainingSet, ranker);
       case VALIDATION:
-        return calculateLoss(validationSet);
+        return calculateLoss(validationSet, ranker);
       default:
         throw new IllegalArgumentException();
     }
   }
 
-  protected abstract double calculateLoss(List<Query> queries);
+  protected abstract double calculateLoss(List<Query> queries, R ranker);
 
-  public static class StandardPointLossCalc<R extends Ranker> extends PointwiseLossCalc<R> {
+  public static class StandardPointLossCalc <R extends Ranker> extends PointwiseLossCalc<R> {
     protected final Error errorFunc;
 
-    public StandardPointLossCalc(R ranker, List<Query> trainingSet, List<Query> validationSet, Error errorFunc){
-      super(ranker, trainingSet, validationSet);
+    public StandardPointLossCalc(List<Query> trainingSet, List<Query> validationSet, Error errorFunc){
+      super(trainingSet, validationSet);
       this.errorFunc = errorFunc;
     }
 
     @Override
-    protected double calculateLoss(List<Query> queries) {
+    protected double calculateLoss(List<Query> queries, R ranker) {
       double loss = 0d;
       for (Query query : queries) {
         List<Document> docList = query.getDocList();
@@ -70,12 +68,12 @@ public abstract class PointwiseLossCalc<R extends Ranker> implements LossCalcula
 
   public static class ListNetLossCalc extends StandardPointLossCalc<ListNetMLP>{
 
-    public ListNetLossCalc(ListNetMLP ranker, List<Query> trainingSet, List<Query> validationSet, Error errorFunc){
-      super(ranker, trainingSet, validationSet, errorFunc);
+    public ListNetLossCalc(List<Query> trainingSet, List<Query> validationSet, Error errorFunc){
+      super(trainingSet, validationSet, errorFunc);
     }
 
     @Override
-    protected double calculateLoss(List<Query> queries){
+    protected double calculateLoss(List<Query> queries, ListNetMLP ranker){
       double loss = 0;
       for (Query query : queries) {
         double targetSum = query.getDocList().stream().mapToDouble(i -> Math.exp(i.getLabel())).sum();
