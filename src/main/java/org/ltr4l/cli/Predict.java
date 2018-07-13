@@ -67,7 +67,7 @@ public class Predict {
     String modelPath = getModelPath(line, params);
     Config optionalConfig = createOptionalConfig(modelPath, line);
     QuerySet testSet = QuerySet.create(optionalConfig.dataSet.test);
-    Ranker ranker = getRanker(modelPath, params);
+    Ranker ranker = getRanker(modelPath);
 
     evaluate(ranker, testSet.getQueries(), optionalConfig);
 
@@ -136,10 +136,9 @@ public class Predict {
     return line.hasOption("model") ? line.getOptionValue("model") : String.format("model/%s-model.json", params[0]);
   }
 
-  public static Ranker getRanker(String modelPath, String[] params) throws IOException{
-    assert(params.length == 1);
+  public static Ranker getRanker(String modelPath) throws IOException{
     Reader reader = new FileReader(modelPath);
-    return Ranker.RankerFactory.getFromModel(params[0], reader) ;
+    return Ranker.RankerFactory.getFromModel(reader);
   }
 
   public static Config createOptionalConfig(String configPath, CommandLine line) throws IOException{
