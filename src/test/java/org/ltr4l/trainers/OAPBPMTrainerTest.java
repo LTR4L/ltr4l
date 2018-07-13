@@ -93,7 +93,7 @@ public class OAPBPMTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 20, 4);
     QuerySet validSet = rdg.getRandomQuerySet(2, 20, 4);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("oap", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 
@@ -123,7 +123,7 @@ public class OAPBPMTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 20, 4);
     QuerySet validSet = rdg.getRandomQuerySet(2, 20, 4);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("oap", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 
@@ -153,7 +153,7 @@ public class OAPBPMTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 20, 4);
     QuerySet validSet = rdg.getRandomQuerySet(2, 20, 4);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("oap", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 
@@ -183,7 +183,7 @@ public class OAPBPMTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 20, 4);
     QuerySet validSet = rdg.getRandomQuerySet(2, 20, 4);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("oap", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 

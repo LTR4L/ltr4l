@@ -88,6 +88,20 @@ public abstract class Ranker<C extends Config> {
   public static class RankerFactory {
 
     //For rankers which need information about the max label (needed for structure of network)
+    public static Ranker get(Reader reader, Config override, int featLength, int maxLabel) {
+      String algorithm;
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
+      try {
+        Map model = mapper.readValue(reader, Map.class);
+        algorithm = ((String)model.get("algorithm")).toLowerCase();
+        reader.reset();
+      } catch (IOException ioe) {
+        throw new RuntimeException(ioe);
+      }
+      return get(algorithm, reader, override, featLength, maxLabel);
+    }
+
     public static Ranker get(String algorithm, Reader reader, Config override, int featLength, int maxLabel){
       assert(featLength > 0 && maxLabel > 0);
       String alg = algorithm.toLowerCase();
@@ -111,6 +125,20 @@ public abstract class Ranker<C extends Config> {
           return get(algorithm, reader, override, featLength);
       }
 
+    }
+
+    public static Ranker get(Reader reader, Config override, int featLength) {
+      String algorithm;
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
+      try {
+        Map model = mapper.readValue(reader, Map.class);
+        algorithm = ((String)model.get("algorithm")).toLowerCase();
+        reader.reset();
+      } catch (IOException ioe) {
+        throw new RuntimeException(ioe);
+      }
+      return get(algorithm, reader, override, featLength);
     }
 
     public static Ranker get(String algorithm, Reader reader, Config override, int featLength) {
@@ -137,17 +165,22 @@ public abstract class Ranker<C extends Config> {
     }
 
     public static Ranker getFromModel(Reader reader) {
-      String alg;
+      String algorithm;
       ObjectMapper mapper = new ObjectMapper();
       mapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
       try {
         Map model = mapper.readValue(reader, Map.class);
-        alg = ((String)((Map)model.get("config")).get("algorithm")).toLowerCase();
+        algorithm = ((String)((Map)model.get("config")).get("algorithm")).toLowerCase();
+        reader.reset();
       } catch (IOException ioe) {
         throw new RuntimeException(ioe);
       }
+      return getFromModel(algorithm, reader);
+    }
+
+    public static Ranker getFromModel(String algorithm, Reader reader) {
+      String alg = algorithm;
       try {
-        reader.reset();
         if (alg.equals("prank")) {
           return PRank.readModel(reader);
         }

@@ -63,7 +63,7 @@ public class ListNetTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
     QuerySet validSet = rdg.getRandomQuerySet(2, 10, 2);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("listnet", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 
@@ -93,7 +93,7 @@ public class ListNetTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
     QuerySet validSet = rdg.getRandomQuerySet(2, 10, 2);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("listnet", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 
@@ -123,7 +123,7 @@ public class ListNetTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
     QuerySet validSet = rdg.getRandomQuerySet(2, 10, 2);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("listnet", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 
@@ -153,7 +153,7 @@ public class ListNetTrainerTest {
     QuerySet trainSet = rdg.getRandomQuerySet(2, 10, 2);
     QuerySet validSet = rdg.getRandomQuerySet(2, 10, 2);
 
-    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer("listnet", trainSet, validSet,
+    AbstractTrainer trainer = AbstractTrainer.TrainerFactory.getTrainer(trainSet, validSet,
         new StringReader(JSON_CONFIG), null);
     trainer.trainAndValidate();
 
