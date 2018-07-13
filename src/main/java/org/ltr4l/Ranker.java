@@ -19,9 +19,11 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.boosting.AdaBoost;
 import org.ltr4l.boosting.Ensemble;
@@ -134,10 +136,18 @@ public abstract class Ranker<C extends Config> {
       }
     }
 
-    public static Ranker getFromModel(String algorithm, Reader reader) {
-      String alg = algorithm.toLowerCase();
+    public static Ranker getFromModel(Reader reader) {
+      String alg;
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
       try {
-
+        Map model = mapper.readValue(reader, Map.class);
+        alg = ((String)((Map)model.get("config")).get("algorithm")).toLowerCase();
+      } catch (IOException ioe) {
+        throw new RuntimeException(ioe);
+      }
+      try {
+        reader.reset();
         if (alg.equals("prank")) {
           return PRank.readModel(reader);
         }
