@@ -1,0 +1,37 @@
+<!--
+ 
+  Copyright 2018 org.LTR4L
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+ 
+-->
+<ivy-module version="2.0">
+  <info organisation="org.ltr4l" module="org.ltr4l"/>
+  <dependencies>
+    <dependency org="${ivy.jar.slf4j.org}" name="${ivy.jar.slf4j-api.name}" rev="${ivy.jar.slf4j.rev}">
+      <artifact name="${ivy.jar.slf4j-api.name}" type="jar"
+                url="http://central.maven.org/maven2/org/slf4j/${ivy.jar.slf4j-api.name}/${ivy.jar.slf4j.rev}/${ivy.jar.slf4j-api.name}-${ivy.jar.slf4j.rev}.jar"/>
+    </dependency>
+    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-core.name}" rev="${lucene-solr.version}"/>
+    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-analyzers-common.name}" rev="${lucene-solr.version}"/>
+    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-codecs.name}" rev="${lucene-solr.version}"/>
+    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-queries.name}" rev="${lucene-solr.version}"/>
+    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-test-framework.name}" rev="${lucene-solr.version}"/>
+    <dependency org="${ivy.jar.solr.org}" name="${ivy.jar.solr-solrj.name}" rev="${lucene-solr.version}"/>
+    <dependency org="${ivy.jar.solr.org}" name="${ivy.jar.solr-test-framework.name}" rev="${lucene-solr.version}"/>
+    <dependency org="${ivy.jar.commons-io.org}" name="${ivy.jar.commons-io.name}" rev="${ivy.jar.commons-io.rev}">
+      <artifact name="${ivy.jar.commons-io.name}" type="jar"
+                url="http://central.maven.org/maven2/commons-io/${ivy.jar.commons-io.name}/${ivy.jar.commons-io.rev}/${ivy.jar.commons-io.name}-${ivy.jar.commons-io.rev}.jar"/>
+    </dependency>
+  </dependencies>
+</ivy-module>

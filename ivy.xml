@@ -22,10 +22,6 @@
       <artifact name="${ivy.jar.junit.name}" type="jar"
                 url="http://repo1.maven.org/maven2/junit/${ivy.jar.junit.name}/${ivy.jar.junit.rev}/${ivy.jar.junit.name}-${ivy.jar.junit.rev}.jar"/>
     </dependency>
-    <dependency org="${ivy.jar.hamcrest.org}" name="${ivy.jar.hamcrest.name}" rev="${ivy.jar.hamcrest.rev}">
-      <artifact name="${ivy.jar.hamcrest.name}" type="jar"
-                url="http://repo1.maven.org/maven2/org/hamcrest/${ivy.jar.hamcrest.name}/${ivy.jar.hamcrest.rev}/${ivy.jar.hamcrest.name}-${ivy.jar.hamcrest.rev}.jar"/>
-    </dependency>
     <dependency org="${ivy.jar.jackson-core.org}" name="${ivy.jar.jackson-core.name}" rev="${ivy.jar.jackson.rev}">
       <artifact name="${ivy.jar.jackson-core.name}" type="jar"
                 url="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/${ivy.jar.jackson-core.name}/${ivy.jar.jackson.rev}/${ivy.jar.jackson-core.name}-${ivy.jar.jackson.rev}.jar"/>
@@ -38,10 +34,6 @@
       <artifact name="${ivy.jar.jackson-annotations.name}" type="jar"
                 url="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/${ivy.jar.jackson-annotations.name}/${ivy.jar.jackson.rev}/${ivy.jar.jackson-annotations.name}-${ivy.jar.jackson.rev}.jar"/>
     </dependency>
-    <dependency org="${ivy.jar.slf4j.org}" name="${ivy.jar.slf4j-api.name}" rev="${ivy.jar.slf4j.rev}">
-      <artifact name="${ivy.jar.slf4j-api.name}" type="jar"
-                url="http://central.maven.org/maven2/org/slf4j/${ivy.jar.slf4j-api.name}/${ivy.jar.slf4j.rev}/${ivy.jar.slf4j-api.name}-${ivy.jar.slf4j.rev}.jar"/>
-    </dependency>
     <dependency org="${ivy.jar.httpcomponents.org}" name="${ivy.jar.httpcomponents-core.name}" rev="${ivy.jar.httpcomponents-core.rev}">
       <artifact name="${ivy.jar.httpcomponents-core.name}" type="jar"
                 url="http://central.maven.org/maven2/org/apache/httpcomponents/${ivy.jar.httpcomponents-core.name}/${ivy.jar.httpcomponents-core.rev}/${ivy.jar.httpcomponents-core.name}-${ivy.jar.httpcomponents-core.rev}.jar"/>
@@ -50,16 +42,9 @@
       <artifact name="${ivy.jar.httpcomponents-client.name}" type="jar"
                 url="http://central.maven.org/maven2/org/apache/httpcomponents/${ivy.jar.httpcomponents-client.name}/${ivy.jar.httpcomponents-client.rev}/${ivy.jar.httpcomponents-client.name}-${ivy.jar.httpcomponents-client.rev}.jar"/>
     </dependency>
-    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-core.name}" rev="${ivy.jar.lucene.rev}"/>
-    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-analyzers-common.name}" rev="${ivy.jar.lucene.rev}"/>
-    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-codecs.name}" rev="${ivy.jar.lucene.rev}"/>
-    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-queries.name}" rev="${ivy.jar.lucene.rev}"/>
-    <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-test-framework.name}" rev="${ivy.jar.lucene.rev}"/>
-    <dependency org="${ivy.jar.solr.org}" name="${ivy.jar.solr-solrj.name}" rev="${ivy.jar.solr.rev}"/>
-    <dependency org="${ivy.jar.solr.org}" name="${ivy.jar.solr-test-framework.name}" rev="${ivy.jar.solr.rev}"/>
-    <dependency org="${ivy.jar.commons-io.org}" name="${ivy.jar.commons-io.name}" rev="${ivy.jar.commons-io.rev}">
-      <artifact name="${ivy.jar.commons-io.name}" type="jar"
-                url="http://central.maven.org/maven2/commons-io/${ivy.jar.commons-io.name}/${ivy.jar.commons-io.rev}/${ivy.jar.commons-io.name}-${ivy.jar.commons-io.rev}.jar"/>
+    <dependency org="${ivy.jar.hamcrest.org}" name="${ivy.jar.hamcrest.name}" rev="${ivy.jar.hamcrest.rev}">
+      <artifact name="${ivy.jar.hamcrest.name}" type="jar"
+                url="http://repo1.maven.org/maven2/org/hamcrest/${ivy.jar.hamcrest.name}/${ivy.jar.hamcrest.rev}/${ivy.jar.hamcrest.name}-${ivy.jar.hamcrest.rev}.jar"/>
     </dependency>
     <dependency org="${ivy.jar.commons-cli.org}" name="${ivy.jar.commons-cli.name}" rev="${ivy.jar.commons-cli.rev}">
       <artifact name="${ivy.jar.commons-cli.name}" type="jar"
