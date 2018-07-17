@@ -43,10 +43,14 @@ public class FeatureExtractor {
   private String procId;
 
   public FeatureExtractor(String url, String confName, CMQueryHandler cmQueryHandler) {
-    extractionTimeout = 10000L;
-    this.cmQueryHandler = cmQueryHandler;
+    this(url, confName, cmQueryHandler, 10000L);
+  }
+
+  public FeatureExtractor(String url, String confName, CMQueryHandler cmQueryHandler, Long extractionTimeout) {
     this.url = url;
     this.confName = confName;
+    this.cmQueryHandler = cmQueryHandler;
+    this.extractionTimeout = extractionTimeout;
   }
 
   public void execute() throws Exception {
@@ -57,7 +61,7 @@ public class FeatureExtractor {
     if(isFinished()) {
       download();
     } else {
-      //TODO: error message
+      System.err.println("Could not finish feature extraction.\nPlease set longer extraction timeout period or confirm the url and conf name are valid.");
     }
   }
 

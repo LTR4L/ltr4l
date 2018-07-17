@@ -139,7 +139,7 @@ public class FeaturesRequestHandler extends RequestHandlerBase {
 
   @Override
   public String getDescription() {
-    return "Features extraction for NLP4L-LTR";
+    return "Features extraction for ltr4l";
   }
 
   public long startExtractor(SolrQueryRequest req, List<FieldFeatureExtractorFactory> featuresSpec, String json) throws Exception {
