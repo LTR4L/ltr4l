@@ -31,7 +31,6 @@ import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.*;
-import org.ltr4l.tools.Error;
 
 /**
  * The implementation of AbstractTrainer which uses the
@@ -65,16 +64,6 @@ public class PRankTrainer extends AbstractTrainer<PRankTrainer.PRank, Config> {
     Collections.shuffle(trainingDocList);
     for (Document doc : trainingDocList)
       ranker.updateWeights(doc);
-  }
-
-  @Override
-  public Class<Config> getConfigClass() {
-    return Config.class;
-  }
-
-  @Override
-  protected PRank constructRanker() {
-    return new PRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet));
   }
 
   public static class PRank extends Ranker<Config> {

@@ -16,7 +16,6 @@
 
 package org.ltr4l.trainers;
 
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,7 +23,6 @@ import org.ltr4l.nn.Activation;
 import org.ltr4l.nn.RankNetMLP;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.tools.Config;
 
 /**
  * An extension of RankNetTrainer.

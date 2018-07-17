@@ -136,19 +136,6 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
     }
   }
 
-  protected abstract <R extends Ranker> R constructRanker();
-
-  public abstract <C extends Config> Class<C> getConfigClass();
-
-  <C extends Config> C getConfig(Reader reader){
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      return mapper.readValue(reader, getConfigClass());
-    } catch (IOException e) {
-      throw new IllegalArgumentException(e);
-    }
-  }
-
   public static class TrainerFactory {
 
     /**

@@ -16,7 +16,6 @@
 
 package org.ltr4l.trainers;
 
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -26,8 +25,6 @@ import org.ltr4l.nn.Activation;
 import org.ltr4l.nn.RankNetMLP;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Config;
 
 /**
  * LambdaRankTrainer trains the RankNetTrainer's network

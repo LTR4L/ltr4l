@@ -16,15 +16,12 @@
 
 package org.ltr4l.trainers;
 
-import java.io.Reader;
 import java.util.List;
 
 import org.ltr4l.nn.*;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
-import org.ltr4l.tools.Config;
-import org.ltr4l.tools.Regularization;
 
 /**
  * The implementation of MLPTrainer which uses the
@@ -51,19 +48,6 @@ public class NNRankTrainer extends MLPTrainer<MLP> {
 
   NNRankTrainer(List<Query> training, List<Query> validation, MLPConfig config){
     this(training, validation, config, new NNMLP(training.get(0).getFeatureLength(), config));
-  }
-
-  @Override
-  protected NNMLP constructRanker(){
-    int featureLength = trainingSet.get(0).getFeatureLength();
-    //Add an output layer with number of nodes equal to number of classes/relevance categories.
-    NetworkShape networkShape = config.getNetworkShape();
-    int outputNodeNumber = QuerySet.findMaxLabel(trainingSet);
-    networkShape.add(outputNodeNumber, Activation.Type.Sigmoid);
-    Optimizer.OptimizerFactory optFact = config.getOptFact();
-    Regularization regularization = config.getReguFunction();
-    String weightModel = config.getWeightInit();
-    return new NNMLP(featureLength, networkShape, optFact, regularization, weightModel);
   }
 
   @Override

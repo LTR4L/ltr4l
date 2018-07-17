@@ -16,7 +16,6 @@
 
 package org.ltr4l.trainers;
 
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,13 +23,10 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.ltr4l.nn.AbstractMLP;
 import org.ltr4l.nn.Activation;
-import org.ltr4l.nn.MLP;
 import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
 import org.ltr4l.nn.WeightInitializer;
-import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.*;
 import org.ltr4l.tools.Error;
 
@@ -54,25 +50,6 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends AbstractTrainer<
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
-  }
-
-  @Override
-  protected AbstractMLP constructRanker(){
-    int featureLength = trainingSet.get(0).getFeatureLength();
-    NetworkShape networkShape = config.getNetworkShape();
-    Optimizer.OptimizerFactory optFact = config.getOptFact();
-    Regularization regularization = config.getReguFunction();
-    String weightModel = config.getWeightInit();
-    return new MLP(featureLength, networkShape, optFact, regularization, weightModel);
-  }
-
-  @Override
-  public Class<MLPConfig> getConfigClass(){
-    return getCC();
-  }
-
-  static Class<MLPConfig> getCC(){
-    return MLPConfig.class;
   }
 
   public static class MLPConfig extends Config {

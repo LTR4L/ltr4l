@@ -16,18 +16,15 @@
 
 package org.ltr4l.trainers;
 
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.*;
-import org.ltr4l.tools.Error;
 
 /**
  * The implementation of AbstractTrainer which uses the
@@ -61,20 +58,6 @@ public class OAPBPMTrainer extends AbstractTrainer<OAPBPMTrainer.OAPBPMRank, OAP
   public void train() {
     for (Document doc : trainingDocList)
       ranker.updateWeights(doc);
-  }
-
-  @Override
-  public Class<OAPBPMConfig> getConfigClass() {
-    return getCC();
-  }
-
-  static Class<OAPBPMConfig> getCC(){
-    return OAPBPMConfig.class;
-  }
-
-  @Override
-  protected Ranker constructRanker() {
-    return new OAPBPMRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet), config.getPNum(), config.getBernNum());
   }
 
   public static class OAPBPMConfig extends Config {

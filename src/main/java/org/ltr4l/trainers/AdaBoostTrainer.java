@@ -17,12 +17,9 @@ package org.ltr4l.trainers;
 
 import org.ltr4l.boosting.*;
 import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
 import org.ltr4l.query.RankedDocs;
 import org.ltr4l.tools.*;
-import org.ltr4l.tools.Error;
 
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,16 +53,6 @@ public class AdaBoostTrainer extends AbstractTrainer<AdaBoost, RankBoost.RankBoo
     WeakLearner wl = AdaWeakLearner.findWeakLearner(ABDistribution.getFullDist(), rTrainingSet, config.getNumSteps());
     ranker.addLearner(wl);
     ABDistribution.update(wl, rTrainingSet);
-  }
-
-  @Override
-  protected AdaBoost constructRanker() {
-    return new AdaBoost();
-  }
-
-  @Override
-  public Class<RankBoost.RankBoostConfig> getConfigClass() {
-    return getCC();
   }
 
   public static Class<RankBoost.RankBoostConfig> getCC(){

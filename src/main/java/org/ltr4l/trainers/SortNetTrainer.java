@@ -16,19 +16,14 @@
 
 package org.ltr4l.trainers;
 
-import java.io.Reader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import org.ltr4l.nn.*;
 
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.*;
-import org.ltr4l.tools.Error;
 
 /**
  * The implementation of MLPTrainer which uses the SortNet algorithm.
@@ -60,16 +55,6 @@ public class SortNetTrainer extends AbstractTrainer<SortNetMLP, MLPTrainer.MLPCo
 
   SortNetTrainer(List<Query> training, List<Query> validation, MLPTrainer.MLPConfig config){
     this(training, validation, config, new SortNetMLP(training.get(0).getFeatureLength(), config));
-  }
-
-  @Override
-  protected SortNetMLP constructRanker() {
-    int featureLength = trainingSet.get(0).getFeatureLength();
-    NetworkShape networkShape = config.getNetworkShape();
-    Optimizer.OptimizerFactory optFact = config.getOptFact();
-    Regularization regularization = config.getReguFunction();
-    String weightModel = config.getWeightInit();
-    return new SortNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
   }
 
   //The following implementation is used for speed up.
@@ -104,11 +89,6 @@ public class SortNetTrainer extends AbstractTrainer<SortNetMLP, MLPTrainer.MLPCo
       }
     }
     if (batchSize != 0) ranker.updateWeights(lrRate, rgRate);
-  }
-
-  @Override
-  public Class<MLPTrainer.MLPConfig> getConfigClass() {
-    return MLPTrainer.MLPConfig.class;
   }
 }
 

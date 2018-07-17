@@ -16,16 +16,11 @@
 
 package org.ltr4l.trainers;
 
-import java.io.Reader;
 import java.util.List;
 
-import org.ltr4l.nn.Activation;
 import org.ltr4l.nn.ListNetMLP;
-import org.ltr4l.nn.NetworkShape;
-import org.ltr4l.nn.Optimizer;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.*;
 import org.ltr4l.tools.Error;
 
@@ -55,21 +50,6 @@ public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
 
   ListNetTrainer(List<Query> training, List<Query> validation, MLPConfig config){
     this(training, validation, config, new ListNetMLP(training.get(0).getFeatureLength(), config));
-  }
-
-  @Override
-  protected ListNetMLP constructRanker() {
-    int featureLength = trainingSet.get(0).getFeatureLength();
-    NetworkShape networkShape = config.getNetworkShape();
-    Optimizer.OptimizerFactory optFact = config.getOptFact();
-    Regularization regularization = config.getReguFunction();
-    String weightModel = config.getWeightInit();
-    return new ListNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
-  }
-
-  @Override
-  public Class<MLPTrainer.MLPConfig> getConfigClass(){
-    return MLPTrainer.MLPConfig.class;
   }
 
   @Override

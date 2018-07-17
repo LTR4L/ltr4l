@@ -20,14 +20,10 @@ import org.ltr4l.boosting.Split;
 import org.ltr4l.nn.Activation;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.*;
-import org.ltr4l.tools.Error;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.ltr4l.boosting.TreeTools.findMinLossFeat;
 
@@ -75,11 +71,6 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
 
   LambdaMartTrainer(List<Query> training, List<Query> validation, Ensemble.TreeConfig config){
     this(training, validation, config, new Ensemble());
-  }
-
-  @Override
-  protected Ensemble constructRanker() {
-    return new Ensemble();
   }
 
   @Override
@@ -166,15 +157,6 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
       }
       validate(t, evalK);
     }
-  }
-
-  @Override
-  public Class<Ensemble.TreeConfig> getConfigClass() {
-    return getCC();
-  }
-
-  public static Class<Ensemble.TreeConfig> getCC(){
-    return Ensemble.TreeConfig.class;
   }
 
 }

@@ -59,16 +59,6 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   }
 
   @Override
-  protected RankNetMLP constructRanker(){
-    int featureLength = trainingSet.get(0).getFeatureLength();
-    NetworkShape networkShape = config.getNetworkShape();
-    Optimizer.OptimizerFactory optFact = config.getOptFact();
-    Regularization regularization = config.getReguFunction();
-    String weightModel = config.getWeightInit();
-    return new RankNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
-  }
-
-  @Override
   public void train() {
     double threshold = 0.5;
     //Present all docs of randomly selected query

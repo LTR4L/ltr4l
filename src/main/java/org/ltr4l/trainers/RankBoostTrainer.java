@@ -18,17 +18,12 @@ package org.ltr4l.trainers;
 import org.ltr4l.boosting.RBDistribution;
 import org.ltr4l.boosting.RankBoost;
 import org.ltr4l.boosting.WeakLearner;
-import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
 import org.ltr4l.query.RankedDocs;
 import org.ltr4l.tools.*;
-import org.ltr4l.tools.Error;
 
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankBoostConfig>{
   private final RBDistribution distribution;
@@ -57,19 +52,4 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
     ranker.addLearner(wl);
     distribution.update(wl, rTrainingSet);
   }
-
-  @Override
-  protected RankBoost constructRanker() {
-    return new RankBoost();
-  }
-
-  @Override
-  public Class<RankBoost.RankBoostConfig> getConfigClass() {
-    return getCC();
-  }
-
-  public static Class<RankBoost.RankBoostConfig> getCC(){
-    return RankBoost.RankBoostConfig.class;
-  }
-
 }
