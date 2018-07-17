@@ -60,7 +60,7 @@ public class DefaultLTRModelReader extends AbstractConfigReader {
   }
 
   public Ranker getRanker() throws IOException{
-    return Ranker.RankerFactory.getFromModel(algorithm, reader);
+    return Ranker.RankerFactory.getFromModel(reader);
   }
 
   public String getAlgorithm() {
