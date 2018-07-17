@@ -19,6 +19,7 @@ package org.ltr4l.trainers;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -258,10 +259,11 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
           }
           case "nnrank": {
             MLPTrainer.MLPConfig config = Config.getConfig(reader, Config.ConfigType.MLP);
-            System.out.println(QuerySet.findMaxLabel(training));
-            System.out.println(config.getNetworkShape().toString());
-            config.getNetworkShape().add(QuerySet.findMaxLabel(training), Activation.Type.Sigmoid);
-            System.out.println(config.getNetworkShape().toString());
+            List<Map<String, Object>> layers = config.getReqArrayParams(config.params, "layers");
+            Map<String, Object> outputLayer = new HashMap<>();
+            outputLayer.put("num", QuerySet.findMaxLabel(training));
+            outputLayer.put("activator", "sigmoid");
+            layers.add(outputLayer);
             config.overrideBy(override);
             return new NNRankTrainer(training, validation, config);
           }
