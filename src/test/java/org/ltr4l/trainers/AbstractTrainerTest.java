@@ -139,16 +139,6 @@ public class AbstractTrainerTest {
     }
 
     @Override
-    protected <R extends Ranker> R constructRanker() {
-      return null;
-    }
-
-    @Override
-    public Class<Config> getConfigClass() {
-      return Config.class;
-    }
-
-    @Override
     public void train() {
 
     }

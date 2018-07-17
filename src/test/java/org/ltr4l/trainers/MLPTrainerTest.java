@@ -21,7 +21,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.ltr4l.nn.Optimizer;
+import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Regularization;
+
+import java.io.StringReader;
 
 public class MLPTrainerTest {
 
@@ -76,8 +79,7 @@ public class MLPTrainerTest {
 
   @Before
   public void setUp() throws Exception {
-    ObjectMapper mapper = new ObjectMapper();
-    config = mapper.readValue(JSON_SRC, MLPTrainer.getCC());
+    config = Config.getConfig(new StringReader(JSON_SRC), Config.ConfigType.MLP);
   }
 
   @Test

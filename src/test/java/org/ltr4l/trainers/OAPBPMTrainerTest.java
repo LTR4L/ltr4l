@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.ltr4l.Ranker;
 import org.ltr4l.evaluation.RankEval;
 import org.ltr4l.query.QuerySet;
+import org.ltr4l.tools.Config;
 import org.ltr4l.tools.RandomDataGenerator;
 
 public class OAPBPMTrainerTest {
@@ -81,7 +82,7 @@ public class OAPBPMTrainerTest {
         "}\n";
 
     ObjectMapper mapper = new ObjectMapper();
-    OAPBPMTrainer.OAPBPMConfig config = mapper.readValue(JSON_SRC, OAPBPMTrainer.getCC());
+    OAPBPMTrainer.OAPBPMConfig config = Config.getConfig(new StringReader(JSON_SRC), Config.ConfigType.OAP);
     Assert.assertEquals(100, config.getPNum());
     Assert.assertEquals(0.0642, config.getBernNum(), 0.000001);
   }
