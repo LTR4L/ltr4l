@@ -27,13 +27,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class PairwiseLossCalc<R extends Ranker> implements LossCalculator{
-  protected final R ranker;
+public abstract class PairwiseLossCalc<R extends Ranker> implements LossCalculator<R> {
   protected final List<Document[][]> trainingPairs;
   protected final List<Document[][]> validationPairs;
 
-  protected PairwiseLossCalc(R ranker, List<Query> trainingSet, List<Query> validationSet){
-    this.ranker = ranker;
+  protected PairwiseLossCalc(List<Query> trainingSet, List<Query> validationSet){
     trainingPairs = trainingSet.stream().map(query -> query.orderDocPairs()).collect(Collectors.toList());
     validationPairs = validationSet.stream().map(query -> query.orderDocPairs()).collect(Collectors.toList());
   }
@@ -47,31 +45,31 @@ public abstract class PairwiseLossCalc<R extends Ranker> implements LossCalculat
   }
 
   @Override
-  public double calculateLoss(DataSet type){
+  public double calculateLoss(DataSet type, R ranker){
     Objects.requireNonNull(type);
     switch (type){
       case TRAINING:
-        return calculateLoss(trainingPairs);
+        return calculateLoss(trainingPairs, ranker);
       case VALIDATION:
-        return calculateLoss(validationPairs);
+        return calculateLoss(validationPairs, ranker);
       default:
         throw new IllegalArgumentException();
     }
   }
 
-  protected abstract double calculateLoss(List<Document[][]> docPairs);
+  protected abstract double calculateLoss(List<Document[][]> docPairs, R ranker);
 
   public static class RankNetLossCalc<R extends Ranker> extends PairwiseLossCalc<R> {
     private final Error errorFunc;
 
-    public RankNetLossCalc(R ranker, List<Query> trainingSet, List<Query> validationSet, Error errorFunc){
-      super(ranker, trainingSet, validationSet);
+    public RankNetLossCalc(List<Query> trainingSet, List<Query> validationSet, Error errorFunc){
+      super(trainingSet, validationSet);
       this.errorFunc = errorFunc;
 
     }
 
     @Override
-    protected double calculateLoss(List<Document[][]> docPairs) {
+    protected double calculateLoss(List<Document[][]> docPairs, R ranker) {
       double loss = 0d;
       int processedQueryNum = 0;
       for (Document[][] query : docPairs) {
@@ -82,7 +80,7 @@ public abstract class PairwiseLossCalc<R extends Ranker> implements LossCalculat
         for (Document[] pair : query) {
           double s1 = ranker.predict(pair[0].getFeatures());
           double s2 = ranker.predict(pair[1].getFeatures());
-          double output = Math.pow(1 + Math.exp(s2 - s1), -1); //double output = new Activation.Sigmoid().output(s1 - s2);
+          double output = Math.pow(1 + Math.exp(s2 - s1), -1); //double output = Activation.Type.Sigmoid().output(s1 - s2);
           queryLoss += errorFunc.error(output, 1d);
         }
         loss += queryLoss / query.length;
@@ -95,14 +93,14 @@ public abstract class PairwiseLossCalc<R extends Ranker> implements LossCalculat
     protected final Error errorFunc;
     protected final double[][] targets;
 
-    public SortNetLossCalc(SortNetMLP ranker, List<Query> trainingSet, List<Query> validationSet, Error errorFunc, double[][] targets){
-      super(ranker, trainingSet, validationSet);
+    public SortNetLossCalc(List<Query> trainingSet, List<Query> validationSet, Error errorFunc, double[][] targets){
+      super(trainingSet, validationSet);
       this.errorFunc = errorFunc;
       this.targets = targets;
     }
 
     @Override
-    protected double calculateLoss(List<Document[][]> docPairs) {
+    protected double calculateLoss(List<Document[][]> docPairs, SortNetMLP ranker) {
       double loss = 0d;
       for (Document[][] pairs : docPairs) {
         if (pairs == null)
@@ -124,12 +122,12 @@ public abstract class PairwiseLossCalc<R extends Ranker> implements LossCalculat
 
   public static class RankBoostLossCalc<R extends Ranker> extends PairwiseLossCalc<R>{
 
-    public RankBoostLossCalc(R ranker, List<Query> trainingSet, List<Query> validationSet){
-      super(ranker, trainingSet, validationSet);
+    public RankBoostLossCalc( List<Query> trainingSet, List<Query> validationSet){
+      super(trainingSet, validationSet);
     }
 
     @Override
-    protected double calculateLoss(List<Document[][]> docPairs) {
+    protected double calculateLoss(List<Document[][]> docPairs, R ranker) {
       double loss = 0d;
       int pairs = 0;
       for(Document[][] query : docPairs){

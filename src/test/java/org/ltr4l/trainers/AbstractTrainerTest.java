@@ -135,25 +135,7 @@ public class AbstractTrainerTest {
   private static class NullAbstractTrainer extends AbstractTrainer<NullRanker, Config> {
 
     NullAbstractTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-      super(training, validation, reader, override);
-    }
-
-    @Override
-    protected LossCalculator makeLossCalculator() {return null; }
-
-    @Override
-    protected org.ltr4l.tools.Error makeErrorFunc() {
-      return null;
-    }
-
-    @Override
-    protected <R extends Ranker> R constructRanker() {
-      return null;
-    }
-
-    @Override
-    public Class<Config> getConfigClass() {
-      return Config.class;
+      super(training.getQueries(), validation.getQueries(), Config.getConfig(reader, Config.ConfigType.BASIC).overrideBy(override), null, null, null);
     }
 
     @Override

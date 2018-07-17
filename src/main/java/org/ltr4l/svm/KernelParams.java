@@ -13,15 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ltr4l.tools;
+package org.ltr4l.svm;
 
-import org.ltr4l.Ranker;
+public class KernelParams {
+  private double sigma;
+  private double c; //linear bias
+  private double d; //power
 
-public interface LossCalculator<R extends Ranker> {
+  public KernelParams(){
+    sigma = 1d;
+    c = 1d;
+    d = 2d;
+  }
 
-  public double calculateLoss(DataSet type, R ranker);
+  public KernelParams setC(double c) {
+    this.c = c;
+    return this;
+  }
 
-  public static enum DataSet{
-    TRAINING,VALIDATION
+  public KernelParams setD(double d) {
+    this.d = d;
+    return this;
+  }
+
+  public KernelParams setSigma(double sigma) {
+    this.sigma = sigma;
+    return this;
+  }
+
+  public double getC() {
+    return c;
+  }
+
+  public double getD() {
+    return d;
+  }
+
+  public double getSigma() {
+    return sigma;
   }
 }

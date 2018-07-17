@@ -43,7 +43,7 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
 
     //Start with constructing the input layer.
     for (int i = 0; i < inputDim; i++) {
-      currentLayer.add(constructNode(new Activation.Identity()));
+      currentLayer.add(constructNode(Activation.Type.Identity));
     }
     network.add(currentLayer);
 
@@ -90,7 +90,7 @@ public abstract class AbstractMLP <N extends AbstractNode.Node, E extends Abstra
       final int inputDim = savedModel.getNode(0, 0).size() - 1;
       //Start with constructing the input layer.
       for (int i = 0; i < inputDim; i++) {
-        currentLayer.add(constructNode(new Activation.Identity()));
+        currentLayer.add(constructNode(Activation.Type.Identity));
       }
       network.add(currentLayer);
 

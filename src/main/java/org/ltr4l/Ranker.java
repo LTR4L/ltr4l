@@ -19,10 +19,13 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ltr4l.boosting.AdaBoost;
 import org.ltr4l.boosting.Ensemble;
 import org.ltr4l.boosting.RankBoost;
 import org.ltr4l.nn.*;
@@ -85,6 +88,20 @@ public abstract class Ranker<C extends Config> {
   public static class RankerFactory {
 
     //For rankers which need information about the max label (needed for structure of network)
+    public static Ranker get(Reader reader, Config override, int featLength, int maxLabel) {
+      String algorithm;
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
+      try {
+        Map model = mapper.readValue(reader, Map.class);
+        algorithm = ((String)model.get("algorithm")).toLowerCase();
+        reader.reset();
+      } catch (IOException ioe) {
+        throw new RuntimeException(ioe);
+      }
+      return get(algorithm, reader, override, featLength, maxLabel);
+    }
+
     public static Ranker get(String algorithm, Reader reader, Config override, int featLength, int maxLabel){
       assert(featLength > 0 && maxLabel > 0);
       String alg = algorithm.toLowerCase();
@@ -101,13 +118,27 @@ public abstract class Ranker<C extends Config> {
           MLPTrainer.MLPConfig mlpConfig = getConfig(reader, MLPTrainer.MLPConfig.class);
           mlpConfig.overrideBy(override);
           NetworkShape networkShape = mlpConfig.getNetworkShape();
-          networkShape.add(maxLabel + 1, new Activation.Sigmoid());
+          networkShape.add(maxLabel + 1, Activation.Type.Sigmoid);
           return new NNMLP(featLength, networkShape, mlpConfig.getOptFact(), mlpConfig.getReguFunction(), mlpConfig.getWeightInit());
         // The algorithms below do not require max label, however they can still be specified.
         default:
           return get(algorithm, reader, override, featLength);
       }
 
+    }
+
+    public static Ranker get(Reader reader, Config override, int featLength) {
+      String algorithm;
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
+      try {
+        Map model = mapper.readValue(reader, Map.class);
+        algorithm = ((String)model.get("algorithm")).toLowerCase();
+        reader.reset();
+      } catch (IOException ioe) {
+        throw new RuntimeException(ioe);
+      }
+      return get(algorithm, reader, override, featLength);
     }
 
     public static Ranker get(String algorithm, Reader reader, Config override, int featLength) {
@@ -133,10 +164,23 @@ public abstract class Ranker<C extends Config> {
       }
     }
 
-    public static Ranker getFromModel(String algorithm, Reader reader) {
-      String alg = algorithm.toLowerCase();
+    public static Ranker getFromModel(Reader reader) {
+      String algorithm;
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
       try {
+        Map model = mapper.readValue(reader, Map.class);
+        algorithm = ((String)((Map)model.get("config")).get("algorithm")).toLowerCase();
+        reader.reset();
+      } catch (IOException ioe) {
+        throw new RuntimeException(ioe);
+      }
+      return getFromModel(algorithm, reader);
+    }
 
+    public static Ranker getFromModel(String algorithm, Reader reader) {
+      String alg = algorithm;
+      try {
         if (alg.equals("prank")) {
           return PRank.readModel(reader);
         }
@@ -159,6 +203,8 @@ public abstract class Ranker<C extends Config> {
             return new Ensemble(reader);
           case "rankboost":
             return new RankBoost(reader);
+          case "adaboost":
+            return new AdaBoost(reader);
           default:
             throw new IllegalArgumentException("Specified algorithm does not exist.");
         }

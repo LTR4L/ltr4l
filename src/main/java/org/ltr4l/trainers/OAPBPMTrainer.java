@@ -16,18 +16,15 @@
 
 package org.ltr4l.trainers;
 
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.ltr4l.Ranker;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.*;
-import org.ltr4l.tools.Error;
 
 /**
  * The implementation of AbstractTrainer which uses the
@@ -40,8 +37,17 @@ public class OAPBPMTrainer extends AbstractTrainer<OAPBPMTrainer.OAPBPMRank, OAP
   private double maxScore;
   private final  List<Document> trainingDocList;
 
-  OAPBPMTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-    super(training, validation, reader, override);
+  OAPBPMTrainer(List<Query> training, List<Query> validation, OAPBPMConfig config) {
+    this(training, validation, config, new OAPBPMRank(training.get(0).getFeatureLength(), QuerySet.findMaxLabel(training), config.getPNum(), config.getBernNum()));
+  }
+
+  OAPBPMTrainer(List<Query> training, List<Query> validation, OAPBPMConfig config, OAPBPMRank ranker) {
+    super(training,
+        validation,
+        config,
+        ranker,
+        StandardError.SQUARE,
+        new PointwiseLossCalc.StandardPointLossCalc<OAPBPMRank>(training, validation, StandardError.SQUARE));
     maxScore = 0d;
     trainingDocList = new ArrayList<>();
     for (Query query : trainingSet)
@@ -52,30 +58,6 @@ public class OAPBPMTrainer extends AbstractTrainer<OAPBPMTrainer.OAPBPMRank, OAP
   public void train() {
     for (Document doc : trainingDocList)
       ranker.updateWeights(doc);
-  }
-
-  @Override
-  protected Error makeErrorFunc(){
-    return StandardError.SQUARE;
-  }
-
-  @Override
-  protected LossCalculator makeLossCalculator(){
-    return new PointwiseLossCalc.StandardPointLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
-  }
-
-  @Override
-  public Class<OAPBPMConfig> getConfigClass() {
-    return getCC();
-  }
-
-  static Class<OAPBPMConfig> getCC(){
-    return OAPBPMConfig.class;
-  }
-
-  @Override
-  protected Ranker constructRanker() {
-    return new OAPBPMRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet), config.getPNum(), config.getBernNum());
   }
 
   public static class OAPBPMConfig extends Config {

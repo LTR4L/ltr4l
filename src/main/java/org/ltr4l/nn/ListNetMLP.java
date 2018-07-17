@@ -53,7 +53,7 @@ public class ListNetMLP extends AbstractMLP<ListNetMLP.LNode, ListNetMLP.LEdge> 
   }
 
   protected void addOutputs(NetworkShape ns){
-    ns.add(1, new Activation.Identity());
+    ns.add(1, Activation.Type.Identity);
   }
 
   @Override

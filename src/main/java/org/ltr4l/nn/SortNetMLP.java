@@ -50,8 +50,8 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
     List<SNode> inputLayerPrime = new ArrayList<>();
     network.add(inputLayer);
     for (int i = 0; i < inputDim; i++) {
-      inputLayer.add(new SNode(0, new Activation.Identity()));
-      inputLayerPrime.add(new SNode(1, new Activation.Identity()));
+      inputLayer.add(new SNode(0, Activation.Type.Identity));
+      inputLayerPrime.add(new SNode(1, Activation.Type.Identity));
     }
     inputLayer.addAll(inputLayerPrime);
 
@@ -120,8 +120,8 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
       List<SNode> inputLayerPrime = new ArrayList<>();
       network.add(inputLayer);
       for (int i = 0; i < model.getNode(0, 0).size() - 1; i++) { // -1 for bias, -1 for index...
-        inputLayer.add(new SNode(0, new Activation.Identity()));
-        inputLayerPrime.add(new SNode(1, new Activation.Identity()));
+        inputLayer.add(new SNode(0, Activation.Type.Identity));
+        inputLayerPrime.add(new SNode(1, Activation.Type.Identity));
       }
       inputLayer.addAll(inputLayerPrime);
 
@@ -206,7 +206,7 @@ public class SortNetMLP extends AbstractMLPBase<SortNetMLP.SNode, SortNetMLP.SEd
 
   @Override
   protected void addOutputs(NetworkShape networkShape){
-    networkShape.add(1, new Activation.Sigmoid());
+    networkShape.add(1, Activation.Type.Sigmoid);
   }
 
   public double[] getOutputs(){

@@ -15,9 +15,7 @@
  */
 package org.ltr4l.trainers;
 
-import org.ltr4l.boosting.RBDistribution;
-import org.ltr4l.boosting.RankBoost;
-import org.ltr4l.boosting.WeakLearner;
+import org.ltr4l.boosting.*;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.RankedDocs;
 import org.ltr4l.tools.*;
@@ -25,12 +23,17 @@ import org.ltr4l.tools.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankBoostConfig>{
-  private final RBDistribution distribution;
+public class AdaBoostTrainer extends AbstractTrainer<AdaBoost, RankBoost.RankBoostConfig> {
+  private final ABDistribution ABDistribution;
   private final List<RankedDocs> rTrainingSet; //Contains doc lists sorted by label. Queries with no pairs of differing labels should be removed.
 
-  public RankBoostTrainer(List<Query> training, List<Query> validation, RankBoost.RankBoostConfig config, RankBoost ranker){
-    super(training, validation, config, ranker, StandardError.ENTROPY, new PairwiseLossCalc.RankBoostLossCalc(training, validation));
+  public AdaBoostTrainer(List<Query> training, List<Query> validation, RankBoost.RankBoostConfig config, AdaBoost ranker){
+    super(training,
+        validation,
+        config,
+        ranker,
+        StandardError.ENTROPY,
+        new PointwiseLossCalc.StandardPointLossCalc<AdaBoost>(training, validation, StandardError.SQUARE ));
     rTrainingSet = new ArrayList<>();
     for(Query query : trainingSet) {
       //Sort into correct rank. This is not just for initialization, but also for later calculation.
@@ -38,18 +41,21 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
       if(rDocs.getLabel(0) == rDocs.getLabel(rDocs.size() - 1)) continue;
       rTrainingSet.add(rDocs);
     }
-    distribution = new RBDistribution(rTrainingSet);
+    ABDistribution = new ABDistribution(rTrainingSet);
   }
 
-  public RankBoostTrainer(List<Query> training, List<Query> validation, RankBoost.RankBoostConfig config){
-    this(training, validation, config, new RankBoost());
+  public AdaBoostTrainer(List<Query> training, List<Query> validation, RankBoost.RankBoostConfig config){
+    this(training, validation, config, new AdaBoost());
   }
 
   @Override
   public void train() {
-    //One iteration of training.
-    WeakLearner wl = WeakLearner.findWeakLearner(distribution, rTrainingSet, config.getNumSteps());
+    WeakLearner wl = AdaWeakLearner.findWeakLearner(ABDistribution.getFullDist(), rTrainingSet, config.getNumSteps());
     ranker.addLearner(wl);
-    distribution.update(wl, rTrainingSet);
+    ABDistribution.update(wl, rTrainingSet);
+  }
+
+  public static Class<RankBoost.RankBoostConfig> getCC(){
+    return RankBoost.RankBoostConfig.class;
   }
 }

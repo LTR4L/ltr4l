@@ -48,7 +48,7 @@ public class WeakLearnerTest {
     queries.add(rDocs2);
     queries.add(rDocs3);
 
-    RBDistribution distribution = RBDistribution.getInitDist(queries);
+    RBDistribution distribution = new RBDistribution(queries);
     WeakLearner wl = WeakLearner.findWeakLearner(distribution, queries, 6);
     Assert.assertEquals(4, wl.getFid());
     Assert.assertEquals(0.5 * Math.log(7), wl.getAlpha(), 0.01);

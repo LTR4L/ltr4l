@@ -16,19 +16,14 @@
 
 package org.ltr4l.trainers;
 
-import java.io.Reader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import org.ltr4l.nn.*;
 
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.*;
-import org.ltr4l.tools.Error;
 
 /**
  * The implementation of MLPTrainer which uses the SortNet algorithm.
@@ -44,32 +39,22 @@ public class SortNetTrainer extends AbstractTrainer<SortNetMLP, MLPTrainer.MLPCo
   protected double rgRate;
   protected final double[][] targets;
 
-  SortNetTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-    super(training, validation, reader, override);
+  SortNetTrainer(List<Query> training, List<Query> validation, MLPTrainer.MLPConfig config, SortNetMLP ranker) {
+    super(training,
+        validation,
+        config,
+        ranker,
+        StandardError.SQUARE,
+        new PairwiseLossCalc.SortNetLossCalc(training, validation, StandardError.SQUARE, new double[][]{{1d,0d},{0d,1}}));
+
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
     targets = new double[][]{{1, 0}, {0, 1}};
   }
 
-  @Override
-  protected Error makeErrorFunc(){
-    return StandardError.SQUARE;
-  }
-
-  @Override
-  protected LossCalculator makeLossCalculator(){
-    return new PairwiseLossCalc.SortNetLossCalc(ranker, trainingSet, validationSet, errorFunc, new double[][]{{1d,0d},{0d,1}});
-  }
-
-  @Override
-  protected SortNetMLP constructRanker() {
-    int featureLength = trainingSet.get(0).getFeatureLength();
-    NetworkShape networkShape = config.getNetworkShape();
-    Optimizer.OptimizerFactory optFact = config.getOptFact();
-    Regularization regularization = config.getReguFunction();
-    String weightModel = config.getWeightInit();
-    return new SortNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
+  SortNetTrainer(List<Query> training, List<Query> validation, MLPTrainer.MLPConfig config){
+    this(training, validation, config, new SortNetMLP(training.get(0).getFeatureLength(), config));
   }
 
   //The following implementation is used for speed up.
@@ -104,11 +89,6 @@ public class SortNetTrainer extends AbstractTrainer<SortNetMLP, MLPTrainer.MLPCo
       }
     }
     if (batchSize != 0) ranker.updateWeights(lrRate, rgRate);
-  }
-
-  @Override
-  public Class<MLPTrainer.MLPConfig> getConfigClass() {
-    return MLPTrainer.MLPConfig.class;
   }
 }
 

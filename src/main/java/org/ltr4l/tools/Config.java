@@ -17,6 +17,14 @@
 package org.ltr4l.tools;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ltr4l.boosting.Ensemble;
+import org.ltr4l.boosting.RankBoost;
+import org.ltr4l.trainers.MLPTrainer;
+import org.ltr4l.trainers.OAPBPMTrainer;
+
+import java.io.IOException;
+import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -53,6 +61,15 @@ public class Config {
     }
 
     return this;
+  }
+
+  public static <C extends Config> C getConfig(Reader reader, ConfigType cType){
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      return (C) mapper.readValue(reader, cType.getConfigClass());
+    } catch (IOException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 
   public static class DataSet {
@@ -124,5 +141,40 @@ public class Config {
   public static List<Map<String, Object>> getReqArrayParams(Map<String, Object> params, String name){
     Object obj = params.get(name);
     return (List<Map<String, Object>>)Objects.requireNonNull(obj, name + " must be set in params!");
+  }
+
+  public static enum ConfigType {
+    BASIC{
+      @Override
+      public Class<Config> getConfigClass(){
+        return Config.class;
+      }
+    },
+    OAP{
+      @Override
+      public Class<OAPBPMTrainer.OAPBPMConfig> getConfigClass(){
+        return OAPBPMTrainer.OAPBPMConfig.class;
+      }
+    },
+    MLP{
+      @Override
+      public Class<MLPTrainer.MLPConfig> getConfigClass(){
+        return MLPTrainer.MLPConfig.class;
+      }
+    },
+    BOOSTING{
+      @Override
+      public Class<RankBoost.RankBoostConfig> getConfigClass(){
+        return RankBoost.RankBoostConfig.class;
+      }
+    },
+    TREE{
+      @Override
+      public Class<Ensemble.TreeConfig> getConfigClass(){
+        return Ensemble.TreeConfig.class;
+      }
+    };
+
+    public abstract Class<? extends Config> getConfigClass();
   }
 }

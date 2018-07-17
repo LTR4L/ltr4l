@@ -44,29 +44,18 @@ import org.ltr4l.tools.Error;
 public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   protected final List<Document[][]> trainingPairs;
 
-  RankNetTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-    super(training, validation, reader, override, true);
+  RankNetTrainer(List<Query> training, List<Query> validation, MLPConfig config, RankNetMLP ranker) {
+    super(training, validation, config, ranker, StandardError.ENTROPY, new PairwiseLossCalc.RankNetLossCalc<>(training, validation, StandardError.ENTROPY));
     trainingPairs = ((PairwiseLossCalc) lossCalc).getTrainingPairs();
   }
 
-  @Override
-  protected RankNetMLP constructRanker(){
-    int featureLength = trainingSet.get(0).getFeatureLength();
-    NetworkShape networkShape = config.getNetworkShape();
-    Optimizer.OptimizerFactory optFact = config.getOptFact();
-    Regularization regularization = config.getReguFunction();
-    String weightModel = config.getWeightInit();
-    return new RankNetMLP(featureLength, networkShape, optFact, regularization, weightModel);
-  }
-
-  @Override
-  protected Error makeErrorFunc(){
-    return StandardError.ENTROPY;
-  }
-
-  @Override
-  protected LossCalculator makeLossCalculator(){
-    return new PairwiseLossCalc.RankNetLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
+  RankNetTrainer(List<Query> training, List<Query> validation, MLPConfig config){
+    this(
+        training,
+        validation,
+        config,
+        new RankNetMLP(training.get(0).getFeatureLength(), config)
+    );
   }
 
   @Override
@@ -90,7 +79,7 @@ public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
         double delta = si - sj;
 
         if (delta < threshold) {
-          double sigma = new Activation.Sigmoid().output(-delta);
+          double sigma = Activation.Type.Sigmoid.output(-delta);
           ranker.backProp(sigma);
           ranker.forwardProp(docA);
           ranker.backProp(-sigma);

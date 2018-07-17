@@ -48,14 +48,14 @@ public abstract class MLPAddedAnOutputNode<N extends Node, E extends AbstractFFE
     Assert.assertEquals(3, mlp.network.size());
     Assert.assertEquals(1, mlp.getLayer(2).size());
     Node outputNode = getNode(mlp, 2, 0);
-    Assert.assertTrue(outputNode.getActivation() instanceof Activation.Identity);
+    Assert.assertEquals(outputNode.getActivation(), Activation.Type.Identity);
 
     Assert.assertEquals(1, mlp.getLayer(0).size());
     Assert.assertEquals(1, mlp.getLayer(1).size());
     Node inputNode = getNode(mlp, 0, 0);
-    Assert.assertTrue(inputNode.getActivation() instanceof Activation.Identity);
+    Assert.assertTrue(inputNode.getActivation() == Activation.Type.Identity);
     Node hiddenNode = getNode(mlp, 1, 0);
-    Assert.assertTrue(hiddenNode.getActivation() instanceof Activation.Sigmoid);
+    Assert.assertEquals(hiddenNode.getActivation(), Activation.Type.Sigmoid);
     Assert.assertEquals(0, inputNode.getInputEdges().size());
     Assert.assertEquals(1, inputNode.getOutputEdges().size());
     Assert.assertEquals(2, hiddenNode.getInputEdges().size());
@@ -98,18 +98,18 @@ public abstract class MLPAddedAnOutputNode<N extends Node, E extends AbstractFFE
     Assert.assertEquals(3, mlp.network.size());
     Assert.assertEquals(1, mlp.getLayer(2).size());
     Node outputNode = getNode(mlp, 2, 0);
-    Assert.assertTrue(outputNode.getActivation() instanceof Activation.Identity);
+    Assert.assertEquals(outputNode.getActivation(), Activation.Type.Identity);
 
     Assert.assertEquals(2, mlp.getLayer(0).size());
     Assert.assertEquals(2, mlp.getLayer(1).size());
     Node inputNode0 = getNode(mlp, 0, 0);
-    Assert.assertTrue(inputNode0.getActivation() instanceof Activation.Identity);
+    Assert.assertEquals(inputNode0.getActivation(), Activation.Type.Identity);
     Node inputNode1 = getNode(mlp, 0, 1);
-    Assert.assertTrue(inputNode1.getActivation() instanceof Activation.Identity);
+    Assert.assertEquals(inputNode1.getActivation(), Activation.Type.Identity);
     Node hiddenNode0 = getNode(mlp, 1, 0);
-    Assert.assertTrue(hiddenNode0.getActivation() instanceof Activation.ReLU);
+    Assert.assertEquals(hiddenNode0.getActivation(), Activation.Type.ReLU);
     Node hiddenNode1 = getNode(mlp, 1, 1);
-    Assert.assertTrue(hiddenNode1.getActivation() instanceof Activation.ReLU);
+    Assert.assertEquals(hiddenNode1.getActivation(), Activation.Type.ReLU);
     Assert.assertEquals(0, inputNode0.getInputEdges().size());
     Assert.assertEquals(0, inputNode1.getInputEdges().size());
     Assert.assertEquals(2, inputNode0.getOutputEdges().size());
@@ -169,17 +169,17 @@ public abstract class MLPAddedAnOutputNode<N extends Node, E extends AbstractFFE
     Assert.assertEquals(4, mlp.network.size());
     Assert.assertEquals(1, mlp.getLayer(3).size());
     Node outputNode = getNode(mlp, 3, 0);
-    Assert.assertTrue(outputNode.getActivation() instanceof Activation.Identity);
+    Assert.assertEquals(outputNode.getActivation(), Activation.Type.Identity);
 
     Assert.assertEquals(1, mlp.getLayer(0).size());
     Assert.assertEquals(1, mlp.getLayer(1).size());
     Assert.assertEquals(1, mlp.getLayer(2).size());
     Node inputNode = getNode(mlp, 0, 0);
-    Assert.assertTrue(inputNode.getActivation() instanceof Activation.Identity);
+    Assert.assertEquals(inputNode.getActivation(), Activation.Type.Identity);
     Node hiddenNode0 = getNode(mlp, 1, 0);
-    Assert.assertTrue(hiddenNode0.getActivation() instanceof Activation.Sigmoid);
+    Assert.assertEquals(hiddenNode0.getActivation(), Activation.Type.Sigmoid);
     Node hiddenNode1 = getNode(mlp, 2, 0);
-    Assert.assertTrue(hiddenNode1.getActivation() instanceof Activation.ReLU);
+    Assert.assertEquals(hiddenNode1.getActivation(), Activation.Type.ReLU);
     Assert.assertEquals(0, inputNode.getInputEdges().size());
     Assert.assertEquals(1, inputNode.getOutputEdges().size());
     Assert.assertEquals(2, hiddenNode0.getInputEdges().size());

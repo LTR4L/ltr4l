@@ -17,6 +17,7 @@ package org.ltr4l.nn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.tools.Regularization;
+import org.ltr4l.trainers.MLPTrainer;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -26,6 +27,10 @@ import java.util.List;
 public class NNMLP extends MLP {
   public NNMLP(int featureLength, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
     super(featureLength, networkShape, optFact, regularization, weightModel);
+  }
+
+  public NNMLP(int featureLength, MLPTrainer.MLPConfig config) { //Config NetworkShape MUST HAVE final layer added!
+    super(featureLength, config);
   }
 
   public NNMLP(Reader reader) throws IOException {
@@ -66,7 +71,7 @@ public class NNMLP extends MLP {
       final int inputDim = savedModel.getNode(0, 0).size() - 1;
       //Start with constructing the input layer.
       for (int i = 0; i < inputDim; i++) {
-        currentLayer.add(constructNode(new Activation.Identity()));
+        currentLayer.add(constructNode(Activation.Type.Identity));
       }
       network.add(currentLayer);
 
@@ -74,7 +79,7 @@ public class NNMLP extends MLP {
       NetworkShape networkShape = savedModel.config.getNetworkShape();
       //addOutputs(networkShape); After addOutputs has been properly implemented, overriding readModel will be unnecessary.
       int outputNum = savedModel.getLayer(savedModel.weights.size() - 1).size();
-      networkShape.add(outputNum, new Activation.Sigmoid());
+      networkShape.add(outputNum, Activation.Type.Sigmoid);
       Optimizer.OptimizerFactory optFact = savedModel.config.getOptFact();
       for (int layerNum = 0; layerNum < savedModel.weights.size(); layerNum++) {
         currentLayer = new ArrayList<>();

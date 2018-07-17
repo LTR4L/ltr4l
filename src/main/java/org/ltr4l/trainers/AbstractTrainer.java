@@ -19,13 +19,19 @@ package org.ltr4l.trainers;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.Ranker;
+import org.ltr4l.boosting.Ensemble;
+import org.ltr4l.boosting.RankBoost;
 import org.ltr4l.evaluation.DCG;
 import org.ltr4l.evaluation.RankEval;
 import org.ltr4l.evaluation.RankEval.RankEvalFactory;
+import org.ltr4l.nn.Activation;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
@@ -57,16 +63,15 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
   protected final RankEval eval;
   protected final  LossCalculator lossCalc;
 
-  AbstractTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-    this.config = getConfig(reader);
-    config.overrideBy(override);     // TODO: want to use generic C instead of Config
+  AbstractTrainer(List<Query> training, List<Query> validation, C config, R ranker, Error errorFunc, LossCalculator lossCalc) {
+    this.config = config;
     epochNum = config.numIterations;
-    trainingSet = training.getQueries();
-    validationSet = validation.getQueries();
+    trainingSet = training;
+    validationSet = validation;
     maxScore = 0d;
-    ranker = constructRanker(); //TODO: ranker, errorFunc, and lossCalc assignments are done in child classes by implementing methods...
-    errorFunc = makeErrorFunc();
-    lossCalc = makeLossCalculator(); //TODO: In child classes, requires that ranker and errorFunc be created already...
+    this.ranker = ranker; //TODO: ranker, errorFunc, and lossCalc assignments are done in child classes by implementing methods...
+    this.errorFunc = errorFunc;
+    this.lossCalc = lossCalc; //TODO: In child classes, requires that ranker and errorFunc be created already...
     assert(config.batchSize >= 0);
     batchSize = config.batchSize;
     eval = getEvaluator(config);
@@ -102,17 +107,8 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
     return ranker;
   }
 
-  /**
-   * This method is used to assign errorFunc.
-   * Child classes must specify which error they will use.
-   * @return Implementation of Error
-   */
-  protected abstract Error makeErrorFunc();
-
-  protected abstract LossCalculator makeLossCalculator();
-
   public double[] calculateLoss() {
-    return new double[]{lossCalc.calculateLoss(TRAINING), lossCalc.calculateLoss(VALIDATION)};
+    return new double[]{lossCalc.calculateLoss(TRAINING, ranker), lossCalc.calculateLoss(VALIDATION, ranker)};
   }
 
   public void validate(int iter, int pos) {
@@ -140,20 +136,31 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
     }
   }
 
-  protected abstract <R extends Ranker> R constructRanker();
-
-  public abstract <C extends Config> Class<C> getConfigClass();
-
-  <C extends Config> C getConfig(Reader reader){
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      return mapper.readValue(reader, getConfigClass());
-    } catch (IOException e) {
-      throw new IllegalArgumentException(e);
-    }
-  }
-
   public static class TrainerFactory {
+
+    /**
+     * This returns the appropriate implementation of Trainer depending on the algorithm.
+     * @param trainingSet The QuerySet containing the data to be used for training.
+     * @param validationSet The QuerySet containing the data to be used for validation.
+     * @param configFile The Config file containing parameters needed for Ranker class.
+     * @param override Set another Config that overrides configFile.
+     * @return new class which implements trainer.
+     */
+    public static AbstractTrainer getTrainer(QuerySet trainingSet, QuerySet validationSet, String configFile, Config override) {
+      String algorithm;
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
+      try{
+        Reader reader = new FileReader(configFile);
+        Map model = mapper.readValue(reader, Map.class);
+        algorithm = ((String)model.get("algorithm")).toLowerCase();
+        reader.reset();
+        return getTrainer(algorithm, trainingSet, validationSet, reader, override);
+      }
+      catch (IOException e){
+        throw new IllegalArgumentException(e);
+      }
+    }
 
     /**
      * This returns the appropriate implementation of Trainer depending on the algorithm.
@@ -173,7 +180,28 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
         throw new IllegalArgumentException(e);
       }
     }
-
+    /**
+     * This returns the appropriate implementation of Trainer depending on the algorithm.
+     * @param trainingSet The QuerySet containing the data to be used for training.
+     * @param validationSet The QuerySet containing the data to be used for validation.
+     * @param reader The Config Reader containing parameters needed for Ranker class.
+     * @param override Set another Config that overrides reader Config.
+     * @return new class which implements trainer.
+     */
+    public static AbstractTrainer getTrainer(QuerySet trainingSet, QuerySet validationSet, Reader reader, Config override) {
+      String algorithm;
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
+      try{
+        Map model = mapper.readValue(reader, Map.class);
+        algorithm = ((String)model.get("algorithm")).toLowerCase();
+        reader.reset();
+        return getTrainer(algorithm, trainingSet, validationSet, reader, override);
+      }
+      catch (IOException e){
+        throw new IllegalArgumentException(e);
+      }
+    }
     /**
      * This returns the appropriate implementation of Trainer depending on the algorithm.
      * @param algorithm Algorithm/implementation to be used.
@@ -184,28 +212,73 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
      * @return new class which implements trainer.
      */
     public static AbstractTrainer getTrainer(String algorithm, QuerySet trainingSet, QuerySet validationSet, Reader reader, Config override) {
+      List<Query> training = trainingSet.getQueries();
+      List<Query> validation = validationSet.getQueries();
       try{
         switch (algorithm.toLowerCase()) {
-          case "prank":
-            return new PRankTrainer(trainingSet, validationSet, reader, override);
-          case "oap":
-            return new OAPBPMTrainer(trainingSet, validationSet, reader, override);
-          case "ranknet":
-            return new RankNetTrainer(trainingSet, validationSet, reader, override);
-          case "franknet":
-            return new FRankTrainer(trainingSet, validationSet, reader, override);
-          case "lambdarank":
-            return new LambdaRankTrainer(trainingSet, validationSet, reader, override);
-          case "nnrank":
-            return new NNRankTrainer(trainingSet, validationSet, reader, override);
-          case "sortnet":
-            return new SortNetTrainer(trainingSet, validationSet, reader, override);
-          case "listnet":
-            return new ListNetTrainer(trainingSet, validationSet, reader, override);
-          case "lambdamart":
-            return new LambdaMartTrainer(trainingSet, validationSet, reader, override);
-          case "rankboost":
-            return new RankBoostTrainer(trainingSet, validationSet, reader, override);
+          case "prank": {
+            Config config = Config.getConfig(reader, Config.ConfigType.BASIC);
+            config.overrideBy(override);
+            return new PRankTrainer(
+                training,
+                validation,
+                config);
+          }
+          case "oap": {
+            OAPBPMTrainer.OAPBPMConfig config = Config.getConfig(reader, Config.ConfigType.OAP);
+            config.overrideBy(override);
+            return new OAPBPMTrainer(training, validation, config);
+          }
+          case "ranknet": {
+            MLPTrainer.MLPConfig config = Config.getConfig(reader, Config.ConfigType.MLP);
+            config.overrideBy(override);
+            return new RankNetTrainer(training, validation, config);
+          }
+          case "franknet": {
+            MLPTrainer.MLPConfig config = Config.getConfig(reader, Config.ConfigType.MLP);
+            config.overrideBy(override);
+            return new FRankTrainer(training, validation, config);
+          }
+          case "lambdarank": {
+            MLPTrainer.MLPConfig config = Config.getConfig(reader, Config.ConfigType.MLP);
+            config.overrideBy(override);
+            return new LambdaRankTrainer(training, validation, config);
+          }
+          case "nnrank": {
+            MLPTrainer.MLPConfig config = Config.getConfig(reader, Config.ConfigType.MLP);
+            List<Map<String, Object>> layers = config.getReqArrayParams(config.params, "layers");
+            Map<String, Object> outputLayer = new HashMap<>();
+            outputLayer.put("num", QuerySet.findMaxLabel(training));
+            outputLayer.put("activator", "sigmoid");
+            layers.add(outputLayer);
+            config.overrideBy(override);
+            return new NNRankTrainer(training, validation, config);
+          }
+          case "sortnet": {
+            MLPTrainer.MLPConfig config = Config.getConfig(reader, Config.ConfigType.MLP);
+            config.overrideBy(override);
+            return new SortNetTrainer(training, validation, config);
+          }
+          case "listnet": {
+            MLPTrainer.MLPConfig config = Config.getConfig(reader, Config.ConfigType.MLP);
+            config.overrideBy(override);
+            return new ListNetTrainer(training, validation, config);
+          }
+          case "lambdamart": {
+            Ensemble.TreeConfig config = Config.getConfig(reader, Config.ConfigType.TREE);
+            config.overrideBy(override);
+            return new LambdaMartTrainer(training, validation, config);
+          }
+          case "rankboost": {
+            RankBoost.RankBoostConfig config = Config.getConfig(reader, Config.ConfigType.BOOSTING);
+            config.overrideBy(override);
+            return new RankBoostTrainer(training, validation, config);
+          }
+          case "adaboost": {
+            RankBoost.RankBoostConfig config = Config.getConfig(reader, Config.ConfigType.BOOSTING);
+            config.overrideBy(override);
+            return new AdaBoostTrainer(training, validation, config);
+          }
           default:
             throw new IllegalArgumentException();
         }

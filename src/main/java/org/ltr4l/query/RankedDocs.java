@@ -16,17 +16,31 @@
 package org.ltr4l.query;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class RankedDocs extends ArrayList<Document> {
+public class RankedDocs {
+  private final List<Document> rankedDocs;
 
   public RankedDocs(List<Document> unrankedDocs){
-    super(unrankedDocs);
-    sort((doca, docb) -> Integer.compare(docb.getLabel(), doca.getLabel()));
+    rankedDocs = new ArrayList<>(unrankedDocs);
+    rankedDocs.sort((doca, docb) -> Integer.compare(docb.getLabel(), doca.getLabel()));
   }
 
   public int getLabel(int i){
-    return get(i).getLabel();
+    return rankedDocs.get(i).getLabel();
+  }
+
+  public List<Document> getRankedDocs(){
+    return Collections.unmodifiableList(rankedDocs);
+  }
+
+  public int size(){
+    return rankedDocs.size();
+  }
+
+  public Document get(int i){
+    return rankedDocs.get(i);
   }
 
 }
