@@ -41,16 +41,20 @@ public class ListNetTrainer extends MLPTrainer<ListNetMLP> {
   private double lrRate;
   private double rgRate;
 
-  ListNetTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, ListNetMLP ranker, Error errorFunc, LossCalculator<ListNetMLP> lossCalc) {
-    super(training, validation, reader, override, ranker, errorFunc, lossCalc);
+  ListNetTrainer(List<Query> training, List<Query> validation, MLPConfig config, ListNetMLP ranker, Error errorFunc, LossCalculator<ListNetMLP> lossCalc) {
+    super(training, validation, config, ranker, errorFunc, lossCalc);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
   }
 
-  ListNetTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, ListNetMLP ranker){
-    this(training,validation, reader, override, ranker, StandardError.ENTROPY,
+  ListNetTrainer(List<Query> training, List<Query> validation, MLPConfig config, ListNetMLP ranker){
+    this(training,validation, config, ranker, StandardError.ENTROPY,
         new PointwiseLossCalc.ListNetLossCalc(training, validation, StandardError.ENTROPY));
+  }
+
+  ListNetTrainer(List<Query> training, List<Query> validation, MLPConfig config){
+    this(training, validation, config, new ListNetMLP(training.get(0).getFeatureLength(), config));
   }
 
   @Override

@@ -44,11 +44,10 @@ public class SortNetTrainer extends AbstractTrainer<SortNetMLP, MLPTrainer.MLPCo
   protected double rgRate;
   protected final double[][] targets;
 
-  SortNetTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, SortNetMLP ranker) {
+  SortNetTrainer(List<Query> training, List<Query> validation, MLPTrainer.MLPConfig config, SortNetMLP ranker) {
     super(training,
         validation,
-        reader,
-        override,
+        config,
         ranker,
         StandardError.SQUARE,
         new PairwiseLossCalc.SortNetLossCalc(training, validation, StandardError.SQUARE, new double[][]{{1d,0d},{0d,1}}));
@@ -57,6 +56,10 @@ public class SortNetTrainer extends AbstractTrainer<SortNetMLP, MLPTrainer.MLPCo
     rgRate = config.getReguRate();
     maxScore = 0;
     targets = new double[][]{{1, 0}, {0, 1}};
+  }
+
+  SortNetTrainer(List<Query> training, List<Query> validation, MLPTrainer.MLPConfig config){
+    this(training, validation, config, new SortNetMLP(training.get(0).getFeatureLength(), config));
   }
 
   @Override

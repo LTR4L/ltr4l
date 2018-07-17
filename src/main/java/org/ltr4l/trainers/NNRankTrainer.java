@@ -41,12 +41,16 @@ public class NNRankTrainer extends MLPTrainer<MLP> {
 
   //Last layer of the network has a number of nodes equal to the number of categories.
   //That layer is created in the constructor, so it is not necessary to specify last layer in config file.
-  NNRankTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, MLP ranker) {
-    super(training, validation, reader, override, ranker);
+  NNRankTrainer(List<Query> training, List<Query> validation, MLPConfig config, MLP ranker) {
+    super(training, validation, config, ranker);
     outputNodeNumber = QuerySet.findMaxLabel(trainingSet);
     targets = new double[outputNodeNumber + 1][outputNodeNumber]; //For 2 output nodes, there should be 3 targets
     for(int i = 0; i < outputNodeNumber + 1; i++)
       targets[i] = makeTarget(i, outputNodeNumber);
+  }
+
+  NNRankTrainer(List<Query> training, List<Query> validation, MLPConfig config){
+    this(training, validation, config, new NNMLP(training.get(0).getFeatureLength(), config));
   }
 
   @Override

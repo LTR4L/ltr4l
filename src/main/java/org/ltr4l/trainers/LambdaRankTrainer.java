@@ -40,8 +40,12 @@ import org.ltr4l.tools.Config;
  * */
 public class LambdaRankTrainer extends RankNetTrainer {
 
-  LambdaRankTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, RankNetMLP ranker) {
-    super(training, validation, reader, override, ranker);
+  LambdaRankTrainer(List<Query> training, List<Query> validation, MLPConfig config, RankNetMLP ranker) {
+    super(training, validation, config, ranker);
+  }
+
+  LambdaRankTrainer(List<Query> training, List<Query> validation, MLPConfig config){
+    super(training, validation, config);
   }
 
   @Override

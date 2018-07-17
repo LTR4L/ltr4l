@@ -135,7 +135,7 @@ public class AbstractTrainerTest {
   private static class NullAbstractTrainer extends AbstractTrainer<NullRanker, Config> {
 
     NullAbstractTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-      super(training.getQueries(), validation.getQueries(), reader, override, null, null, null);
+      super(training.getQueries(), validation.getQueries(), Config.getConfig(reader, Config.ConfigType.BASIC).overrideBy(override), null, null, null);
     }
 
     @Override

@@ -44,8 +44,16 @@ public class PRankTrainer extends AbstractTrainer<PRankTrainer.PRank, Config> {
 
   private final  List<Document> trainingDocList;
 
-  PRankTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, PRank ranker) {
-    super(training, validation, reader, override, ranker, StandardError.SQUARE, new PointwiseLossCalc.StandardPointLossCalc<PRank>(training, validation, StandardError.SQUARE));
+  PRankTrainer(List<Query> training, List<Query> validation, Config config) {
+    this(training, validation, config, new PRank(training.get(0).getFeatureLength(), QuerySet.findMaxLabel(training)));
+  }
+
+  PRankTrainer(List<Query> training, List<Query> validation, Config config, PRank ranker) {
+    super(training, validation,
+        config,
+        ranker,
+        StandardError.SQUARE,
+        new PointwiseLossCalc.StandardPointLossCalc<PRank>(training, validation, StandardError.SQUARE));
     maxScore = 0.0;
     trainingDocList = new ArrayList<>();
     for (Query query : trainingSet)

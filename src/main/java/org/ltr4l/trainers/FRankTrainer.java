@@ -39,8 +39,11 @@ import org.ltr4l.tools.Config;
 public class FRankTrainer extends RankNetTrainer {
 
 
-  FRankTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, RankNetMLP ranker) {
-    super(training, validation, reader, override, ranker);
+  FRankTrainer(List<Query> training, List<Query> validation, MLPConfig config, RankNetMLP ranker) {
+    super(training, validation, config, ranker);
+  }
+  FRankTrainer(List<Query> training, List<Query> validation, MLPConfig config){
+    super(training, validation, config);
   }
 
   @Override

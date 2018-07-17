@@ -45,12 +45,12 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends AbstractTrainer<
   protected double rgRate;
   //protected Config config;
 
-  MLPTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, M ranker) {
-    this(training, validation, reader, override, ranker, StandardError.SQUARE, new PointwiseLossCalc.StandardPointLossCalc<M>(training, validation, StandardError.SQUARE));
+  MLPTrainer(List<Query> training, List<Query> validation, MLPConfig config, M ranker) {
+    this(training, validation, config, ranker, StandardError.SQUARE, new PointwiseLossCalc.StandardPointLossCalc<M>(training, validation, StandardError.SQUARE));
   }
 
-  MLPTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, M ranker, Error errorFunc, LossCalculator<M> lossCalc) {
-    super(training, validation, reader, override, ranker, errorFunc, lossCalc);
+  MLPTrainer(List<Query> training, List<Query> validation, MLPConfig config, M ranker, Error errorFunc, LossCalculator<M> lossCalc) {
+    super(training, validation, config, ranker, errorFunc, lossCalc);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;

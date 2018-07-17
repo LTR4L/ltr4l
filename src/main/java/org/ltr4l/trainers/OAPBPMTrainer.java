@@ -40,8 +40,17 @@ public class OAPBPMTrainer extends AbstractTrainer<OAPBPMTrainer.OAPBPMRank, OAP
   private double maxScore;
   private final  List<Document> trainingDocList;
 
-  OAPBPMTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, OAPBPMRank ranker) {
-    super(training, validation, reader, override, ranker, StandardError.SQUARE, new PointwiseLossCalc.StandardPointLossCalc<OAPBPMRank>(training, validation, StandardError.SQUARE));
+  OAPBPMTrainer(List<Query> training, List<Query> validation, OAPBPMConfig config) {
+    this(training, validation, config, new OAPBPMRank(training.get(0).getFeatureLength(), QuerySet.findMaxLabel(training), config.getPNum(), config.getBernNum()));
+  }
+
+  OAPBPMTrainer(List<Query> training, List<Query> validation, OAPBPMConfig config, OAPBPMRank ranker) {
+    super(training,
+        validation,
+        config,
+        ranker,
+        StandardError.SQUARE,
+        new PointwiseLossCalc.StandardPointLossCalc<OAPBPMRank>(training, validation, StandardError.SQUARE));
     maxScore = 0d;
     trainingDocList = new ArrayList<>();
     for (Query query : trainingSet)

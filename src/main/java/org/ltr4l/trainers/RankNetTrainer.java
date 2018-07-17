@@ -44,9 +44,18 @@ import org.ltr4l.tools.Error;
 public class RankNetTrainer extends MLPTrainer<RankNetMLP> {
   protected final List<Document[][]> trainingPairs;
 
-  RankNetTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, RankNetMLP ranker) {
-    super(training, validation, reader, override, ranker, StandardError.ENTROPY, new PairwiseLossCalc.RankNetLossCalc<RankNetMLP>(training, validation, StandardError.ENTROPY));
+  RankNetTrainer(List<Query> training, List<Query> validation, MLPConfig config, RankNetMLP ranker) {
+    super(training, validation, config, ranker, StandardError.ENTROPY, new PairwiseLossCalc.RankNetLossCalc<>(training, validation, StandardError.ENTROPY));
     trainingPairs = ((PairwiseLossCalc) lossCalc).getTrainingPairs();
+  }
+
+  RankNetTrainer(List<Query> training, List<Query> validation, MLPConfig config){
+    this(
+        training,
+        validation,
+        config,
+        new RankNetMLP(training.get(0).getFeatureLength(), config)
+    );
   }
 
   @Override

@@ -25,9 +25,12 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.Ranker;
+import org.ltr4l.boosting.Ensemble;
+import org.ltr4l.boosting.RankBoost;
 import org.ltr4l.evaluation.DCG;
 import org.ltr4l.evaluation.RankEval;
 import org.ltr4l.evaluation.RankEval.RankEvalFactory;
+import org.ltr4l.nn.Activation;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
@@ -59,9 +62,8 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
   protected final RankEval eval;
   protected final  LossCalculator lossCalc;
 
-  AbstractTrainer(List<Query> training, List<Query> validation, Reader reader, Config override, R ranker, Error errorFunc, LossCalculator lossCalc) {
-    this.config = getConfig(reader);
-    config.overrideBy(override);     // TODO: want to use generic C instead of Config
+  AbstractTrainer(List<Query> training, List<Query> validation, C config, R ranker, Error errorFunc, LossCalculator lossCalc) {
+    this.config = config;
     epochNum = config.numIterations;
     trainingSet = training;
     validationSet = validation;
@@ -226,28 +228,68 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
       List<Query> validation = validationSet.getQueries();
       try{
         switch (algorithm.toLowerCase()) {
-          case "prank":
-            return new PRankTrainer(training, validation, reader, override);
-          case "oap":
-            return new OAPBPMTrainer(training, validation, reader, override);
-          case "ranknet":
-            return new RankNetTrainer(training, validation, reader, override);
-          case "franknet":
-            return new FRankTrainer(training, validation, reader, override);
-          case "lambdarank":
-            return new LambdaRankTrainer(training, validation, reader, override);
-          case "nnrank":
-            return new NNRankTrainer(training, validation, reader, override);
-          case "sortnet":
-            return new SortNetTrainer(training, validation, reader, override);
-          case "listnet":
-            return new ListNetTrainer(training, validation, reader, override);
-          case "lambdamart":
-            return new LambdaMartTrainer(training, validation, reader, override);
-          case "rankboost":
-            return new RankBoostTrainer(training, validation, reader, override);
-          case "adaboost":
-            return new AdaBoostTrainer(training, validation, reader, override);
+          case "prank": {
+            Config config = Config.getConfig(reader, Config.ConfigType.BASIC);
+            config.overrideBy(override);
+            return new PRankTrainer(
+                training,
+                validation,
+                config);
+          }
+          case "oap": {
+            OAPBPMTrainer.OAPBPMConfig config = Config.getConfig(reader, Config.ConfigType.OAP);
+            config.overrideBy(override);
+            return new OAPBPMTrainer(training, validation, config);
+          }
+          case "ranknet": {
+            MLPTrainer.MLPConfig config = Config.getConfig(reader, Config.ConfigType.MLP);
+            config.overrideBy(override);
+            return new RankNetTrainer(training, validation, config);
+          }
+          case "franknet": {
+            MLPTrainer.MLPConfig config = Config.getConfig(reader, Config.ConfigType.MLP);
+            config.overrideBy(override);
+            return new FRankTrainer(training, validation, config);
+          }
+          case "lambdarank": {
+            MLPTrainer.MLPConfig config = Config.getConfig(reader, Config.ConfigType.MLP);
+            config.overrideBy(override);
+            return new LambdaRankTrainer(training, validation, config);
+          }
+          case "nnrank": {
+            MLPTrainer.MLPConfig config = Config.getConfig(reader, Config.ConfigType.MLP);
+            System.out.println(QuerySet.findMaxLabel(training));
+            System.out.println(config.getNetworkShape().toString());
+            config.getNetworkShape().add(QuerySet.findMaxLabel(training), Activation.Type.Sigmoid);
+            System.out.println(config.getNetworkShape().toString());
+            config.overrideBy(override);
+            return new NNRankTrainer(training, validation, config);
+          }
+          case "sortnet": {
+            MLPTrainer.MLPConfig config = Config.getConfig(reader, Config.ConfigType.MLP);
+            config.overrideBy(override);
+            return new SortNetTrainer(training, validation, config);
+          }
+          case "listnet": {
+            MLPTrainer.MLPConfig config = Config.getConfig(reader, Config.ConfigType.MLP);
+            config.overrideBy(override);
+            return new ListNetTrainer(training, validation, config);
+          }
+          case "lambdamart": {
+            Ensemble.TreeConfig config = Config.getConfig(reader, Config.ConfigType.TREE);
+            config.overrideBy(override);
+            return new LambdaMartTrainer(training, validation, config);
+          }
+          case "rankboost": {
+            RankBoost.RankBoostConfig config = Config.getConfig(reader, Config.ConfigType.BOOSTING);
+            config.overrideBy(override);
+            return new RankBoostTrainer(training, validation, config);
+          }
+          case "adaboost": {
+            RankBoost.RankBoostConfig config = Config.getConfig(reader, Config.ConfigType.BOOSTING);
+            config.overrideBy(override);
+            return new AdaBoostTrainer(training, validation, config);
+          }
           default:
             throw new IllegalArgumentException();
         }

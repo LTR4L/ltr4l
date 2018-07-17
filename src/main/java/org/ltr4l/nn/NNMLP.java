@@ -17,6 +17,7 @@ package org.ltr4l.nn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.tools.Regularization;
+import org.ltr4l.trainers.MLPTrainer;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -26,6 +27,10 @@ import java.util.List;
 public class NNMLP extends MLP {
   public NNMLP(int featureLength, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel) {
     super(featureLength, networkShape, optFact, regularization, weightModel);
+  }
+
+  public NNMLP(int featureLength, MLPTrainer.MLPConfig config) { //Config NetworkShape MUST HAVE final layer added!
+    super(featureLength, config);
   }
 
   public NNMLP(Reader reader) throws IOException {

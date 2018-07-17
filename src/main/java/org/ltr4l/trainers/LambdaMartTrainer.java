@@ -49,8 +49,8 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
   private final int numSteps;
   private final double lrRate;
 
-  LambdaMartTrainer(List<Query> training, List<Query> validation, Reader reader, Config override) {
-    super(training, validation, reader, override, new Ensemble(), StandardError.ENTROPY, new PairwiseLossCalc.RankNetLossCalc(training, validation, StandardError.ENTROPY));
+  LambdaMartTrainer(List<Query> training, List<Query> validation, Ensemble.TreeConfig config, Ensemble ranker) {
+    super(training, validation, config, ranker, StandardError.ENTROPY, new PairwiseLossCalc.RankNetLossCalc(training, validation, StandardError.ENTROPY));
     trainingDocs = DataProcessor.makeDocList(trainingSet);
     trainingPairs = ((PairwiseLossCalc) lossCalc).getTrainingPairs(); //TODO: use generics over casting...
     numTrees = config.getNumTrees();
@@ -71,6 +71,10 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
       featureSortedDocs.add(FeatureSortedDocs.get(trainingDocs, feat));
       thresholds[feat] = treeTools.findThreshold(featureSortedDocs.get(feat));
     }
+  }
+
+  LambdaMartTrainer(List<Query> training, List<Query> validation, Ensemble.TreeConfig config){
+    this(training, validation, config, new Ensemble());
   }
 
   @Override
