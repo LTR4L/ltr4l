@@ -20,14 +20,10 @@ import org.ltr4l.boosting.Split;
 import org.ltr4l.nn.Activation;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.*;
-import org.ltr4l.tools.Error;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.ltr4l.boosting.TreeTools.findMinLossFeat;
 
@@ -49,8 +45,8 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
   private final int numSteps;
   private final double lrRate;
 
-  LambdaMartTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-    super(training, validation, reader, override);
+  LambdaMartTrainer(List<Query> training, List<Query> validation, Ensemble.TreeConfig config, Ensemble ranker) {
+    super(training, validation, config, ranker, StandardError.ENTROPY, new PairwiseLossCalc.RankNetLossCalc(training, validation, StandardError.ENTROPY));
     trainingDocs = DataProcessor.makeDocList(trainingSet);
     trainingPairs = ((PairwiseLossCalc) lossCalc).getTrainingPairs(); //TODO: use generics over casting...
     numTrees = config.getNumTrees();
@@ -64,27 +60,17 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
     // {threshold, calculateScore}, //Feature 1
     // ...
     //}
-    thresholds = new double[training.getFeatureLength()][2];
+    int featLength = training.get(0).getFeatureLength();
+    thresholds = new double[featLength][2];
     TreeTools treeTools = new RegressionTreeTools();
-    for (int feat = 0; feat < training.getFeatureLength(); feat++) {
+    for (int feat = 0; feat < featLength; feat++) {
       featureSortedDocs.add(FeatureSortedDocs.get(trainingDocs, feat));
       thresholds[feat] = treeTools.findThreshold(featureSortedDocs.get(feat));
     }
   }
 
-  @Override
-  protected Ensemble constructRanker() {
-    return new Ensemble();
-  }
-
-  @Override
-  protected Error makeErrorFunc() {
-    return StandardError.ENTROPY;
-  }
-
-  @Override
-  protected LossCalculator makeLossCalculator(){
-    return new PairwiseLossCalc.RankNetLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
+  LambdaMartTrainer(List<Query> training, List<Query> validation, Ensemble.TreeConfig config){
+    this(training, validation, config, new Ensemble());
   }
 
   @Override
@@ -171,15 +157,6 @@ public class LambdaMartTrainer extends AbstractTrainer<Ensemble, Ensemble.TreeCo
       }
       validate(t, evalK);
     }
-  }
-
-  @Override
-  public Class<Ensemble.TreeConfig> getConfigClass() {
-    return getCC();
-  }
-
-  public static Class<Ensemble.TreeConfig> getCC(){
-    return Ensemble.TreeConfig.class;
   }
 
 }

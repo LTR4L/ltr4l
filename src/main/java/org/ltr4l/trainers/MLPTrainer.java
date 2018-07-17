@@ -16,7 +16,6 @@
 
 package org.ltr4l.trainers;
 
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,13 +23,10 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.ltr4l.nn.AbstractMLP;
 import org.ltr4l.nn.Activation;
-import org.ltr4l.nn.MLP;
 import org.ltr4l.nn.NetworkShape;
 import org.ltr4l.nn.Optimizer;
 import org.ltr4l.nn.WeightInitializer;
-import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.*;
 import org.ltr4l.tools.Error;
 
@@ -45,46 +41,15 @@ public abstract class MLPTrainer<M extends AbstractMLP> extends AbstractTrainer<
   protected double rgRate;
   //protected Config config;
 
-  MLPTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-    this(training, validation, reader, override, false);
+  MLPTrainer(List<Query> training, List<Query> validation, MLPConfig config, M ranker) {
+    this(training, validation, config, ranker, StandardError.SQUARE, new PointwiseLossCalc.StandardPointLossCalc<M>(training, validation, StandardError.SQUARE));
   }
 
-  //This constructor exists solely for the purpose of child classes
-  //It gives child classes the ability to assign an extended MLP.
-  MLPTrainer(QuerySet training, QuerySet validation, Reader reader, Config override, boolean hasOtherMLP) {
-    super(training, validation, reader, override);
+  MLPTrainer(List<Query> training, List<Query> validation, MLPConfig config, M ranker, Error errorFunc, LossCalculator<M> lossCalc) {
+    super(training, validation, config, ranker, errorFunc, lossCalc);
     lrRate = config.getLearningRate();
     rgRate = config.getReguRate();
     maxScore = 0;
-  }
-
-  @Override
-  protected Error makeErrorFunc(){
-    return StandardError.SQUARE; //Default square error
-  }
-
-  @Override
-  protected LossCalculator makeLossCalculator(){
-    return new PointwiseLossCalc.StandardPointLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
-  }
-
-  @Override
-  protected AbstractMLP constructRanker(){
-    int featureLength = trainingSet.get(0).getFeatureLength();
-    NetworkShape networkShape = config.getNetworkShape();
-    Optimizer.OptimizerFactory optFact = config.getOptFact();
-    Regularization regularization = config.getReguFunction();
-    String weightModel = config.getWeightInit();
-    return new MLP(featureLength, networkShape, optFact, regularization, weightModel);
-  }
-
-  @Override
-  public Class<MLPConfig> getConfigClass(){
-    return getCC();
-  }
-
-  static Class<MLPConfig> getCC(){
-    return MLPConfig.class;
   }
 
   public static class MLPConfig extends Config {

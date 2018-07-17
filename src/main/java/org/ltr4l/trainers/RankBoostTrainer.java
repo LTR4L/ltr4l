@@ -18,24 +18,19 @@ package org.ltr4l.trainers;
 import org.ltr4l.boosting.RBDistribution;
 import org.ltr4l.boosting.RankBoost;
 import org.ltr4l.boosting.WeakLearner;
-import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.query.QuerySet;
 import org.ltr4l.query.RankedDocs;
 import org.ltr4l.tools.*;
-import org.ltr4l.tools.Error;
 
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankBoostConfig>{
   private final RBDistribution distribution;
   private final List<RankedDocs> rTrainingSet; //Contains doc lists sorted by label. Queries with no pairs of differing labels should be removed.
 
-  public RankBoostTrainer(QuerySet training, QuerySet validation, Reader reader, Config override){
-    super(training, validation, reader, override);
+  public RankBoostTrainer(List<Query> training, List<Query> validation, RankBoost.RankBoostConfig config, RankBoost ranker){
+    super(training, validation, config, ranker, StandardError.ENTROPY, new PairwiseLossCalc.RankBoostLossCalc(training, validation));
     rTrainingSet = new ArrayList<>();
     for(Query query : trainingSet) {
       //Sort into correct rank. This is not just for initialization, but also for later calculation.
@@ -46,14 +41,8 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
     distribution = new RBDistribution(rTrainingSet);
   }
 
-  @Override
-  protected Error makeErrorFunc() {
-   return StandardError.ENTROPY;
-  }
-
-  @Override
-  protected LossCalculator makeLossCalculator(){
-    return new PairwiseLossCalc.RankBoostLossCalc<>(ranker, trainingSet, validationSet);
+  public RankBoostTrainer(List<Query> training, List<Query> validation, RankBoost.RankBoostConfig config){
+    this(training, validation, config, new RankBoost());
   }
 
   @Override
@@ -63,19 +52,4 @@ public class RankBoostTrainer extends AbstractTrainer<RankBoost, RankBoost.RankB
     ranker.addLearner(wl);
     distribution.update(wl, rTrainingSet);
   }
-
-  @Override
-  protected RankBoost constructRanker() {
-    return new RankBoost();
-  }
-
-  @Override
-  public Class<RankBoost.RankBoostConfig> getConfigClass() {
-    return getCC();
-  }
-
-  public static Class<RankBoost.RankBoostConfig> getCC(){
-    return RankBoost.RankBoostConfig.class;
-  }
-
 }

@@ -31,7 +31,6 @@ import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.*;
-import org.ltr4l.tools.Error;
 
 /**
  * The implementation of AbstractTrainer which uses the
@@ -44,8 +43,16 @@ public class PRankTrainer extends AbstractTrainer<PRankTrainer.PRank, Config> {
 
   private final  List<Document> trainingDocList;
 
-  PRankTrainer(QuerySet training, QuerySet validation, Reader reader, Config override) {
-    super(training, validation, reader, override);
+  PRankTrainer(List<Query> training, List<Query> validation, Config config) {
+    this(training, validation, config, new PRank(training.get(0).getFeatureLength(), QuerySet.findMaxLabel(training)));
+  }
+
+  PRankTrainer(List<Query> training, List<Query> validation, Config config, PRank ranker) {
+    super(training, validation,
+        config,
+        ranker,
+        StandardError.SQUARE,
+        new PointwiseLossCalc.StandardPointLossCalc<PRank>(training, validation, StandardError.SQUARE));
     maxScore = 0.0;
     trainingDocList = new ArrayList<>();
     for (Query query : trainingSet)
@@ -57,26 +64,6 @@ public class PRankTrainer extends AbstractTrainer<PRankTrainer.PRank, Config> {
     Collections.shuffle(trainingDocList);
     for (Document doc : trainingDocList)
       ranker.updateWeights(doc);
-  }
-
-  @Override
-  protected Error makeErrorFunc(){
-    return StandardError.SQUARE;
-  }
-
-  @Override
-  protected LossCalculator makeLossCalculator() {
-    return new PointwiseLossCalc.StandardPointLossCalc<>(ranker, trainingSet, validationSet, errorFunc);
-  }
-
-  @Override
-  public Class<Config> getConfigClass() {
-    return Config.class;
-  }
-
-  @Override
-  protected PRank constructRanker() {
-    return new PRank(trainingSet.get(0).getFeatureLength(), QuerySet.findMaxLabel(trainingSet));
   }
 
   public static class PRank extends Ranker<Config> {
