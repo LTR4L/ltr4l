@@ -15,7 +15,9 @@ before_install:
   - sudo ln -s -T /usr/share/java/ivy.jar /usr/share/ant/lib/ivy*.jar
 
 install:
-  - ant ivy-bootstrap
+  - ant clean-ivycache ivy-bootstrap
 
 script:
+  - ant clean compile test
+  - cd ltr4l-solr
   - ant clean compile test

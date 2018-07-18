@@ -53,12 +53,6 @@ public class DefaultLTRQuery extends AbstractLTRQuery {
       super(query);
     }
 
-    /**
-     * Expert: adds all terms occurring in this query to the terms set. If the
-     * {@link Weight} was created with {@code needsScores == true} then this
-     * method will only extract terms which are used for scoring, otherwise it
-     * will extract all terms which are used for matching.
-     */
     @Override
     public void extractTerms(Set<Term> set) {
       for(FieldFeatureExtractorFactory factory: featuresSpec){

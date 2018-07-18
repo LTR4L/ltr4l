@@ -22,6 +22,7 @@
 
     <property file="version.properties"/>
     <property file="build.properties"/>
+    <property file="ivy-jars.properties"/>
 
     <target name="compile" description="compile source and test code">
         <mkdir dir="${cls.dir}"/>
@@ -194,8 +195,13 @@
         </delete>
     </target>
 
+    <target name="clean-ivycache" description="clean ivy cache">
+        <ivy:cleancache/>
+    </target>
+
     <target name="ivy-bootstrap" description="--> retrieve dependencies with ivy">
         <property file="ivy-jars.properties"/>
+        <ivy:resolve />
         <ivy:retrieve />
 <!--
         <ivy:retrieve sync="true" type="jar" />
