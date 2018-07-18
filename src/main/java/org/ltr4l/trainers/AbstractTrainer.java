@@ -19,9 +19,7 @@ package org.ltr4l.trainers;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,7 +29,6 @@ import org.ltr4l.boosting.RankBoost;
 import org.ltr4l.evaluation.DCG;
 import org.ltr4l.evaluation.RankEval;
 import org.ltr4l.evaluation.RankEval.RankEvalFactory;
-import org.ltr4l.nn.Activation;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
 import org.ltr4l.tools.Config;
