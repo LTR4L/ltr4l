@@ -16,6 +16,7 @@
  
 -->
 <project name="org.LTR4L_solr-project"
+         xmlns:ivy="antlib:org.apache.ivy.ant"
          default="compile" basedir=".">
 
     <property file="../version.properties"/>
@@ -25,16 +26,22 @@
         <mkdir dir="${cls.dir}"/>
         <javac srcdir="${src.dir}/main/java" destdir="${cls.dir}" debug="on" includes="**/*.java">
             <classpath path="${cls.dir}"/>
-	    <classpath path="../${cls.dir}"/>
+	        <classpath path="../${cls.dir}"/>
             <classpath>
-		<fileset dir="../${lib.dir}" includes="**/*.jar"/>
+		        <fileset dir="../${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
             </classpath>
         </javac>
         <javac srcdir="${src.dir}/test/java" destdir="${cls.dir}" debug="on" includes="**/*Test.java">
             <classpath path="${cls.dir}"/>
-	    <classpath path="../${cls.dir}"/>
+	        <classpath path="../${cls.dir}"/>
             <classpath>
-		    <fileset dir="../${lib.dir}" includes="**/*.jar"/>
+		        <fileset dir="../${lib.dir}" includes="**/*.jar"/>
+            </classpath>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
             </classpath>
         </javac>
     </target>
@@ -47,6 +54,9 @@
                failureProperty="tests.failed">
             <classpath path="${cls.dir}"/>
             <classpath path="../${cls.dir}"/>
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar"/>
+            </classpath>
             <classpath>
 		      <fileset dir="../${lib.dir}" includes="**/*.jar"/>
             </classpath>
@@ -72,16 +82,23 @@
                 <include name="**/*.class"/>
                 <include name="*.properties"/>
             </fileset>
-            <fileset dir="../${lib.dir}">
-		    <include name="**/*.jar"/>
-		    <exclude name="*-javadoc.jar"/>
-		    <exclude name="*-sources.jar"/>
-		    <exclude name="*jacoco*.jar"/>
-		    <exclude name="*junit*.jar"/>
+            <fileset dir="${lib.dir}">
+                <include name="**/*.jar"/>
+                <exclude name="*-javadoc.jar"/>
+                <exclude name="*-sources.jar"/>
+                <exclude name="*jacoco*.jar"/>
+                <exclude name="*junit*.jar"/>
             </fileset>
             <fileset dir="../${cls.dir}">
                 <include name="**/*.class"/>
                 <include name="*.properties"/>
+            </fileset>
+            <fileset dir="../${lib.dir}">
+		        <include name="**/*.jar"/>
+		        <exclude name="*-javadoc.jar"/>
+                <exclude name="*-sources.jar"/>
+                <exclude name="*jacoco*.jar"/>
+                <exclude name="*junit*.jar"/>
             </fileset>
         </jar>
     </target>
@@ -92,8 +109,18 @@
         <delete dir="${cls.dir}"/>
         <delete dir="${test.result.dir}"/>
         <delete>
-            <fileset dir="." includes="${solr_product.jar}"/>
+            <fileset dir="." includes="${product.jar}"/>
         </delete>
+    </target>
+
+    <target name="clean-ivycache" description="clean ivy cache">
+        <ivy:cleancache/>
+    </target>
+
+    <target name="ivy-bootstrap" description="--> retrieve dependencies with ivy">
+        <property file="ivy-jars.properties"/>
+        <ivy:resolve />
+        <ivy:retrieve />
     </target>
 
     <target name="javadoc" description="generate documentation">
