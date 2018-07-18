@@ -109,13 +109,13 @@ public abstract class Ranker<C extends Config> {
         case "prank":
           return new PRank(featLength, maxLabel);
         case "oap":
-          OAPBPMConfig config = getConfig(reader, OAPBPMTrainer.OAPBPMConfig.class); //TODO: hardcoded...
+          OAPBPMConfig config = Config.getConfig(reader, Config.ConfigType.OAP);
           config.overrideBy(override);
           int pNum = config.getPNum();
           double bernNum = config.getBernNum();
           return new OAPBPMRank(featLength, maxLabel, pNum, bernNum);
         case "nnrank":
-          MLPTrainer.MLPConfig mlpConfig = getConfig(reader, MLPTrainer.MLPConfig.class);
+          MLPTrainer.MLPConfig mlpConfig = Config.getConfig(reader, Config.ConfigType.MLP);
           mlpConfig.overrideBy(override);
           NetworkShape networkShape = mlpConfig.getNetworkShape();
           networkShape.add(maxLabel + 1, Activation.Type.Sigmoid);
@@ -144,7 +144,7 @@ public abstract class Ranker<C extends Config> {
     public static Ranker get(String algorithm, Reader reader, Config override, int featLength) {
       assert(featLength > 0);
       String alg = algorithm.toLowerCase();
-      MLPTrainer.MLPConfig config = getConfig(reader, MLPTrainer.MLPConfig.class);
+      MLPTrainer.MLPConfig config = Config.getConfig(reader, Config.ConfigType.MLP);
       config.overrideBy(override);
       switch (alg) {
         case "prank":
@@ -214,14 +214,4 @@ public abstract class Ranker<C extends Config> {
       }
     }
   }
-
-    //TODO: Move elsewhere? Same as AbstractTrainer.getConfig
-    protected static <C extends Config> C getConfig(Reader reader, Class<C> configClass){
-      ObjectMapper mapper = new ObjectMapper();
-      try {
-        return mapper.readValue(reader, configClass);
-      } catch (IOException e) {
-        throw new IllegalArgumentException(e);
-      }
-    }
 }
