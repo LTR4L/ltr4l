@@ -38,24 +38,48 @@ public class VectorMathTest {
   }
 
   @Test
-  public void dot() throws Exception {
+  public void testDot() throws Exception {
     Assert.assertEquals(90d, VectorMath.dot(A, B), 0.01);
   }
 
   @Test
-  public void norm2() throws Exception {
+  public void testScalarMult() throws Exception {
+    List<Double> C = VectorMath.scalarMult(3, A);
+    Assert.assertEquals(3, C.get(0), 0.01);
+    Assert.assertEquals(6, C.get(1), 0.01);
+    Assert.assertEquals(9, C.get(2), 0.01);
+    Assert.assertEquals(12, C.get(3), 0.01);
+
+    C = VectorMath.scalarMult(2.5, B);
+    Assert.assertEquals(12.5, C.get(0), 0.01);
+    Assert.assertEquals(17.5, C.get(1), 0.01);
+    Assert.assertEquals(22.5, C.get(2), 0.01);
+    Assert.assertEquals(27.5, C.get(3), 0.01);
+  }
+
+  @Test
+  public void testAdd() throws Exception {
+    List<Double> C = VectorMath.add(A, B);
+    Assert.assertEquals(6d, C.get(0), 0.01);
+    Assert.assertEquals(9d, C.get(1), 0.01);
+    Assert.assertEquals(12d, C.get(2), 0.01);
+    Assert.assertEquals(15d, C.get(3), 0.01);
+  }
+
+  @Test
+  public void testNorm2() throws Exception {
     Assert.assertEquals(30d, VectorMath.norm2(A), 0.01);
     Assert.assertEquals(276d, VectorMath.norm2(B), 0.01);
   }
 
   @Test
-  public void norm() throws Exception {
+  public void testNorm() throws Exception {
     Assert.assertEquals(Math.sqrt(30d), VectorMath.norm(A), 0.01);
     Assert.assertEquals(Math.sqrt(276d), VectorMath.norm(B), 0.01);
   }
 
   @Test
-  public void diff() throws Exception {
+  public void testDiff() throws Exception {
     double diff = 4d;
     for(double elem : VectorMath.diff(A, B)){
       Assert.assertEquals(-diff, elem, 0.01);

@@ -21,6 +21,7 @@ import org.ltr4l.query.Query;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class PairwiseQueryCreator {
 
@@ -49,7 +50,6 @@ public class PairwiseQueryCreator {
       query.addDocument(doc1);
       query.addDocument(doc2);
     }
-    Collections.shuffle(query.getDocList());
     return query;
   }
 

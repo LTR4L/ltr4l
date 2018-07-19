@@ -112,7 +112,7 @@ public class TreeToolsTest {
   }
 
 
-  protected static List<Document> makeDocsWithFeatures(double[][] docFeats){
+  public static List<Document> makeDocsWithFeatures(double[][] docFeats){
     List<Document> docs = new ArrayList<>();
     for(double[] features : docFeats){
       Document doc = new Document();
@@ -132,7 +132,7 @@ public class TreeToolsTest {
     return documents;
   }
 
-  protected static List<Document> addLabels(List<Document> docList, int... labels){
+  public static List<Document> addLabels(List<Document> docList, int... labels){
     assert(labels.length == docList.size());
     for(int i = 0; i < docList.size(); i++)
       docList.get(i).setLabel(labels[i]);
