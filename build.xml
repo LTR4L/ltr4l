@@ -122,8 +122,8 @@
 
     <target name="download-ms-dataset">
         <mkdir dir="${data.dir}"/>
-        <get src="https://download.microsoft.com/download/E/7/E/E7EABEF1-4C7B-4E31-ACE5-73927950ED5E/Letor.zip" dest="${data.dir}/Letor.zip"/>
-        <unzip src="${data.dir}/Letor.zip" dest="${data.dir}/Letor"/>
+        <get src="${dataset.path}/${dataset.name}" dest="${data.dir}/${dataset.name}"/>
+        <unzip src="${data.dir}/${dataset.name}" dest="${data.dir}/dataset"/>
     </target>
 
 
