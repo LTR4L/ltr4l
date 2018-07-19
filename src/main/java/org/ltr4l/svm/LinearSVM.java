@@ -15,6 +15,8 @@
  */
 package org.ltr4l.svm;
 
+import org.ltr4l.tools.Error;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
@@ -24,11 +26,13 @@ public class LinearSVM<C extends AbstractSVM.SVMConfig> extends AbstractSVM<C> {
   protected final List<Double> weights;
   protected double db;
   protected List<Double> dw;
+  protected int numIter;
 
-  protected LinearSVM(Kernel kernel, SVMInitializer init, List<Double> weights, double bias){
+  public LinearSVM(Kernel kernel, SVMInitializer init, int dim){
     super(kernel);
-    this.weights = weights;
-    this.bias = bias;
+    weights = init.makeInitialWeights(dim);
+    bias = init.getBias();
+    numIter = 0;
   }
 
   @Override
@@ -41,4 +45,40 @@ public class LinearSVM<C extends AbstractSVM.SVMConfig> extends AbstractSVM<C> {
     return VectorMath.dot(features, weights) + params.getC();
   }
 
+  @Override
+  public void optimize(SVMOptimizer optimizer, Error error, double output, double target){
+    throw new UnsupportedOperationException();
+  }
+
+  public void updateWeights(double lrRate){
+    throw new UnsupportedOperationException();
+  }
+
+  public double getBias() {
+    return bias;
+  }
+
+  public void setBias(double bias) {
+    this.bias = bias;
+  }
+
+  public List<Double> getWeights() {
+    return weights;
+  }
+
+  public double getDb() {
+    return db;
+  }
+
+  public void setDb(double db) {
+    this.db = db;
+  }
+
+  public List<Double> getDw() {
+    return dw;
+  }
+
+  public void setDw(List<Double> dw) {
+    this.dw = dw;
+  }
 }

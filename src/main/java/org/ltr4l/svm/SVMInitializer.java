@@ -23,23 +23,29 @@ public class SVMInitializer {
   private final Random r;
   private final double mean;
   private final double stdev;
-  private final Dist initDist;
-  private final int wDim;
+  private final Type initType;
+  private static final Type DEFAULT = Type.UNIFORM;
 
-  public SVMInitializer(Dist initDist, int wDim){
-    this(initDist, wDim, 0, 0.1);
+  private static Type getInitType(String initType){
+    for (Type type : Type.values())
+      if(type.name().equals(initType.toUpperCase()))
+        return type;
+    return DEFAULT;
   }
 
-  public SVMInitializer(Dist initDist, int wDim, double mean, double stdev){
+  public SVMInitializer(String initType){
+    this(initType, 0, 0.1);
+  }
+
+  public SVMInitializer(String initType, double mean, double stdev){
     this.mean = mean;
     this.stdev = stdev;
-    this.initDist = initDist;
-    this.wDim = wDim;
+    this.initType = getInitType(initType);
     r = new Random(System.currentTimeMillis());
   }
 
   private double nextDouble(){
-    switch (initDist){
+    switch (initType){
       case UNIFORM:
         return r.nextDouble();
       case GAUSSIAN:
@@ -52,7 +58,7 @@ public class SVMInitializer {
     }
   }
 
-  public List<Double> makeInitialWeights(){
+  public List<Double> makeInitialWeights(int wDim){
     List<Double> weights = new ArrayList<>();
     for(int i = 0; i < wDim; i++)
       weights.add(nextDouble());
@@ -63,7 +69,7 @@ public class SVMInitializer {
     return nextDouble();
   }
 
-  private static enum Dist{
+  public static enum Type {
     UNIFORM, GAUSSIAN, ZERO
   }
 }

@@ -21,10 +21,14 @@ import java.util.List;
 
 public class Document {
   private int label;
-  private List<Double> features;
+  private final List<Double> features;
 
   public Document() {
     features = new ArrayList<>();
+  }
+  public Document(List<Double> features, int label) {
+    this.features = features;
+    this.label = label;
   }
 
   public int getLabel() {

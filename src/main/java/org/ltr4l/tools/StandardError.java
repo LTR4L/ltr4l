@@ -52,6 +52,15 @@ public enum StandardError implements Error {
     public double der(double output, double target) {
       return 1 / 2 * (Math.sqrt(target / output) + Math.sqrt((1 - target) / (1 - output)));
     }
-
+  },
+  HINGE{
+    @Override
+    public double error(double output, double target){
+      return Math.max(1 - target * output, 0d); //Output should be W * X + b in linear case, target label
+    }
+    @Override
+    public double der(double output, double target){ //Note: non-smoothed hinge loss
+      return target * output < 1 ? -target * target : 0;
+    }
   }
 }

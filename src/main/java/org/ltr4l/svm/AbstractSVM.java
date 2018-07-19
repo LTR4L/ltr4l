@@ -15,12 +15,10 @@
  */
 package org.ltr4l.svm;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.ltr4l.Ranker;
 import org.ltr4l.tools.Config;
-
-import java.io.IOException;
-import java.io.Writer;
-import java.util.List;
+import org.ltr4l.tools.Error;
 
 public abstract class AbstractSVM<C extends AbstractSVM.SVMConfig> extends Ranker<C> {
   protected final Kernel kernel;
@@ -31,10 +29,20 @@ public abstract class AbstractSVM<C extends AbstractSVM.SVMConfig> extends Ranke
     this.params = new KernelParams();
   }
 
+  public abstract void optimize(SVMOptimizer optimizer, Error error, double output, double target);
+
   public KernelParams getParams() {
     return params;
   }
 
   public static class SVMConfig extends Config {
+    @JsonIgnore
+    public String getSVMWeightInit(){
+      return getString(params, "svmInit", SVMInitializer.Type.UNIFORM.name());
+    }
+    @JsonIgnore
+    public double getLearningRate() { return getReqDouble(params, "learningRate"); }
+    @JsonIgnore
+    public SVMOptimizer getOptimizer() { return SVMOptimizer.Factory.get(getString(params, "optimizer", "sgd")); }
   }
 }
