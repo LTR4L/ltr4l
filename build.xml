@@ -120,6 +120,13 @@
         </jacoco:report>
     </target>
 
+    <target name="download-ms-dataset">
+        <mkdir dir="${data.dir}"/>
+        <get src="${dataset.path}/${dataset.name}" dest="${data.dir}/${dataset.name}"/>
+        <unzip src="${data.dir}/${dataset.name}" dest="${data.dir}/dataset"/>
+    </target>
+
+
     <!-- This jar package is used via "java -jar LTR4L-0.1-dev.jar $*"
     <target name="jar" depends="compile" description="make jar file">
         <jar destfile="${product.jar}">
