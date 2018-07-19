@@ -20,6 +20,8 @@ import org.ltr4l.Ranker;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 
+import java.util.Map;
+
 public abstract class AbstractSVM<C extends AbstractSVM.SVMConfig> extends Ranker<C> {
   protected final Kernel kernel;
   protected final KernelParams params;
@@ -44,5 +46,15 @@ public abstract class AbstractSVM<C extends AbstractSVM.SVMConfig> extends Ranke
     public double getLearningRate() { return getReqDouble(params, "learningRate"); }
     @JsonIgnore
     public SVMOptimizer getOptimizer() { return SVMOptimizer.Factory.get(getString(params, "optimizer", "sgd")); }
+    @JsonIgnore
+    public boolean getMetricOption() {return getBoolean(params, "directlyOpt", false);}
+    @JsonIgnore
+    public static boolean getBoolean(Map<String, Object> params, String name, boolean defValue){
+      Object obj = params.get(name);
+      if(obj == null){
+        return defValue;
+      }
+      return Boolean.parseBoolean(obj.toString());
+    }
   }
 }

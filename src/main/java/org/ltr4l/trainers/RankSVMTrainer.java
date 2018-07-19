@@ -31,6 +31,7 @@ public class RankSVMTrainer<C extends AbstractSVM.SVMConfig> extends AbstractTra
   protected double prevBias; //Used for reversion, if direct metric evaluation (unrelated to loss) is desired...
   protected List<Double> prevWeights; //Used for reversion, if direct metric evaluation is desired...
   protected double lrRate;
+  protected boolean optMetric;
 
   protected RankSVMTrainer(List<Query> training, List<Query> validation, C config, LinearSVM ranker, Error errorFunc, LossCalculator lossCalc) {
     super(training, validation, config, ranker, errorFunc, lossCalc);
@@ -60,11 +61,32 @@ public class RankSVMTrainer<C extends AbstractSVM.SVMConfig> extends AbstractTra
         numTrained++;
         if (batchSize == 0 || numTrained % batchSize == 0) {
           //TODO: modify learning rate
-          ranker.updateWeights(lrRate);
+          updateRankerWeights();
         }
       }
     }
     if (batchSize != 0 && numTrained % batchSize != 0)
+      updateRankerWeights();
+  }
+
+  protected void updateRankerWeights(){
+    if (optMetric)
+      optimizeToMetric();
+    else
       ranker.updateWeights(lrRate);
   }
+
+  protected void optimizeToMetric(){ //This is conducted outside of ranker, as all documents are required
+    List<Double> prevWeights = ranker.getWeights();
+    double prevBias = ranker.getBias();
+    ranker.updateWeights(lrRate);
+    double newScore = eval.calculateAvgAllQueries(ranker, validationSet, evalK);
+    if (newScore > maxScore)
+      maxScore = newScore;
+    else
+      ranker.revertWeights(prevWeights, prevBias);
+  }
+
+
+
 }

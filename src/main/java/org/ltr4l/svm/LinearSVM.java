@@ -19,6 +19,8 @@ import org.ltr4l.tools.Error;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LinearSVM<C extends AbstractSVM.SVMConfig> extends AbstractSVM<C> {
@@ -26,13 +28,15 @@ public class LinearSVM<C extends AbstractSVM.SVMConfig> extends AbstractSVM<C> {
   protected final List<Double> weights;
   protected double db;
   protected List<Double> dw;
-  protected int numIter;
+  protected int accDer;
 
   public LinearSVM(Kernel kernel, SVMInitializer init, int dim){
     super(kernel);
     weights = init.makeInitialWeights(dim);
     bias = init.getBias();
-    numIter = 0;
+    accDer = 0;
+    db = 0;
+    dw = new ArrayList<>(Collections.nCopies(weights.size(), 0d));
   }
 
   @Override
@@ -47,23 +51,36 @@ public class LinearSVM<C extends AbstractSVM.SVMConfig> extends AbstractSVM<C> {
 
   @Override
   public void optimize(SVMOptimizer optimizer, Error error, double output, double target){
-    throw new UnsupportedOperationException();
+    //TODO: SGD hard coded...
+    db += error.der(output, target);
+    List<Double> dwNew = VectorMath.scalarMult(error.der(output, target), weights);
+    dw = VectorMath.add(dw, dwNew);
+    accDer++;
   }
 
   public void updateWeights(double lrRate){
-    throw new UnsupportedOperationException();
+    if (accDer <= 0) return;
+    bias -= lrRate * db / accDer;
+    for (int i = 0; i < weights.size(); i++) {
+      double w = weights.get(i) - lrRate * dw.get(i);
+      weights.set(i, w);
+    }
+    accDer = 0;
   }
 
   public double getBias() {
     return bias;
   }
 
-  public void setBias(double bias) {
-    this.bias = bias;
+  public List<Double> getWeights() {
+    return new ArrayList<>(weights);
   }
 
-  public List<Double> getWeights() {
-    return weights;
+  public void revertWeights(List<Double> prevWeights, double prevBias){
+    assert(weights.size() == prevWeights.size());
+    this.bias = prevBias;
+    for(int i = 0; i < weights.size(); i++)
+      this.weights.set(i, prevWeights.get(i));
   }
 
   public double getDb() {
