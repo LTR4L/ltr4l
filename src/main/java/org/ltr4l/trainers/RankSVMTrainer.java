@@ -41,7 +41,7 @@ public class RankSVMTrainer extends AbstractTrainer<LinearSVM, AbstractSVM.SVMCo
   }
 
   public RankSVMTrainer(List<Query> training, List<Query> validation, AbstractSVM.SVMConfig config){
-    this(training, validation, config, new LinearSVM(Kernel.Type.LINEAR, new SVMInitializer(config.getSVMWeightInit()), training.get(0).getFeatureLength()), StandardError.HINGE, null);
+    this(training, validation, config, new LinearSVM(new SVMInitializer(config.getSVMWeightInit()), training.get(0).getFeatureLength()), StandardError.HINGE, null);
   }
 
   @Override

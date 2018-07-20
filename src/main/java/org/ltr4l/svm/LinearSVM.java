@@ -30,8 +30,8 @@ public class LinearSVM<C extends AbstractSVM.SVMConfig> extends AbstractSVM<C> {
   protected List<Double> dw;
   protected int accDer;
 
-  public LinearSVM(Kernel kernel, SVMInitializer init, int dim){
-    super(kernel);
+  public LinearSVM(SVMInitializer init, int dim){
+    super(Kernel.Type.LINEAR);
     weights = init.makeInitialWeights(dim);
     bias = init.getBias();
     accDer = 0;
