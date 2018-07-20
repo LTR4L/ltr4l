@@ -46,7 +46,7 @@ public class LinearSVM<C extends AbstractSVM.SVMConfig> extends AbstractSVM<C> {
 
   @Override
   public double predict(List<Double> features) {
-    return VectorMath.dot(features, weights) + params.getC();
+    return kernel.similarityK(features, weights, params.setC(bias));
   }
 
   @Override
