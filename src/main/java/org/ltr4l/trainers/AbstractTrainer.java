@@ -16,9 +16,7 @@
 
 package org.ltr4l.trainers;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -148,10 +146,11 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
       ObjectMapper mapper = new ObjectMapper();
       mapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
       try{
-        Reader reader = new FileReader(configFile);
+        Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile)));
+        reader.mark(8192); //default buffer size...
         Map model = mapper.readValue(reader, Map.class);
         algorithm = ((String)model.get("algorithm")).toLowerCase();
-        reader.reset();
+        reader.reset(); //Note: if the config file exceeds buffer size, this will not work.
         return getTrainer(algorithm, trainingSet, validationSet, reader, override);
       }
       catch (IOException e){
@@ -159,24 +158,6 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
       }
     }
 
-    /**
-     * This returns the appropriate implementation of Trainer depending on the algorithm.
-     * @param algorithm Algorithm/implementation to be used.
-     * @param trainingSet The QuerySet containing the data to be used for training.
-     * @param validationSet The QuerySet containing the data to be used for validation.
-     * @param configFile The Config file containing parameters needed for Ranker class.
-     * @param override Set another Config that overrides configFile.
-     * @return new class which implements trainer.
-     */
-    public static AbstractTrainer getTrainer(String algorithm, QuerySet trainingSet, QuerySet validationSet, String configFile, Config override) {
-      try{
-        Reader reader = new FileReader(configFile);
-        return getTrainer(algorithm, trainingSet, validationSet, reader, override);
-      }
-      catch (IOException e){
-        throw new IllegalArgumentException(e);
-      }
-    }
     /**
      * This returns the appropriate implementation of Trainer depending on the algorithm.
      * @param trainingSet The QuerySet containing the data to be used for training.
