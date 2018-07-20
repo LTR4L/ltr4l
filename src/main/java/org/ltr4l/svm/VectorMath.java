@@ -35,6 +35,20 @@ public class VectorMath {
     return dotProd;
   }
 
+  public static List<Double> scalarMult(double scalar, List<Double> vector){
+    List<Double> scaledVec = new ArrayList<>();
+    vector.forEach(elem -> scaledVec.add(elem * scalar));
+    return scaledVec;
+  }
+
+  public static List<Double> add(List<Double> A, List<Double> B){
+    checkVectors(A, B);
+    List<Double> newVec = new ArrayList<>();
+    for (int i = 0; i < A.size(); i++)
+      newVec.add(A.get(i) + B.get(i));
+    return newVec;
+  }
+
   public static double norm2(List<Double> A) {
     //Squared norm
     double norm = 0d;
