@@ -60,7 +60,7 @@ public enum StandardError implements Error {
     }
     @Override
     public double der(double output, double target){ //Note: non-smoothed hinge loss
-      return target * output < 1 ? -target * target : 0;
+      return target * output < 1 ? -target : 0;
     }
   }
 }

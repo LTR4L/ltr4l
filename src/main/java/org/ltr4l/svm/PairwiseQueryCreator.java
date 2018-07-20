@@ -32,6 +32,8 @@ public class PairwiseQueryCreator {
     //qid info lost in above; only index remains
     List<Query> pwQueries = new ArrayList<>();
     for (Document[][] origQuery : pairs){
+      if (origQuery == null)
+        continue;
       Query nQuery = createQuery(origQuery);
       pwQueries.add(nQuery);
     }

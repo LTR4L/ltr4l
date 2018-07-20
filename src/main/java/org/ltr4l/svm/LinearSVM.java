@@ -50,22 +50,23 @@ public class LinearSVM<C extends AbstractSVM.SVMConfig> extends AbstractSVM<C> {
   }
 
   @Override
-  public void optimize(SVMOptimizer optimizer, Error error, double output, double target){
+  public void optimize(List<Double> features, SVMOptimizer optimizer, Error error, double output, double target){
     //TODO: SGD hard coded...
     db += error.der(output, target);
-    List<Double> dwNew = VectorMath.scalarMult(error.der(output, target), weights);
+    if (error.der(output, target) == 0d) throw new IllegalArgumentException();
+    List<Double> dwNew = VectorMath.scalarMult(error.der(output, target), features);
     dw = VectorMath.add(dw, dwNew);
     accDer++;
   }
 
   public void updateWeights(double lrRate){
-    if (accDer <= 0) return;
+    assert (accDer  != 0);
     bias -= lrRate * db / accDer;
     for (int i = 0; i < weights.size(); i++) {
-      double w = weights.get(i) - lrRate * dw.get(i);
+      double w = weights.get(i) - lrRate * dw.get(i) / accDer;
       weights.set(i, w);
     }
-    accDer = 0;
+    accDer = 0;;
   }
 
   public double getBias() {
@@ -81,14 +82,6 @@ public class LinearSVM<C extends AbstractSVM.SVMConfig> extends AbstractSVM<C> {
     this.bias = prevBias;
     for(int i = 0; i < weights.size(); i++)
       this.weights.set(i, prevWeights.get(i));
-  }
-
-  public double getDb() {
-    return db;
-  }
-
-  public void setDb(double db) {
-    this.db = db;
   }
 
   public List<Double> getDw() {

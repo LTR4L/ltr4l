@@ -24,25 +24,34 @@ import org.ltr4l.tools.StandardError;
 
 import java.util.List;
 
-public class RankSVMTrainer<C extends AbstractSVM.SVMConfig> extends AbstractTrainer<LinearSVM, C> {
+public class RankSVMTrainer extends AbstractTrainer<LinearSVM, AbstractSVM.SVMConfig> {
   protected final List<Query> pwTraining;
   protected final List<Query> pwValidation;
   protected final SVMOptimizer optimizer;
-  protected double prevBias; //Used for reversion, if direct metric evaluation (unrelated to loss) is desired...
-  protected List<Double> prevWeights; //Used for reversion, if direct metric evaluation is desired...
   protected double lrRate;
-  protected boolean optMetric;
+  protected final boolean optMetric;
 
-  protected RankSVMTrainer(List<Query> training, List<Query> validation, C config, LinearSVM ranker, Error errorFunc, LossCalculator lossCalc) {
+  protected RankSVMTrainer(List<Query> training, List<Query> validation, AbstractSVM.SVMConfig config, LinearSVM ranker, Error errorFunc, LossCalculator lossCalc) {
     super(training, validation, config, ranker, errorFunc, lossCalc);
     pwTraining = PairwiseQueryCreator.createQueries(training);
     pwValidation = PairwiseQueryCreator.createQueries(validation);
     optimizer = config.getOptimizer();
     lrRate = config.getLearningRate();
+    optMetric = config.getMetricOption();
   }
 
-  public RankSVMTrainer(List<Query> training, List<Query> validation, C config){
+  public RankSVMTrainer(List<Query> training, List<Query> validation, AbstractSVM.SVMConfig config){
     this(training, validation, config, new LinearSVM(Kernel.Type.LINEAR, new SVMInitializer(config.getSVMWeightInit()), training.get(0).getFeatureLength()), StandardError.HINGE, null);
+  }
+
+  @Override
+  public void validate(int iter, int pos) { //TODO: IMPLEMENT CALCULATE LOSS
+    double newScore = eval.calculateAvgAllQueries(ranker, pwValidation, pos);
+    if (newScore > maxScore) {
+      maxScore = newScore;
+    }
+    double[] losses = new double[]{0d, 0d};
+    report.log(iter, newScore, losses[0], losses[1]);
   }
 
   @Override
@@ -57,15 +66,15 @@ public class RankSVMTrainer<C extends AbstractSVM.SVMConfig> extends AbstractTra
         double loss = errorFunc.error(output, target);
         if (loss <= 0)
           continue;
-        ranker.optimize(optimizer, errorFunc, output, target);
+        ranker.optimize(doc.getFeatures(), optimizer, errorFunc, output, target);
         numTrained++;
-        if (batchSize == 0 || numTrained % batchSize == 0) {
+        if (batchSize != 0 && numTrained % batchSize == 0) {
           //TODO: modify learning rate
           updateRankerWeights();
         }
       }
     }
-    if (batchSize != 0 && numTrained % batchSize != 0)
+    if (batchSize == 0 || numTrained % batchSize != 0)
       updateRankerWeights();
   }
 
@@ -76,17 +85,15 @@ public class RankSVMTrainer<C extends AbstractSVM.SVMConfig> extends AbstractTra
       ranker.updateWeights(lrRate);
   }
 
-  protected void optimizeToMetric(){ //This is conducted outside of ranker, as all documents are required
+  protected void optimizeToMetric(){ //This is conducted outside of ranker, as all documents are required to calculate metric
     List<Double> prevWeights = ranker.getWeights();
     double prevBias = ranker.getBias();
     ranker.updateWeights(lrRate);
-    double newScore = eval.calculateAvgAllQueries(ranker, validationSet, evalK);
+    double newScore = eval.calculateAvgAllQueries(ranker, pwValidation, evalK);
     if (newScore > maxScore)
       maxScore = newScore;
     else
       ranker.revertWeights(prevWeights, prevBias);
   }
-
-
 
 }

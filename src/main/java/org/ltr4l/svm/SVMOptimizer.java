@@ -19,7 +19,7 @@ public interface SVMOptimizer {
 
   public static class Factory{
     public static SVMOptimizer get(String string){
-      throw new UnsupportedOperationException();
+      return null; //TODO: implement...
     }
   }
 }

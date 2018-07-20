@@ -29,6 +29,7 @@ import org.ltr4l.evaluation.RankEval;
 import org.ltr4l.evaluation.RankEval.RankEvalFactory;
 import org.ltr4l.query.Query;
 import org.ltr4l.query.QuerySet;
+import org.ltr4l.svm.AbstractSVM;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 import org.ltr4l.tools.LossCalculator;
@@ -197,10 +198,7 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
           case "prank": {
             Config config = Config.getConfig(reader, Config.ConfigType.BASIC);
             config.overrideBy(override);
-            return new PRankTrainer(
-                training,
-                validation,
-                config);
+            return new PRankTrainer(training, validation, config);
           }
           case "oap": {
             OAPBPMTrainer.OAPBPMConfig config = Config.getConfig(reader, Config.ConfigType.OAP);
@@ -256,6 +254,11 @@ public abstract class AbstractTrainer<R extends Ranker, C extends Config> {
             RankBoost.RankBoostConfig config = Config.getConfig(reader, Config.ConfigType.BOOSTING);
             config.overrideBy(override);
             return new AdaBoostTrainer(training, validation, config);
+          }
+          case "ranksvm": {
+            AbstractSVM.SVMConfig config = Config.getConfig(reader, Config.ConfigType.SVM);
+            config.overrideBy(override);
+            return new RankSVMTrainer(training, validation, config);
           }
           default:
             throw new IllegalArgumentException();

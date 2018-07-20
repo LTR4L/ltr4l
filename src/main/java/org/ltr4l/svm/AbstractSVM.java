@@ -20,6 +20,7 @@ import org.ltr4l.Ranker;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 
+import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractSVM<C extends AbstractSVM.SVMConfig> extends Ranker<C> {
@@ -31,7 +32,7 @@ public abstract class AbstractSVM<C extends AbstractSVM.SVMConfig> extends Ranke
     this.params = new KernelParams();
   }
 
-  public abstract void optimize(SVMOptimizer optimizer, Error error, double output, double target);
+  public abstract void optimize(List<Double> features, SVMOptimizer optimizer, Error error, double output, double target);
 
   public KernelParams getParams() {
     return params;
@@ -40,14 +41,14 @@ public abstract class AbstractSVM<C extends AbstractSVM.SVMConfig> extends Ranke
   public static class SVMConfig extends Config {
     @JsonIgnore
     public String getSVMWeightInit(){
-      return getString(params, "svmInit", SVMInitializer.Type.UNIFORM.name());
+      return getString(params, "weightInit", SVMInitializer.Type.UNIFORM.name());
     }
     @JsonIgnore
     public double getLearningRate() { return getReqDouble(params, "learningRate"); }
     @JsonIgnore
     public SVMOptimizer getOptimizer() { return SVMOptimizer.Factory.get(getString(params, "optimizer", "sgd")); }
     @JsonIgnore
-    public boolean getMetricOption() {return getBoolean(params, "directlyOpt", false);}
+    public boolean getMetricOption() {return getBoolean(params, "optMetric", false);}
     @JsonIgnore
     public static boolean getBoolean(Map<String, Object> params, String name, boolean defValue){
       Object obj = params.get(name);

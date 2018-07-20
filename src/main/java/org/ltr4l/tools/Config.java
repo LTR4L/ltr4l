@@ -20,6 +20,7 @@ package org.ltr4l.tools;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ltr4l.boosting.Ensemble;
 import org.ltr4l.boosting.RankBoost;
+import org.ltr4l.svm.AbstractSVM;
 import org.ltr4l.trainers.MLPTrainer;
 import org.ltr4l.trainers.OAPBPMTrainer;
 
@@ -173,6 +174,10 @@ public class Config {
       public Class<Ensemble.TreeConfig> getConfigClass(){
         return Ensemble.TreeConfig.class;
       }
+    },
+    SVM{
+      @Override
+      public Class<AbstractSVM.SVMConfig> getConfigClass() { return AbstractSVM.SVMConfig.class; }
     };
 
     public abstract Class<? extends Config> getConfigClass();
