@@ -22,6 +22,7 @@ import org.ltr4l.tools.Error;
 import org.ltr4l.tools.LossCalculator;
 import org.ltr4l.tools.StandardError;
 
+import java.util.Collections;
 import java.util.List;
 
 public class RankSVMTrainer extends AbstractTrainer<LinearSVM, AbstractSVM.SVMConfig> {
@@ -57,8 +58,10 @@ public class RankSVMTrainer extends AbstractTrainer<LinearSVM, AbstractSVM.SVMCo
   @Override
   public void train() {
     int numTrained = 0;
+    Collections.shuffle(pwTraining); //Note: shuffles original list
     for (int qid = 0; qid < pwTraining.size(); qid++){
       List<Document> query = pwTraining.get(qid).getDocList();
+      Collections.shuffle(query);
       for (int vecId = 0; vecId < query.size(); vecId++) {
         Document doc = query.get(vecId);
         double output = ranker.predict(doc.getFeatures());
