@@ -1,14 +1,13 @@
 {
   "algorithm" : "RankSVM",
   "numIterations" : 100,
-  "batchSize" : 10,
+  "batchSize" : 0,
   "verbose": true,
   "params" : {
     "learningRate" : 0.01,
     "optimizer" : "sgd",
     "weightInit" : "gaussian",
-    "optMetric" : false,
-    "batchSize" : 0
+    "optMetric" : true
   },
 
   "dataSet" : {
