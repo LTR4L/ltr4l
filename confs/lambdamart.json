@@ -7,8 +7,6 @@
     "numLeaves" : 4,
     "numSteps" : 10,
     "learningRate" : 0.05,
-    "optimizer" : "adam",
-    "weightInit" : "xavier",
     "regularization" : {
       "regularizer" : "L2",
       "rate" : 0.01
