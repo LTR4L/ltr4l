@@ -15,11 +15,44 @@
  */
 package org.ltr4l.svm;
 
-public interface Solver {
+import org.ltr4l.evaluation.RankEval;
+import org.ltr4l.query.Query;
+import org.ltr4l.tools.Error;
+
+import java.util.List;
+
+public abstract class Solver<R extends AbstractSVM> {
+  protected final int batchSize;
+  protected int numTrained;
+  protected R svmRanker;
+  protected double bestMetric;
+  protected final RankEval eval;
+
+  protected Solver(R svmRanker, RankEval eval, int batchSize){
+    this.svmRanker = svmRanker;
+    this.eval = eval;
+    this.batchSize = batchSize;
+    numTrained = 0;
+    bestMetric = 0d;
+  }
+
+  public abstract void optimize(AbstractSVM svm, Error errorFunc, List<Query> training, int batchSize);
 
   public static class Factory{
     public static Solver get(String string){
       return null; //TODO: implement...
     }
   }
+
+  public static class SGD <L extends LinearSVM> extends Solver<L> {
+
+    public SGD(L lSvmRanker, RankEval eval, int batchSize){
+      super(lSvmRanker, eval, batchSize);
+    }
+
+    @Override
+    public void optimize(AbstractSVM svm, Error errorFunc, List<Query> training, int batchSize){ }
+  }
+
+
 }

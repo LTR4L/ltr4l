@@ -1,7 +1,7 @@
 {
   "algorithm" : "RankSVM",
   "numIterations" : 100,
-  "batchSize" : 0,
+  "batchSize" : 10,
   "verbose": true,
   "params" : {
     "learningRate" : 0.01,

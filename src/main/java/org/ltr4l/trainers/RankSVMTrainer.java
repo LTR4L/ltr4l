@@ -30,11 +30,12 @@ public class RankSVMTrainer extends AbstractTrainer<LinearSVM, AbstractSVM.SVMCo
   protected final List<Query> pwValidation;
   protected final Solver optimizer;
   protected double lrRate;
+  protected final Solver solver;
   protected final boolean optMetric;
 
   protected RankSVMTrainer(List<Query> training, List<Query> validation, AbstractSVM.SVMConfig config, LinearSVM ranker, Error errorFunc, LossCalculator lossCalc) {
     super(training, validation, config, ranker, errorFunc, lossCalc);
-    pwTraining = PairwiseQueryCreator.createQueries(training);
+    pwTraining = PairwiseQueryCreator.createQueries(training); //Pairs with same labels / queries with only one label are thrown out...
     pwValidation = PairwiseQueryCreator.createQueries(validation);
     optimizer = config.getOptimizer();
     lrRate = config.getLearningRate();
@@ -91,6 +92,10 @@ public class RankSVMTrainer extends AbstractTrainer<LinearSVM, AbstractSVM.SVMCo
   protected void optimizeToMetric(){ //This is conducted outside of ranker, as all documents are required to calculate metric
     List<Double> prevWeights = ranker.getWeights();
     double prevBias = ranker.getBias();
+    optimizeToMetric(prevWeights, prevBias);
+  }
+
+  protected void optimizeToMetric(List<Double> prevWeights, double prevBias){
     ranker.updateWeights(lrRate);
     double newScore = eval.calculateAvgAllQueries(ranker, pwValidation, evalK);
     if (newScore > maxScore)
