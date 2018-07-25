@@ -15,10 +15,10 @@
  */
 package org.ltr4l.svm;
 
-public interface SVMOptimizer {
+public interface Solver {
 
   public static class Factory{
-    public static SVMOptimizer get(String string){
+    public static Solver get(String string){
       return null; //TODO: implement...
     }
   }

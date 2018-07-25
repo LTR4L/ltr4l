@@ -50,7 +50,7 @@ public class LinearSVM<C extends AbstractSVM.SVMConfig> extends AbstractSVM<C> {
   }
 
   @Override
-  public void optimize(List<Double> features, SVMOptimizer optimizer, Error error, double output, double target){
+  public void optimize(List<Double> features, Solver optimizer, Error error, double output, double target){
     //TODO: SGD hard coded...
     db += error.der(output, target);
     if (error.der(output, target) == 0d) throw new IllegalArgumentException();

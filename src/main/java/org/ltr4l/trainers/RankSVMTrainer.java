@@ -28,7 +28,7 @@ import java.util.List;
 public class RankSVMTrainer extends AbstractTrainer<LinearSVM, AbstractSVM.SVMConfig> {
   protected final List<Query> pwTraining;
   protected final List<Query> pwValidation;
-  protected final SVMOptimizer optimizer;
+  protected final Solver optimizer;
   protected double lrRate;
   protected final boolean optMetric;
 
