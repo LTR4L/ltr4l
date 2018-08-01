@@ -16,4 +16,4 @@
 
 JAR_FILE=$(ls -1 LTR4L-*.jar|head -n 1)
 
-java -cp $JAR_FILE org.ltr4l.cli.FeatureExtract $*
+java -cp $JAR_FILE:lib/* org.ltr4l.cli.FeatureExtract $*
