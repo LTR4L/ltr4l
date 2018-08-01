@@ -23,8 +23,13 @@ import java.util.*;
 
 public class CMQueryHandler {
   private final Map<String,Map<String, Float>> clickRates;
+  private final String idField;
 
   public CMQueryHandler(InputStream inputStream){
+    this(inputStream, "id");
+  }
+  public CMQueryHandler(InputStream inputStream, String idField){
+    this.idField = idField;
     Objects.requireNonNull(inputStream);
     List<ImpressionLog> impressionLogList = ClickModels.getInstance().parseImpressionLog(inputStream);
     ClickModelAnalyzer clickModelAnalyzer = new ClickModelAnalyzer();
@@ -36,7 +41,7 @@ public class CMQueryHandler {
   }
 
   public OutputStream getQuery(OutputStream outputStream) throws IOException{
-    CMQueries cmq = new CMQueries(clickRates);
+    CMQueries cmq = new CMQueries(clickRates, idField);
     ObjectMapper mapper = new ObjectMapper();
     mapper.enable(SerializationFeature.INDENT_OUTPUT);
     mapper.writeValue(outputStream, cmq);
@@ -52,7 +57,11 @@ public class CMQueryHandler {
     public List<CMQuery> queries;
 
     public CMQueries(Map<String, Map<String, Float>> clickRates){
-      idField = "id";
+      this(clickRates, "id");
+    }
+
+    public CMQueries(Map<String, Map<String, Float>> clickRates, String idField){
+      this.idField = idField;
       queries = new ArrayList<>();
       int qid = 0; //TODO: ok to start qid from 0?
       for(String query : clickRates.keySet()){
