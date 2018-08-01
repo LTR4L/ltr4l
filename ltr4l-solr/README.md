@@ -114,14 +114,14 @@ The structure of impression log file is as follows.
 
 With impression log, you can get training data as following command.
 ```
-$ java -cp LTR4L-VERSION.jar:lib/* org.ltr4l.cli.FeatureExtract [solrUrl] [ltrFeaturesFilename] [impressionLogFile] [trainedDataName(outputFile)] [borders]
+$ ./extract [solrUrl] [ltrFeaturesFilename] [impressionLogFile] [trainedDataName(outputFile)] [borders]
 ```
 
 Borders parameter is the array of float values. This is used for classifying each document by click rate which calculated from impressions and clicks.
 
 example command)
 ```
-$ java -cp LTR4L-VERSION.jar:lib/* org.ltr4l.cli.FeatureExtract http://localhost:8983/solr/techproducts/features ltr_features.conf impressionLog.json training_data.json 1.0,2.4,5.0
+$ ./extract http://localhost:8983/solr/techproducts/features ltr_features.conf impressionLog.json training_data.json 1.0,2.4,5.0
 ```
 
 Then, you can get training data.
