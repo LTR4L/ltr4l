@@ -39,17 +39,27 @@ public class FeatureExtractor {
   private LTRResponseHandler ltrResponseHandler;
   private final String url;
   private final String confName;
+  private final String idField;
   private final long extractionTimeout;
   private String procId;
 
   public FeatureExtractor(String url, String confName, CMQueryHandler cmQueryHandler) {
-    this(url, confName, cmQueryHandler, 10000L);
+    this(url, confName, cmQueryHandler, "id", 10000L);
   }
 
   public FeatureExtractor(String url, String confName, CMQueryHandler cmQueryHandler, Long extractionTimeout) {
+    this(url, confName, cmQueryHandler, "id", extractionTimeout);
+  }
+
+  public FeatureExtractor(String url, String confName, CMQueryHandler cmQueryHandler, String idField) {
+    this(url, confName, cmQueryHandler, idField, 10000L);
+  }
+
+  public FeatureExtractor(String url, String confName, CMQueryHandler cmQueryHandler, String idField, Long extractionTimeout) {
     this.url = url;
     this.confName = confName;
     this.cmQueryHandler = cmQueryHandler;
+    this.idField = idField;
     this.extractionTimeout = extractionTimeout;
   }
 
@@ -68,7 +78,7 @@ public class FeatureExtractor {
   private void postTrainingData() throws Exception {
     HttpClient httpClient = HttpClients.createDefault();
 
-    CMQueryHandler.CMQueries cmQueries = new CMQueryHandler.CMQueries(cmQueryHandler.getClickRates());
+    CMQueryHandler.CMQueries cmQueries = new CMQueryHandler.CMQueries(cmQueryHandler.getClickRates(), idField);
     String url = this.url + "?command=extract&conf=" + confName + "&wt=json";
     StringEntity trainingJson = new StringEntity(cmQueries.toString());
     HttpPost httpPost = new HttpPost(url);
@@ -97,6 +107,7 @@ public class FeatureExtractor {
 
     //TODO: smarter code
     while (progress < 100 && duration < extractionTimeout * 10000) {
+      Thread.sleep(1000);
       HttpResponse response = httpClient.execute(httpGet);
       HttpEntity entity = response.getEntity();
       if (entity != null) {
@@ -107,7 +118,6 @@ public class FeatureExtractor {
       } else {
         return false;
       }
-      Thread.sleep(1000);
       duration = System.nanoTime() - startTime;
     }
     return progress == 100;
