@@ -45,8 +45,8 @@ public class FeatureExtract {
       System.err.printf("No required argument %s specified", REQUIRED_ARG);
       printUsage(options);
     }
-    else if(params.length > 5){
-      System.err.printf("Too many argument is specified: %s", params[4]);
+    else if(params.length > 6){
+      System.err.printf("Too many argument is specified: %s", params[6]);
       printUsage(options);
     }
 
@@ -55,8 +55,17 @@ public class FeatureExtract {
     String impressionLogFile = line.hasOption("impressionLog") ? line.getOptionValue("impressionLog") : params[2];
     outputFile = line.hasOption("outputFile") ? line.getOptionValue("outputFile") : params[3];
     String bordersListStr = line.hasOption("borders") ? line.getOptionValue("borders") : params[4];
+    String idField = null;
 
-    String trainingData = extract(url, configFile, impressionLogFile, bordersListStr);
+    if (params.length == 6) {
+      idField = params[5];
+    } else if (line.hasOption("idField")) {
+      line.getOptionValue("idField");
+    } else {
+      idField = "id";
+    }
+
+    String trainingData = extract(url, configFile, impressionLogFile, bordersListStr, idField);
     writeTrainingData(trainingData);
   }
 
@@ -101,7 +110,7 @@ public class FeatureExtract {
     return line;
   }
 
-  private static String extract(String url, String confFile, String impressionLogFileName, String bordersListStr) throws Exception {
+  private static String extract(String url, String confFile, String impressionLogFileName, String bordersListStr, String idField) throws Exception {
     File impressionLogFile = new File(impressionLogFileName);
     if (!impressionLogFile.canRead()) {
       System.err.printf("Cannot read impression log file: %s\n\n", impressionLogFile);
@@ -110,7 +119,7 @@ public class FeatureExtract {
 
     CMQueryHandler cmQueryHandler = new CMQueryHandler(new FileInputStream(impressionLogFile));
 
-    FeatureExtractor featureExtractor = new FeatureExtractor(url, confFile, cmQueryHandler);
+    FeatureExtractor featureExtractor = new FeatureExtractor(url, confFile, cmQueryHandler, idField);
     featureExtractor.execute();
     return featureExtractor.getMSFormatTrainingData(bordersListStr);
   }
