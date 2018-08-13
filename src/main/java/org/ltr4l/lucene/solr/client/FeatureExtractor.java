@@ -31,6 +31,7 @@ import org.ltr4l.click.LTRResponseHandler;
 import org.ltr4l.click.ClickRateClassifier;
 
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class FeatureExtractor {
@@ -133,7 +134,7 @@ public class FeatureExtractor {
     httpGet.addHeader("Content-type", "application/json; charset=UTF-8");
     HttpResponse response = httpClient.execute(httpGet);
 
-    InputStreamReader inputStreamReader = new InputStreamReader(response.getEntity().getContent());
+    InputStreamReader inputStreamReader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
     ltrResponseHandler = new LTRResponseHandler(inputStreamReader);
   }
 

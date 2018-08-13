@@ -121,7 +121,7 @@ Borders parameter is the array of float values. This is used for classifying eac
 
 example command)
 ```
-$ ./extract http://localhost:8983/solr/techproducts/features ltr_features.conf impressionLog.json training_data.json 1.0,2.4,5.0
+$ ./extract http://localhost:8983/solr/techproducts/features ltr_features.conf impressionLog.json training_data.txt 1.0,2.4,5.0
 ```
 
 Then, you can get training data.
