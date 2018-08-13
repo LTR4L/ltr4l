@@ -32,6 +32,7 @@ import org.apache.solr.schema.FieldType;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -61,7 +62,7 @@ public class FeaturesExtractor implements Callable<Integer> {
     final boolean _debug = false;
     List<Explanation> _debugExpls = null;
     try {
-      pw = new PrintWriter(featuresFile);
+      pw = new PrintWriter(featuresFile, "UTF-8");
       pw.println("{");
       pw.print("  featuresSet: [");
       int cntFE = 0;

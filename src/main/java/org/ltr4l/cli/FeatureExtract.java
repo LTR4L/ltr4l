@@ -128,6 +128,7 @@ public class FeatureExtract {
     try (FileWriter fw = new FileWriter(new File(outputFile))) {
       fw.write(trainingData);
     } catch (IOException ioe) {
+      ioe.printStackTrace();
       System.err.println("Exception happened while writing training data");
       System.exit(-1);
     }

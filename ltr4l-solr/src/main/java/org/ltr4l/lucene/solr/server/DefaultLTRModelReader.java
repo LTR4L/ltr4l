@@ -20,6 +20,7 @@ import org.apache.solr.core.SolrResourceLoader;
 import org.ltr4l.Ranker;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class DefaultLTRModelReader extends AbstractConfigReader {
@@ -42,11 +43,10 @@ public class DefaultLTRModelReader extends AbstractConfigReader {
       solrHome = loader.getInstancePath().toString();
     }
 
-    System.err.println("solrHome : " + solrHome);
     // To avoid opening model files every time when getting ranker.
     StringBuilder sb = new StringBuilder();
     try (InputStream is = new FileInputStream(solrHome + "/" + fileName);
-         InputStreamReader iReader = new InputStreamReader(is, "UTF-8")){
+         InputStreamReader iReader = new InputStreamReader(is, StandardCharsets.UTF_8)){
       char buf[] = new char[8192];
       int numRead;
       while(0 <= (numRead = iReader.read(buf))) {

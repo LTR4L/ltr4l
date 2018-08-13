@@ -80,10 +80,11 @@ public class FeatureExtractor {
 
     CMQueryHandler.CMQueries cmQueries = new CMQueryHandler.CMQueries(cmQueryHandler.getClickRates(), idField);
     String url = this.url + "?command=extract&conf=" + confName + "&wt=json";
-    StringEntity trainingJson = new StringEntity(cmQueries.toString());
+    StringEntity trainingJson = new StringEntity(cmQueries.toString(), "UTF-8");
     HttpPost httpPost = new HttpPost(url);
+    trainingJson.setContentType("application/json; charset=UTF-8");
     httpPost.setEntity(trainingJson);
-    httpPost.addHeader("Content-type", "application/json");
+    httpPost.addHeader("Content-type", "application/json; charset=UTF-8");
     httpPost.addHeader("Accept", "application/json");
 
     HttpResponse response = httpClient.execute(httpPost);
@@ -129,6 +130,7 @@ public class FeatureExtractor {
     HttpClient httpClient = HttpClients.createDefault();
 
     HttpGet httpGet = new HttpGet(url);
+    httpGet.addHeader("Content-type", "application/json; charset=UTF-8");
     HttpResponse response = httpClient.execute(httpGet);
 
     InputStreamReader inputStreamReader = new InputStreamReader(response.getEntity().getContent());

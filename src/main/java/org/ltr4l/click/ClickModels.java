@@ -45,8 +45,8 @@ public class ClickModels {
     List<ImpressionLog> impressionLogList = new ArrayList<ImpressionLog>();
     ObjectMapper objectMapper = new ObjectMapper();
 
-    try {
-      Map<String, Object> objectMap = objectMapper.readValue(inputStream, Map.class);
+    try (InputStreamReader ir = new InputStreamReader(inputStream, "UTF-8")){
+      Map<String, Object> objectMap = objectMapper.readValue(ir, Map.class);
 
       List<Map<String, Object>> impressionLogs = (List<Map<String, Object>>)objectMap.get("data");
       if (impressionLogs == null) {

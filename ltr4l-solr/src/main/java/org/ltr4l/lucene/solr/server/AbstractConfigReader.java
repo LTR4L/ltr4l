@@ -23,6 +23,8 @@ import org.apache.solr.core.SolrResourceLoader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public abstract class AbstractConfigReader {
@@ -39,12 +41,10 @@ public abstract class AbstractConfigReader {
 
   public AbstractConfigReader(String content) throws IOException {
     if(content != null) {
-          System.err.println("content: " + content);
-
       InputStream is = new ByteArrayInputStream(content.getBytes());
-      try {
+      try (InputStreamReader ir = new InputStreamReader(is, StandardCharsets.UTF_8)){
         ObjectMapper mapper = new ObjectMapper();
-        configMap = mapper.readValue(is, Map.class);
+        configMap = mapper.readValue(ir, Map.class);
       } finally {
         IOUtils.closeWhileHandlingException(is);
       }
@@ -54,11 +54,10 @@ public abstract class AbstractConfigReader {
   public static Map load(SolrResourceLoader loader, String fileName) throws IOException {
     if(loader == null)
       loader = new SolrResourceLoader();
-    InputStream is = null;
-    try {
+    InputStream is = loader.openResource(fileName);
+    try (InputStreamReader ir = new InputStreamReader(is, StandardCharsets.UTF_8)){
       ObjectMapper mapper = new ObjectMapper();
-      is = loader.openResource(fileName);
-      return mapper.readValue(is, Map.class);
+      return mapper.readValue(ir, Map.class);
     } finally {
       IOUtils.closeWhileHandlingException(is);
     }
