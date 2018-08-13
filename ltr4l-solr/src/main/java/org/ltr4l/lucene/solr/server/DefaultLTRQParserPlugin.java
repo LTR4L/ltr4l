@@ -51,10 +51,8 @@ public class DefaultLTRQParserPlugin extends QParserPlugin {
       FeaturesConfigReader.FeatureDesc[] featureDescs = fcReader.getFeatureDescs();
       for (FeaturesConfigReader.FeatureDesc featureDesc : featureDescs) {
         if(featureDesc == null){
-          System.err.println("feature : null");
           continue;
         }
-        System.err.println("feature : " + featureDesc.name);
         FieldFeatureExtractorFactory dfeFactory = FeaturesConfigReader.loadFactory(featureDesc);
         featuresSpec.add(dfeFactory);
       }
