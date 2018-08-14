@@ -22,10 +22,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class PairwiseQueryCreator {
 
   private PairwiseQueryCreator(){}
+
+  public static List<Document> createPWData(List<Query> origQueries) {
+    return createQueries(origQueries).stream().flatMap(q -> q.getDocList().stream()).collect(Collectors.toCollection(ArrayList::new));
+  }
 
   public static List<Query> createQueries(List<Query> origQueries){
     Document[][][] pairs = origQueries.stream().map(q -> q.orderDocPairs()).toArray(Document[][][]::new);
