@@ -54,10 +54,17 @@ public class SMO extends Solver {
 
   @Override
   public double getBias() {
-    Document[] supportVecs = findSupportVectorPair();
+    int i = 0;
+    while(i < lagrangeMults.size() && lagrangeMults.get(i) != 0d)
+      i++;
+    if (i > lagrangeMults.size())
+      throw new IllegalArgumentException("no valid support vector found...");
+    Document supportVec = trainingData.get(i);
+    return VectorMath.dot(getWeights(), supportVec.getFeatures()) - supportVec.getLabel();
+/*    Document[] supportVecs = findSupportVectorPair();
     double s1Prod = kernel.similarityK(this.getWeights(), supportVecs[0].getFeatures(), kParams);
     double s2Prod = kernel.similarityK(this.getWeights(), supportVecs[1].getFeatures(), kParams);
-    return - (s1Prod + s2Prod) / 2;
+    return - (s1Prod + s2Prod) / 2;*/
   }
 
   @Override
@@ -65,7 +72,7 @@ public class SMO extends Solver {
 
   }
 
-  protected Document[] findSupportVectorPair(){
+/*  protected Document[] findSupportVectorPair(){
     Document[] pair = new Document[2];
     for(int i = 0; i < lagrangeMults.size(); i++) {
       if (pair[0] != null && pair[1] != null)
@@ -80,6 +87,6 @@ public class SMO extends Solver {
         pair[1] = doc;
     }
     throw new IllegalArgumentException("No valid support vector pair...");
-  }
+  }*/
 
 }

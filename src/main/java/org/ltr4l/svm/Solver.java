@@ -63,6 +63,8 @@ public abstract class Solver {
       switch(type) {
         case sgd:
           return new SGD(config, trainingData);
+        case smo:
+          return new SMO(config, trainingData);
         default:
           return new SGD(config, trainingData);
       }
@@ -70,7 +72,7 @@ public abstract class Solver {
   }
 
   public static enum Type {
-    sgd;
+    sgd, smo;
 
     public static Solver.Type get(String type){
       for(Solver.Type solver : Solver.Type.values())
