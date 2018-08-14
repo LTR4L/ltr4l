@@ -22,9 +22,7 @@ import org.ltr4l.tools.Error;
 import org.ltr4l.tools.LossCalculator;
 import org.ltr4l.tools.StandardError;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class RankSVMTrainer extends AbstractTrainer<SVM, AbstractSVM.SVMConfig> {
   protected final List<Query> pwTraining;
