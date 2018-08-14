@@ -15,44 +15,70 @@
  */
 package org.ltr4l.svm;
 
-import org.ltr4l.evaluation.RankEval;
-import org.ltr4l.query.Query;
+import org.ltr4l.query.Document;
 import org.ltr4l.tools.Error;
 
 import java.util.List;
 
-public abstract class Solver<R extends AbstractSVM> {
-  protected final int batchSize;
+public abstract class Solver {
   protected int numTrained;
-  protected R svmRanker;
   protected double bestMetric;
-  protected final RankEval eval;
+  protected int batchSize;
+  protected double lrRate;
+  protected final Kernel kernel;
+  protected final KernelParams kParams;
+  protected final List<Document> trainingData;
 
-  protected Solver(R svmRanker, RankEval eval, int batchSize){
-    this.svmRanker = svmRanker;
-    this.eval = eval;
-    this.batchSize = batchSize;
+  protected Solver(AbstractSVM.SVMConfig config, List<Document> trainingData){
+    kernel = config.getKernel();
+    kParams = new KernelParams();
+    batchSize = config.batchSize;
+    lrRate = config.getLearningRate();
+    this.trainingData = trainingData;
     numTrained = 0;
     bestMetric = 0d;
   }
 
-  public abstract void optimize(AbstractSVM svm, Error errorFunc, List<Query> training, int batchSize);
+  public abstract void trainEpoch(Error error);
+
+  protected void iterate(Document doc, Error error) {
+    List<Double> features = doc.getFeatures();
+    double output = this.predict(features);
+    double target = doc.getLabel();
+    iterate(features, error, output, target);
+  }
+
+  protected abstract void iterate(List<Double> Features, Error error, double output, double target);
+  public abstract List<Double> getWeights();
+  public abstract double getBias();
+  public abstract void updateWeights(double lrRate);
+
+  public double predict(List<Double> features) {
+    return kernel.similarityK(features, this.getWeights(), kParams.setC(getBias()));
+  }
 
   public static class Factory{
-    public static Solver get(String string){
-      return null; //TODO: implement...
+    public static Solver get(AbstractSVM.SVMConfig config, List<Document> trainingData) {
+      Solver.Type type = config.getOptimizer();
+      switch(type) {
+        case sgd:
+          return new SGD(config, trainingData);
+        default:
+          return new SGD(config, trainingData);
+      }
     }
   }
 
-  public static class SGD <L extends LinearSVM> extends Solver<L> {
+  public static enum Type {
+    sgd;
 
-    public SGD(L lSvmRanker, RankEval eval, int batchSize){
-      super(lSvmRanker, eval, batchSize);
+    public static Solver.Type get(String type){
+      for(Solver.Type solver : Solver.Type.values())
+        if(solver.name().equals(type))
+          return solver;
+      System.err.println("Invalid Solver (Optimizer) provided. Will use SGD.");
+      return sgd;
     }
-
-    @Override
-    public void optimize(AbstractSVM svm, Error errorFunc, List<Query> training, int batchSize){ }
   }
-
 
 }
