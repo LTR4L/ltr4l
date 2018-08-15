@@ -22,13 +22,18 @@ import org.ltr4l.tools.Error;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class SMO extends Solver {
   protected final List<Double> lagrangeMults;
   protected final List<Document> trainingData;
-  protected final double[] errorCache;
+  protected double[] errorCache;
   protected final double lmConstraint;
+  protected final double tolerance;
+
   protected double bias;
 
   public SMO(AbstractSVM.SVMConfig config, List<Query> trainingQueries) {
@@ -36,8 +41,21 @@ public class SMO extends Solver {
     SVMInitializer init = new SVMInitializer(config.getSVMWeightInit());
     trainingData = trainingQueries.stream().flatMap(q -> q.getDocList().stream()).collect(Collectors.toCollection(ArrayList::new));
     lagrangeMults = init.makeInitialWeights(trainingData.size()); //lagrange mult for every data point
-    errorCache = new double[lagrangeMults.size()];
+    errorCache = initializeError();
+    tolerance = 0.001;
     lmConstraint = 0d;
+  }
+
+  private double[] initializeError() {
+    double[] initialError = new double[trainingData.size()];
+    for (int i = 0; i < initialError.length; i++)
+      initialError[i] = calculateError(i);
+    return initialError;
+  }
+
+  private double calculateError(int i) {
+    Document doc = trainingData.get(i);
+    return predict(doc.getFeatures()) - doc.getLabel();
   }
 
   @Override
@@ -115,8 +133,8 @@ public class SMO extends Solver {
     int y2 = trainingData.get(i2).getLabel();
     List<Double> feat1 = trainingData.get(i1).getFeatures();
     List<Double> feat2 = trainingData.get(i2).getFeatures();
-    double E1 = predict(feat1) - y1; //TODO: Have error cache...
-    double E2 = predict(feat1) - y2;
+    double E1 = errorCache[i1];
+    double E2 = errorCache[i2];
     int s = y1 * y2;
     double L = s == -1 ? Math.max(0d, alph2 - alph1) : Math.max(0, alph2 + alph1 - lmConstraint);
     double H = s == -1 ? Math.min(lmConstraint, lmConstraint + alph2 - alph1) : Math.min(lmConstraint, alph2 + alph1);
@@ -147,26 +165,60 @@ public class SMO extends Solver {
     //Compute new threshold...
     double b1 = E1 + y1 * (a1 - alph1) * k11 + y2 * (a2 - alph2) * k12 + bias;
     double b2 = E2 + y1 * (a1 - alph1) * k12 + y2 * (a2 - alph2) * k22 + bias;
-    bias = (b1 + b2) / 2;
-    //TODO: update error cache
+    double newBias = (b1 + b2) / 2;
+    updateErrorCache(i1, i2, a1, a2, newBias);
     lagrangeMults.set(i1, a1);
     lagrangeMults.set(i2, a2);
+    bias = newBias;
     return true;
   }
 
-  private int examineExample(int i2) {
-
-  }
-
-  private void updateErrorCache() {
-    for (int i = 0; i < lagrangeMults.size(); i++) {
-      errorCache[i] = calculateError(i);
+  private void updateErrorCache(int i1, int i2, double a1, double a2, double newBias) {
+    double delta = bias - newBias;
+    int[] optimizedPair = new int[]{i1, i2};
+    for (int i : optimizedPair)
+      if (lagrangeMults.get(i) > 0 && lagrangeMults.get(i) < lmConstraint)
+        errorCache[i] = 0d;
+    Document doc1 = trainingData.get(i1);
+    Document doc2 = trainingData.get(i2);
+    for (int i = 0; i < errorCache.length; i++) {
+      if (i == i1 || i == i2)
+        continue;
+      Document doci = trainingData.get(i);
+      errorCache[i] = errorCache[i] +
+          doc1.getLabel() * (a1 - lagrangeMults.get(i1)) * kernel.similarityK(doc1.getFeatures(), doci.getFeatures()) +
+          doc2.getLabel() * (a2 - lagrangeMults.get(i2)) * kernel.similarityK(doc2.getFeatures(), doci.getFeatures()) +
+          delta;
     }
   }
 
-  private double calculateError(int i2) {
-    Document doc = trainingData.get(i2);
-    return predict(doc.getFeatures()) - doc.getLabel();
+  private int examineExample(int i2) {
+    int y2 = trainingData.get(i2).getLabel();
+    double alph2 = lagrangeMults.get(i2);
+    double E2 = errorCache[i2];
+    double r2 = E2 * y2;
+    if ((r2 <= -tolerance  && alph2 < lmConstraint) || (r2 >= tolerance && alph2 > 0)) { // Non-bound and violates KKT
+      int[] alphaids = IntStream.range(0, lagrangeMults.size())
+          .filter(idx -> (lagrangeMults.get(idx) != 0 || lagrangeMults.get(idx) != lmConstraint))
+          .toArray();
+      if (alphaids.length > 0) {
+
+      }
+
+
+/*      Map<Integer,Double> alphas = IntStream.range(0, lagrangeMults.size())
+          .filter(idx -> (lagrangeMults.get(idx) != 0 || lagrangeMults.get(idx) != lmConstraint))
+          .collect(Collectors.toMap(i -> i, i -> (Double)lagrangeMults.get(i)));*/
+    }
+  }
+
+  /**
+   * Heuristic to choose alpha1, after alpha 2 is chosen.
+   * @param i2
+   * @return
+   */
+  private int chooseAlpha1(int i2) {
+
   }
 
   private double obj(double alpha1, double alpha2, int y1, int y2, double E1, double E2, double k11, double k12, double k22, double bound) {
@@ -177,7 +229,7 @@ public class SMO extends Solver {
     return (bound1 * f1) + (bound * f2) + (bound1 * bound1 * k11)/2 + (bound * bound * k22)/2 + (s * bound * bound1 * k12);
   }
 
-  private boolean kktAreSatisifiedBy(int i) {
+/*  private boolean kktAreSatisifiedBy(int i) {
     double alpha = lagrangeMults.get(i);
     double output = predict(trainingData.get(i).getFeatures());
     int label = trainingData.get(i).getLabel();
@@ -186,11 +238,7 @@ public class SMO extends Solver {
     if ((alpha > 0 && alpha < lmConstraint) && label * output == 1)
       return true;
     return alpha == lmConstraint && label * output <= 1;
-  }
-
-  private int[] chooseLagrangePair() {
-
-  }
+  }*/
 
 /*  protected Document[] findSupportVectorPair(){
     Document[] pair = new Document[2];
