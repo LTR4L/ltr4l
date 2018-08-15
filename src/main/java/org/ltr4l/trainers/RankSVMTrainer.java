@@ -43,7 +43,7 @@ public class RankSVMTrainer extends AbstractTrainer<SVM, AbstractSVM.SVMConfig> 
         training,
         validation,
         config,
-        new SVM( config, PairwiseQueryCreator.createPWData(training)), //TODO: dimension will change depending on solver.....
+        new SVM( config, PairwiseQueryCreator.createQueries(training)), //TODO: dimension will change depending on solver.....
         StandardError.HINGE,
         null);
   }

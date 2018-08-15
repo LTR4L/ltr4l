@@ -16,25 +16,34 @@
 package org.ltr4l.svm;
 
 import org.ltr4l.query.Document;
+import org.ltr4l.query.Query;
 import org.ltr4l.tools.Error;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SGD extends Solver {
   protected final List<Double> weights;
+  protected final List<Document> trainingData;
   protected List<Double> dw;
   protected double bias;
   protected double db;
 
-  public SGD(AbstractSVM.SVMConfig config, List<Document> trainingData) {
-    super(config, trainingData);
+  public SGD(AbstractSVM.SVMConfig config, List<Query> trainingQueries) {
+    super(config, trainingQueries);
     SVMInitializer init = new SVMInitializer(config.getSVMWeightInit());
-    weights = init.makeInitialWeights(trainingData.get(0).getFeatureLength()); //linear SGD primal weights...
+    trainingData = trainingQueries.stream().flatMap(q -> q.getDocList().stream()).collect(Collectors.toCollection(ArrayList::new));
+    weights = init.makeInitialWeights(trainingQueries.get(0).getFeatureLength()); //linear SGD primal weights...
     bias = init.getBias();
     db = 0d;
     dw = new ArrayList<>(Collections.nCopies(weights.size(), 0d));
+  }
+
+  @Override
+  public double predict(List<Double> features) {
+    return kernel.similarityK(features, this.getWeights(), kParams.setC(getBias()));
   }
 
   @Override

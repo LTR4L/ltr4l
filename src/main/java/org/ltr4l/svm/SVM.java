@@ -16,6 +16,7 @@
 package org.ltr4l.svm;
 
 import org.ltr4l.query.Document;
+import org.ltr4l.query.Query;
 import org.ltr4l.tools.Error;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ import java.util.List;
 public class SVM<C extends AbstractSVM.SVMConfig> extends AbstractSVM<C> {
   protected final Solver solver;
 
-  public SVM(SVMConfig config, List<Document> trainingData) {
+  public SVM(SVMConfig config, List<Query> trainingData) {
     super(config.getKernel());
     solver = Solver.Factory.get(config, trainingData);
   }

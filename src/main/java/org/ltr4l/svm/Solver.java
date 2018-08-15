@@ -16,6 +16,7 @@
 package org.ltr4l.svm;
 
 import org.ltr4l.query.Document;
+import org.ltr4l.query.Query;
 import org.ltr4l.tools.Error;
 
 import java.util.List;
@@ -27,14 +28,14 @@ public abstract class Solver {
   protected double lrRate;
   protected final Kernel kernel;
   protected final KernelParams kParams;
-  protected final List<Document> trainingData;
+  protected final List<Query> trainingQueries;
 
-  protected Solver(AbstractSVM.SVMConfig config, List<Document> trainingData){
+  protected Solver(AbstractSVM.SVMConfig config, List<Query> trainingQueries){
     kernel = config.getKernel();
     kParams = new KernelParams();
     batchSize = config.batchSize;
     lrRate = config.getLearningRate();
-    this.trainingData = trainingData;
+    this.trainingQueries = trainingQueries;
     numTrained = 0;
     bestMetric = 0d;
   }
@@ -53,12 +54,10 @@ public abstract class Solver {
   public abstract double getBias();
   public abstract void updateWeights(double lrRate);
 
-  public double predict(List<Double> features) {
-    return kernel.similarityK(features, this.getWeights(), kParams.setC(getBias()));
-  }
+  public abstract double predict(List<Double> features);
 
   public static class Factory{
-    public static Solver get(AbstractSVM.SVMConfig config, List<Document> trainingData) {
+    public static Solver get(AbstractSVM.SVMConfig config, List<Query> trainingData) {
       Solver.Type type = config.getOptimizer();
       switch(type) {
         case sgd:
