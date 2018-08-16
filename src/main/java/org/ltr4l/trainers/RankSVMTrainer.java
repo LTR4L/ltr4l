@@ -15,7 +15,6 @@
  */
 package org.ltr4l.trainers;
 
-import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.svm.*;
 import org.ltr4l.tools.Error;
@@ -60,29 +59,7 @@ public class RankSVMTrainer extends AbstractTrainer<SVM, AbstractSVM.SVMConfig> 
 
   @Override
   public void train() {
-    ranker.optimize(errorFunc);
+    ranker.optimize();
   }
-
-/*  protected void updateRankerWeights(){
-    if (optMetric)
-      optimizeToMetric();
-    else
-      ranker.updateWeights(lrRate);
-  }
-
-  protected void optimizeToMetric(){ //This is conducted outside of ranker, as all documents are required to calculate metric
-    List<Double> prevWeights = ranker.getWeights();
-    double prevBias = ranker.getBias();
-    optimizeToMetric(prevWeights, prevBias);
-  }
-
-  protected void optimizeToMetric(List<Double> prevWeights, double prevBias){
-    ranker.updateWeights(lrRate);
-    double newScore = eval.calculateAvgAllQueries(ranker, pwValidation, evalK);
-    if (newScore > maxScore)
-      maxScore = newScore;
-    else
-      ranker.revertWeights(prevWeights, prevBias);
-  }*/
 
 }

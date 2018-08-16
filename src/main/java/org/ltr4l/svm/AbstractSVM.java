@@ -31,7 +31,7 @@ public abstract class AbstractSVM<C extends AbstractSVM.SVMConfig> extends Ranke
     this.kernel = kernel;
   }
 
-  public abstract void optimize(Error error);
+  public abstract void optimize();
 
   public static class SVMConfig extends Config {
     @JsonIgnore

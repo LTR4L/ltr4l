@@ -18,6 +18,7 @@ package org.ltr4l.svm;
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.tools.Error;
+import org.ltr4l.tools.StandardError;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 public class SGD extends Solver {
   protected final List<Double> weights;
   protected final List<Document> trainingData;
+  protected final Error errorFunc;
   protected List<Double> dw;
   protected double bias;
   protected double db;
@@ -36,6 +38,7 @@ public class SGD extends Solver {
     SVMInitializer init = new SVMInitializer(config.getSVMWeightInit());
     trainingData = trainingQueries.stream().flatMap(q -> q.getDocList().stream()).collect(Collectors.toCollection(ArrayList::new));
     weights = init.makeInitialWeights(trainingQueries.get(0).getFeatureLength()); //linear SGD primal weights...
+    errorFunc = StandardError.HINGE;
     bias = init.getBias();
     db = 0d;
     dw = new ArrayList<>(Collections.nCopies(weights.size(), 0d));
@@ -43,44 +46,39 @@ public class SGD extends Solver {
 
   @Override
   public double predict(List<Double> features) {
-    return kernel.similarityK(features, this.getWeights(), kParams.setC(getBias()));
+    return kernel.similarityK(features, weights, kParams.setC(bias));
   }
 
   @Override
-  public void trainEpoch(Error error) {
+  public void trainEpoch() {
     List<Document> data = new ArrayList<>(trainingData);
     Collections.shuffle(data);
     for (Document doc : data)
-      iterate(doc, error);
+      iterate(doc);
     updateWeights(lrRate);
   }
 
-  @Override
-  protected void iterate(List<Double> features, Error error, double output, double target){
-    if (error.error(output, target) <= 0)
+  protected void iterate(Document doc) {
+    List<Double> features = doc.getFeatures();
+    double output = this.predict(features);
+    double target = doc.getLabel();
+    iterate(features, output, target);
+  }
+
+  protected void iterate(List<Double> features, double output, double target){
+    if (errorFunc.error(output, target) <= 0)
       return;
-    db += error.der(output, target);
-    if (error.der(output, target) == 0d)
+    db += errorFunc.der(output, target);
+    if (errorFunc.der(output, target) == 0d)
       throw new IllegalArgumentException();
-    List<Double> dwNew = VectorMath.scalarMult(error.der(output, target), features);
+    List<Double> dwNew = VectorMath.scalarMult(errorFunc.der(output, target), features);
     dw = VectorMath.add(dw, dwNew);
     numTrained++;
     if (batchSize != 0 && numTrained % batchSize == 0)
       updateWeights(lrRate); //TODO: modify learning rate
   }
 
-  @Override
-  public List<Double> getWeights() {
-    return weights;
-  }
-
-  @Override
-  public double getBias() {
-    return bias;
-  }
-
-  @Override
-  public void updateWeights(double lrRate) {
+  private void updateWeights(double lrRate) {
     assert(numTrained >= 0);
     if(numTrained == 0)
       return;

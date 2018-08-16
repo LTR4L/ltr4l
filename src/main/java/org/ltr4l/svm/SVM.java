@@ -42,15 +42,8 @@ public class SVM<C extends AbstractSVM.SVMConfig> extends AbstractSVM<C> {
   }
 
   @Override
-  public void optimize(Error error){
-    solver.trainEpoch(error);
+  public void optimize(){
+    solver.trainEpoch();
   }
 
-  public void updateWeights(double lrRate){
-    solver.updateWeights(lrRate);
-  }
-
-  public List<Double> getWeights() {
-    return solver.getWeights();
-  }
 }

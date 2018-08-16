@@ -40,20 +40,7 @@ public abstract class Solver {
     bestMetric = 0d;
   }
 
-  public abstract void trainEpoch(Error error);
-
-  protected void iterate(Document doc, Error error) {
-    List<Double> features = doc.getFeatures();
-    double output = this.predict(features);
-    double target = doc.getLabel();
-    iterate(features, error, output, target);
-  }
-
-  protected abstract void iterate(List<Double> Features, Error error, double output, double target);
-  public abstract List<Double> getWeights();
-  public abstract double getBias();
-  public abstract void updateWeights(double lrRate);
-
+  public abstract void trainEpoch();
   public abstract double predict(List<Double> features);
 
   public static class Factory{

@@ -19,11 +19,7 @@ import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
 import org.ltr4l.tools.Error;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -33,6 +29,7 @@ public class SMO extends Solver {
   protected double[] errorCache;
   protected final double lmConstraint;
   protected final double tolerance;
+  protected final double eps;
 
   protected double bias;
 
@@ -43,17 +40,22 @@ public class SMO extends Solver {
     lagrangeMults = init.makeInitialWeights(trainingData.size()); //lagrange mult for every data point
     errorCache = initializeError();
     tolerance = 0.001;
+    eps = 1e-8;
     lmConstraint = 0d;
   }
 
   private double[] initializeError() {
     double[] initialError = new double[trainingData.size()];
+    System.out.printf("Initializing error cache for %d samples\n", initialError.length);
     for (int i = 0; i < initialError.length; i++)
       initialError[i] = calculateError(i);
+    System.out.println("Error cache initialized...");
     return initialError;
   }
 
   private double calculateError(int i) {
+    if(i % (trainingData.size() % 100 == 0 ? trainingData.size() / 100 : trainingData.size() / 100 + 1) == 0)
+      System.out.print("#");
     Document doc = trainingData.get(i);
     return predict(doc.getFeatures()) - doc.getLabel();
   }
@@ -66,56 +68,33 @@ public class SMO extends Solver {
       double alpha = lagrangeMults.get(i); //Note: non-support vectors have zero lagrange multiplier
       output += doc.getLabel() * alpha * kernel.similarityK(doc.getFeatures(), features);
     }
-    return output - getBias();
+    return output - bias;
   }
 
   @Override
-  public void trainEpoch(Error error) {
-
-  }
-
-  @Override
-  protected void iterate(List<Double> features, Error error, double output, double target){
-  }
-
-  @Override
-  public List<Double> getWeights() {
-    List<Double> weights = new ArrayList<>(Collections.nCopies(trainingQueries.get(0).getFeatureLength(), 0d));
-    for (int i = 0; i < lagrangeMults.size(); i++) {
-      double alpha = lagrangeMults.get(i);
-      if(alpha == 0)
-        continue;
-      List<Double> grad = VectorMath.scalarMult(alpha, trainingData.get(i).getFeatures());
-      weights = VectorMath.add(weights, grad);
+  public void trainEpoch() {
+    System.out.println("Beginning training... ");
+    int numChanged = 0;
+    boolean examineAll = true;
+    while (numChanged > 0 || examineAll) {
+      numChanged = 0;
+      if (examineAll)
+        for (int i2 = 0; i2 < trainingData.size(); i2++) {
+          i2 += examineExample(i2);
+          examineAll = false;
+        }
+      else {
+        int[] unboundAlphas = IntStream.range(0, trainingData.size())
+            .filter(idx -> (lagrangeMults.get(idx) != 0) && lagrangeMults.get(idx) != lmConstraint)
+            .toArray();
+        for (int i2 : unboundAlphas)
+          numChanged += examineExample(i2);
+        if (numChanged == 0)
+          examineAll = true;
+      }
     }
-    return weights;
-  }
-
-  private double calculateBias() {
-    int i = 0;
-    while (i < lagrangeMults.size() && lagrangeMults.get(i) != 0d)
-      i++;
-    if (i > lagrangeMults.size())
-      throw new IllegalArgumentException("no valid support vector found...");
-    Document supportVec = trainingData.get(i);
-    bias = VectorMath.dot(getWeights(), supportVec.getFeatures()) - supportVec.getLabel();
-    return bias;
-  }
-
-  @Override
-  public double getBias() {
-    return bias;
-/*    Document[] supportVecs = findSupportVectorPair();
-    double s1Prod = kernel.similarityK(this.getWeights(), supportVecs[0].getFeatures(), kParams);
-    double s2Prod = kernel.similarityK(this.getWeights(), supportVecs[1].getFeatures(), kParams);
-    return - (s1Prod + s2Prod) / 2;*/
-  }
-
-  @Override
-  public void updateWeights(double lrRate) {
 
   }
-
 
   /**
    * Used to optimize lagrange multipliers i1 and i2; constraints on i2 are used to optimize.
@@ -124,7 +103,7 @@ public class SMO extends Solver {
    * @param i2
    * @return
    */
-  private boolean takeStep(int i1, int i2, double eps) {
+  private boolean takeStep(int i1, int i2) {
     if (i1 == i2)
       return false;
     double alph1 = lagrangeMults.get(i1);
@@ -147,8 +126,10 @@ public class SMO extends Solver {
     double a2; //to update alpha2
     if (eta > 0) { //in general, as long as the kernel obeys Mercer's conditions, eta should be positive!
       a2 = alph2 + y2 * (E1 - E2) / eta;
-      if (a2 < L) a2 = L;
-      else if (a2 > H) a2 = H;
+      if (a2 < L)
+        a2 = L;
+      else if
+          (a2 > H) a2 = H;
     } else {
       double Lobj = obj(alph1, alph2, y1, y2, E1, E2, k11, k12, k22, L);
       double Hobj = obj(alph1, alph2, y1, y2, E1, E2, k11, k12, k22, H);
@@ -170,6 +151,7 @@ public class SMO extends Solver {
     lagrangeMults.set(i1, a1);
     lagrangeMults.set(i2, a2);
     bias = newBias;
+    System.out.printf("Optimized %d and %d \n", i1, i2);
     return true;
   }
 
@@ -198,27 +180,40 @@ public class SMO extends Solver {
     double E2 = errorCache[i2];
     double r2 = E2 * y2;
     if ((r2 <= -tolerance  && alph2 < lmConstraint) || (r2 >= tolerance && alph2 > 0)) { // Non-bound and violates KKT
-      int[] alphaids = IntStream.range(0, lagrangeMults.size())
-          .filter(idx -> (lagrangeMults.get(idx) != 0 || lagrangeMults.get(idx) != lmConstraint))
-          .toArray();
-      if (alphaids.length > 0) {
-
+      List<Integer> alphaids = IntStream.range(0, lagrangeMults.size()) //List is chosen here, to shuffle if takestep returns false.
+          .filter(idx -> (lagrangeMults.get(idx) != 0 && lagrangeMults.get(idx) != lmConstraint))
+          .boxed() //For list
+          .sorted(Comparator.comparingDouble(idx -> errorCache[idx])) //Largest Error appears first, minimum last
+          .collect(Collectors.toList());
+      if (alphaids.size() > 1) { //Approximate stepsize with |E2 - E1|.
+        //Heuristic 2: find alpha which maximizes step size.
+        int i1 = chooseSecondAlpha(E2, alphaids); //TODO: alphaIds or from all alphas??
+        if (takeStep(i1, i2))
+          return 1;
       }
-
-
-/*      Map<Integer,Double> alphas = IntStream.range(0, lagrangeMults.size())
-          .filter(idx -> (lagrangeMults.get(idx) != 0 || lagrangeMults.get(idx) != lmConstraint))
-          .collect(Collectors.toMap(i -> i, i -> (Double)lagrangeMults.get(i)));*/
+      //Loop over all non-zero and non-C alpha, starting at a random point
+      Collections.shuffle(alphaids);
+      for (int i1 : alphaids)
+        if (takeStep(i1, i2))
+          return 1;
+      //Loop over all possible i1, starting at a random point
+      //Shuffle and speed up by removing alphas already checked
+      Set<Integer> alreadyChecked = new HashSet<>(alphaids);
+      List<Integer> toCheck = IntStream.range(0, lagrangeMults.size())
+          .filter(idx -> !alreadyChecked.contains(idx))
+          .boxed()
+          .collect(Collectors.toList());
+      for (int i1 : toCheck) {
+        if (takeStep(i1, i2))
+          return 1;
+      }
     }
+    return 0;
   }
 
-  /**
-   * Heuristic to choose alpha1, after alpha 2 is chosen.
-   * @param i2
-   * @return
-   */
-  private int chooseAlpha1(int i2) {
-
+  private static int chooseSecondAlpha(double E2, List<Integer> alphaIds) {
+    assert(alphaIds.get(0) > alphaIds.get(alphaIds.size() - 1)); //First element should be largest, last smallest.
+    return E2 <= 0 ? alphaIds.get(0) : alphaIds.get(alphaIds.size() - 1);
   }
 
   private double obj(double alpha1, double alpha2, int y1, int y2, double E1, double E2, double k11, double k12, double k22, double bound) {
@@ -228,33 +223,5 @@ public class SMO extends Solver {
     double bound1 = alpha1 + s * (alpha2 - bound);
     return (bound1 * f1) + (bound * f2) + (bound1 * bound1 * k11)/2 + (bound * bound * k22)/2 + (s * bound * bound1 * k12);
   }
-
-/*  private boolean kktAreSatisifiedBy(int i) {
-    double alpha = lagrangeMults.get(i);
-    double output = predict(trainingData.get(i).getFeatures());
-    int label = trainingData.get(i).getLabel();
-    if (alpha == 0 && label * output >= 1)
-      return true;
-    if ((alpha > 0 && alpha < lmConstraint) && label * output == 1)
-      return true;
-    return alpha == lmConstraint && label * output <= 1;
-  }*/
-
-/*  protected Document[] findSupportVectorPair(){
-    Document[] pair = new Document[2];
-    for(int i = 0; i < lagrangeMults.size(); i++) {
-      if (pair[0] != null && pair[1] != null)
-        return pair;
-      double alpha = lagrangeMults.get(i);
-      if(alpha == 0)
-        continue;
-      Document doc = trainingQueries.get(i);
-      if(doc.getLabel() == -1)
-        pair[0] = doc;
-      else
-        pair[1] = doc;
-    }
-    throw new IllegalArgumentException("No valid support vector pair...");
-  }*/
 
 }
