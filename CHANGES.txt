@@ -1,0 +1,45 @@
+LTR4L change history
+
+========== 0.1-dev / YYYY-MM-DD ===================================
+
+Important Notice
+
+* Initial release
+
+New Features & Improvements
+
+* Add support for the following neural network algorithms (training, evaluation)
+  - PRank
+  - OAP-BPM
+  - NNRank
+  - RankNet
+  - FRankNet
+  - LambdaRank
+  - SortNet
+  - ListNet
+
+* Add support for the following boosting algorithms (training, evaluation)
+  - Adaboost
+  - RankBoost
+  - LambdaMART
+
+* Add support for the following SVM algorithms (training, evaluation)
+  - RankSVM (Linear kernel, SGD)
+
+* Add the feature to make MS-LETOR formatted training data from impression log.
+
+* Add Apache Solr's re-ranking feature with some neural-network/boosting algorithms.
+
+Bug Fixes
+
+API Changes
+
+Javadoc Fixes
+
+Project environments
+
+Tests
+
+Deprecated/Deleted Features
+
+Others
