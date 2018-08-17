@@ -23,9 +23,10 @@ import java.util.Objects;
  * U and V are features.
  */
 public interface Kernel {
+  static final KernelParams DEFAULT_PARAMS = new KernelParams();
 
   public default double similarityK(List<Double> U, List<Double> V){
-    return similarityK(U, V, new KernelParams());
+    return similarityK(U, V, DEFAULT_PARAMS);
   }
 
   public double similarityK(List<Double> U, List<Double> V, KernelParams params);

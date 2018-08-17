@@ -22,7 +22,7 @@ public class KernelParams {
 
   public KernelParams(){
     sigma = 1d;
-    c = 1d;
+    c = 1;
     d = 2d;
   }
 

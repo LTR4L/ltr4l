@@ -17,7 +17,7 @@
 package org.ltr4l.nn;
 
 /**
- * The variants of gradient descent which optimize the parameter update.
+ * The variants of gradient descent which learn the parameter update.
  * Note that the standard gradient descent is of the form w = w - η(dw).
  */
 public interface Optimizer {

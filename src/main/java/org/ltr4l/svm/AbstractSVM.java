@@ -17,6 +17,7 @@ package org.ltr4l.svm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.ltr4l.Ranker;
+import org.ltr4l.query.Document;
 import org.ltr4l.tools.Config;
 import org.ltr4l.tools.Error;
 
@@ -25,18 +26,12 @@ import java.util.Map;
 
 public abstract class AbstractSVM<C extends AbstractSVM.SVMConfig> extends Ranker<C> {
   protected final Kernel kernel;
-  protected final KernelParams params;
 
   protected AbstractSVM(Kernel kernel){
     this.kernel = kernel;
-    this.params = new KernelParams();
   }
 
-  public abstract void optimize(List<Double> features, SVMOptimizer optimizer, Error error, double output, double target);
-
-  public KernelParams getParams() {
-    return params;
-  }
+  public abstract void optimize();
 
   public static class SVMConfig extends Config {
     @JsonIgnore
@@ -46,7 +41,7 @@ public abstract class AbstractSVM<C extends AbstractSVM.SVMConfig> extends Ranke
     @JsonIgnore
     public double getLearningRate() { return getReqDouble(params, "learningRate"); }
     @JsonIgnore
-    public SVMOptimizer getOptimizer() { return SVMOptimizer.Factory.get(getString(params, "optimizer", "sgd")); }
+    public Solver.Type getOptimizer() { return Solver.Type.get(getString(params, "optimizer", "sgd")); }
     @JsonIgnore
     public boolean getMetricOption() {return getBoolean(params, "optMetric", false);}
     @JsonIgnore
@@ -57,5 +52,7 @@ public abstract class AbstractSVM<C extends AbstractSVM.SVMConfig> extends Ranke
       }
       return Boolean.parseBoolean(obj.toString());
     }
+    @JsonIgnore
+    public Kernel getKernel() {return Kernel.getKernel(getReqString(params, "kernel"));}
   }
 }
