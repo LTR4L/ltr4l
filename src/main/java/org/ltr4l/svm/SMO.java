@@ -17,7 +17,6 @@ package org.ltr4l.svm;
 
 import org.ltr4l.query.Document;
 import org.ltr4l.query.Query;
-import org.ltr4l.tools.Error;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,13 +34,14 @@ public class SMO extends Solver {
 
   public SMO(AbstractSVM.SVMConfig config, List<Query> trainingQueries) {
     super(config, trainingQueries);
+    kParams.setC(0d);
     SVMInitializer init = new SVMInitializer(config.getSVMWeightInit());
     trainingData = trainingQueries.stream().flatMap(q -> q.getDocList().stream()).collect(Collectors.toCollection(ArrayList::new));
     lagrangeMults = init.makeInitialWeights(trainingData.size()); //lagrange mult for every data point
     errorCache = initializeError();
     tolerance = 0.001;
     eps = 1e-8;
-    lmConstraint = 0d;
+    lmConstraint = 1d; //TODO: use default value for now...
   }
 
   private double[] initializeError() {
@@ -66,7 +66,7 @@ public class SMO extends Solver {
     for (int i = 0; i < lagrangeMults.size(); i++) {
       Document doc = trainingData.get(i);
       double alpha = lagrangeMults.get(i); //Note: non-support vectors have zero lagrange multiplier
-      output += doc.getLabel() * alpha * kernel.similarityK(doc.getFeatures(), features);
+      output += doc.getLabel() * alpha * kernel.similarityK(doc.getFeatures(), features, kParams);
     }
     return output - bias;
   }
@@ -119,9 +119,9 @@ public class SMO extends Solver {
     double H = s == -1 ? Math.min(lmConstraint, lmConstraint + alph2 - alph1) : Math.min(lmConstraint, alph2 + alph1);
     if (L == H)
       return false;
-    double k11 = kernel.similarityK(feat1, feat1);
-    double k12 = kernel.similarityK(feat1, feat2);
-    double k22 = kernel.similarityK(feat2, feat2);
+    double k11 = kernel.similarityK(feat1, feat1, kParams);
+    double k12 = kernel.similarityK(feat1, feat2, kParams);
+    double k22 = kernel.similarityK(feat2, feat2, kParams);
     double eta = k11 + k22 - 2*k12;
     double a2; //to update alpha2
     if (eta > 0) { //in general, as long as the kernel obeys Mercer's conditions, eta should be positive!
@@ -151,7 +151,6 @@ public class SMO extends Solver {
     lagrangeMults.set(i1, a1);
     lagrangeMults.set(i2, a2);
     bias = newBias;
-    System.out.printf("Optimized %d and %d \n", i1, i2);
     return true;
   }
 

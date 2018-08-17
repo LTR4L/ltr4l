@@ -5,9 +5,9 @@
   "verbose": true,
   "params" : {
     "learningRate" : 0.01,
-    "optimizer" : "smo",
+    "optimizer" : "sgd",
     "weightInit" : "gaussian",
-    "kernel" : "gaussian",
+    "kernel" : "linear",
     "optMetric" : true
   },
 
