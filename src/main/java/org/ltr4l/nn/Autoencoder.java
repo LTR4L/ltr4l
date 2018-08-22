@@ -33,7 +33,7 @@ public class Autoencoder extends AbstractMLP<Autoencoder.AENode, MLP.Edge> imple
     assert(size >= 1);
     for(int i = 0; i < size; i++) {
       NetworkShape.LayerSetting ls = networkShape.getLayerSetting(i);
-      if (!(ls.getActivation() instanceof Activation.Sigmoid))
+      if (!(ls.getActivation() == Activation.Type.Sigmoid))
         throw new IllegalArgumentException("Non-Sigmoid Activations are not supported for Autoencoder!");
       if(i == size - 1)
         break; //Don't duplicate encoding layer
@@ -46,7 +46,7 @@ public class Autoencoder extends AbstractMLP<Autoencoder.AENode, MLP.Edge> imple
   protected Autoencoder(int inputDim, NetworkShape networkShape, Optimizer.OptimizerFactory optFact, Regularization regularization, String weightModel, double sparsity, double beta) {
     super(inputDim, networkShape, optFact, regularization, weightModel);
     List<AENode> outputs = new ArrayList<>(); //Output layer should mirror input, but nodes should be different reference
-    getLayer(0).forEach(n -> outputs.add(new AENode(new Activation.Identity())));
+    getLayer(0).forEach(n -> outputs.add(new AENode(Activation.Type.Identity)));
     network.add(outputs);
     eLayerIdx = (network.size() / 2) + 1;
     this.sparsity = sparsity;
