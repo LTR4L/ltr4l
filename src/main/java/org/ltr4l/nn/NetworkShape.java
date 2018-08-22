@@ -69,6 +69,8 @@ public class NetworkShape {
     layerSettings = new ArrayList<>();
   }
 
+  public void add(int num, Activation actFunc, int index){ layerSettings.add(index, new LayerSetting(num, actFunc)); }
+
   public void add(int num, Activation actFunc){
     layerSettings.add(new LayerSetting(num, actFunc));
   }
