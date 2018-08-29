@@ -8,7 +8,8 @@
     "optimizer" : "sgd",
     "weightInit" : "gaussian",
     "kernel" : "linear",
-    "optMetric" : true
+    "optMetric" : true,
+    "isSVMData" : false
   },
 
   "dataSet" : {

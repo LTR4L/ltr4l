@@ -24,15 +24,13 @@ import org.ltr4l.tools.StandardError;
 import java.util.List;
 
 public class RankSVMTrainer extends AbstractTrainer<SVM, AbstractSVM.SVMConfig> {
-  protected final List<Query> pwTraining;
   protected final List<Query> pwValidation;
   protected double lrRate;
   protected final boolean optMetric;
 
   protected RankSVMTrainer(List<Query> training, List<Query> validation, AbstractSVM.SVMConfig config, SVM ranker, Error errorFunc, LossCalculator lossCalc) {
     super(training, validation, config, ranker, errorFunc, lossCalc);
-    pwTraining = PairwiseQueryCreator.createQueries(training); //Pairs with same labels / queries with only one label are thrown out...
-    pwValidation = PairwiseQueryCreator.createQueries(validation);
+    pwValidation = PairwiseQueryCreator.createQueries(validation); //Pairs with same labels / queries with only one label are thrown out...
     lrRate = config.getLearningRate();
     optMetric = config.getMetricOption();
   }
@@ -42,7 +40,7 @@ public class RankSVMTrainer extends AbstractTrainer<SVM, AbstractSVM.SVMConfig> 
         training,
         validation,
         config,
-        new SVM( config, PairwiseQueryCreator.createQueries(training)), //TODO: dimension will change depending on solver.....
+        new SVM(config, config.dataIsSVMFormat() ? training : PairwiseQueryCreator.createQueries(training)), //TODO: dimension will change depending on solver.....
         StandardError.HINGE,
         null);
   }
