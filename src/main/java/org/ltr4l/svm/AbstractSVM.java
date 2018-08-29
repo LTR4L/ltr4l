@@ -54,5 +54,9 @@ public abstract class AbstractSVM<C extends AbstractSVM.SVMConfig> extends Ranke
     }
     @JsonIgnore
     public Kernel getKernel() {return Kernel.getKernel(getReqString(params, "kernel"));}
+    @JsonIgnore
+    public boolean dataIsSVMFormat() {
+      return getBoolean(params, "isSVMData", false);
+    }
   }
 }
