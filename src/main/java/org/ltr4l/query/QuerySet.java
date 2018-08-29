@@ -32,6 +32,7 @@ public class QuerySet {
   public QuerySet() {
     queries = new ArrayList<>();
   }
+  public QuerySet(List<Query> queries) { this.queries = queries; }
 
   public void addQuery(Query query){
     queries.add(query);

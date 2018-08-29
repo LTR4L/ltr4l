@@ -31,8 +31,12 @@ public class Query {
   }
 
   public Query(List<Document> docList) {
+    this(docList, -1);
+  }
+
+  public Query(List<Document> docList, int queryId) {
     this.docList = docList;
-    queryId = -1;
+    this.queryId = queryId;
     featureLength = docList.get(0).getFeatureLength();
   }
 
