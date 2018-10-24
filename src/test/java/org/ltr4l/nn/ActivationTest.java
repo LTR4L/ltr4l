@@ -54,4 +54,25 @@ public class ActivationTest {
     Assert.assertEquals(0, act.derivative(0), 0.001);
     Assert.assertEquals(0, act.derivative(-100), 0.001);
   }
+
+  @Test
+  public void testLeakyReLU() throws Exception {
+    Activation act = Activation.Type.LeakyReLU;
+
+    Assert.assertEquals(10, act.output(10), 0.001);
+    Assert.assertEquals(0d, act.output(0), 0.001);
+    Assert.assertEquals(-1d, act.output(-100), 0.001);
+    Assert.assertEquals(1, act.derivative(10), 0.001);
+    Assert.assertEquals(0.01, act.derivative(0), 0.001);
+    Assert.assertEquals(0.01, act.derivative(-100), 0.001);
+  }
+
+  @Test
+  public void testTanH() throws Exception {
+    Activation act = Activation.Type.TanH;
+
+    Assert.assertEquals(0.7616, act.output(1), 0.001);
+    Assert.assertEquals(0d, act.output(0), 0.001);
+    Assert.assertEquals(-0.7616, act.output(-1), 0.001);
+  }
 }

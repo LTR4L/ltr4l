@@ -68,6 +68,27 @@ public interface Activation {
       public double derivative(double input) {
         return input <= 0 ? 0 : 1;
       }
+    },
+    LeakyReLU{
+      @Override
+      public double output(double input) {
+        return input <= 0 ? 0.01 * input : input;
+      }
+      @Override
+      public double derivative(double input) {
+        return input <= 0 ? 0.01 : 1;
+      }
+    },
+    TanH{
+      @Override
+      public double output(double input) {
+        return Math.tanh(input);
+      }
+      @Override
+      public double derivative(double input) {
+        double tanh = Math.tanh(input);
+        return 1 - (tanh * tanh);
+      }
     }
   }
 }
