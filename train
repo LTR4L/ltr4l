@@ -14,6 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-JAR_FILE=$(ls -1 LTR4L-*.jar|head -n 1)
+JAR_FILE=$(ls -1 LTR4L-*.jar| sort -r | head -n 1)
 
 java -cp $JAR_FILE org.ltr4l.cli.Train $*
