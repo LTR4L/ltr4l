@@ -134,7 +134,7 @@ public class Predict {
   }
 
   public static Ranker getRanker(String modelPath) throws IOException{
-    Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(modelPath)));
+    Reader reader = new FileReader(modelPath);
     return Ranker.RankerFactory.getFromModel(reader);
   }
 

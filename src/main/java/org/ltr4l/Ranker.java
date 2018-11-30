@@ -162,8 +162,6 @@ public abstract class Ranker<C extends Config> {
     }
 
     public static Ranker getFromModel(Reader reader) throws IOException{
-      if (reader instanceof FileReader)
-        throw new IllegalArgumentException("FileReader is currently unsupported...");
       BufferedReader br;
       //Here a check for markSupported() is not needed, as BufferedReader supports it.
       //BufferedReader is needed for readLine(), as model file is likely to exceed
@@ -179,7 +177,7 @@ public abstract class Ranker<C extends Config> {
         line = line.trim();
         if (line.startsWith("\"algorithm\" :")) {
           line = line.split(":")[1].trim(); //Note: no check for extra colons...
-          assert(line.startsWith("\"") && line.endsWith("\""));
+          assert(line.startsWith("\"") && line.endsWith(","));
           algorithm = line.substring(1, line.length() - 2).toLowerCase();
           //System.out.println("Algorithm is " + algorithm);
           break;
@@ -187,7 +185,7 @@ public abstract class Ranker<C extends Config> {
       }
       Objects.requireNonNull(algorithm, "Model file does not contain algorithm name!");
       br.reset();
-      return getFromModel(algorithm, reader);
+      return getFromModel(algorithm, br); //Pass br to avoid problems with StringReader, FileReader, etc...
     }
 
     public static Ranker getFromModel(String algorithm, Reader reader) {
