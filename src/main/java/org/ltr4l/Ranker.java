@@ -16,10 +16,7 @@
 package org.ltr4l;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -164,18 +161,31 @@ public abstract class Ranker<C extends Config> {
       }
     }
 
-    public static Ranker getFromModel(Reader reader) {
-      String algorithm;
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
-      try {
-        Map model = mapper.readValue(reader, Map.class);
-        algorithm = ((String)((Map)model.get("config")).get("algorithm")).toLowerCase();
-        reader.reset();
-      } catch (IOException ioe) {
-        throw new RuntimeException(ioe);
+    public static Ranker getFromModel(Reader reader) throws IOException{
+      BufferedReader br;
+      //Here a check for markSupported() is not needed, as BufferedReader supports it.
+      //BufferedReader is needed for readLine(), as model file is likely to exceed
+      //reasonable readAheadLimits; thus ObjectMapper should not be used...
+      if (reader instanceof BufferedReader)
+        br = (BufferedReader) reader;
+      else
+        br = new BufferedReader(reader);
+      br.mark(8192);
+      String line;
+      String algorithm = null;
+      while ((line = br.readLine()) != null) {
+        line = line.trim();
+        if (line.startsWith("\"algorithm\" :")) {
+          line = line.split(":")[1].trim(); //Note: no check for extra colons...
+          assert(line.startsWith("\"") && line.endsWith(","));
+          algorithm = line.substring(1, line.length() - 2).toLowerCase();
+          //System.out.println("Algorithm is " + algorithm);
+          break;
+        }
       }
-      return getFromModel(algorithm, reader);
+      Objects.requireNonNull(algorithm, "Model file does not contain algorithm name!");
+      br.reset();
+      return getFromModel(algorithm, br); //Pass br to avoid problems with StringReader, FileReader, etc...
     }
 
     public static Ranker getFromModel(String algorithm, Reader reader) {

@@ -15,10 +15,7 @@
  */
 package org.ltr4l.cli;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
