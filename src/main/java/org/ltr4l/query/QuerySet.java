@@ -22,20 +22,29 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class QuerySet {
 
-  private List<Query> queries;
+  private final List<Query> queries;
+  private final Map<Integer, Query> queryMap; //TODO: Implement so that only one collection is necessary...
 
   public QuerySet() {
     queries = new ArrayList<>();
+    queryMap = new HashMap<>();
   }
-  public QuerySet(List<Query> queries) { this.queries = queries; }
+  public QuerySet(List<Query> queries) {
+    this.queries = queries;
+    queryMap = queries.stream().collect(Collectors.toMap(Query::getQueryId, Function.identity()));
+  }
 
   public void addQuery(Query query){
-    queries.add(query);
+    if (!queryMap.containsKey(query.getQueryId())) {
+      queries.add(query);
+      queryMap.put(query.getQueryId(), query);
+    }
   }
 
   public static QuerySet create(String file){
@@ -89,30 +98,24 @@ public class QuerySet {
   //  Dataset format: svmlight / libsvm format
   //  <label> <feature-id>:<feature-value>... #docid = <feature-value> inc = <feature-value> prob = <feature-value>
   private void makeDocumentVector(String line) {
-    String[] queryDocumentInfo = line.split("#docid")[0].split(" ");
-    int label = Integer.parseInt(queryDocumentInfo[0]);
-    int qid = Integer.parseInt(queryDocumentInfo[1].split(":")[1]); //queryid
+    final String[] queryDocumentInfo = line.split("#docid")[0].split(" ");
+    final int label = Integer.parseInt(queryDocumentInfo[0]);
+    final int qid = Integer.parseInt(queryDocumentInfo[1].split(":")[1]); //queryid
     Document document = new Document();
     document.setLabel(label);
     for (int i = 2; i < queryDocumentInfo.length; i++) {             //Parse the line for document features
       double feature = Double.parseDouble(queryDocumentInfo[i].split(":")[1]);
       document.addFeature(feature);
     }
-    boolean queryFound = false;
-    if (!queries.isEmpty()) {
-      for (Query query : queries) {
-        if (qid == query.getQueryId()) {
-          query.addDocument(document);
-          queryFound = true;
-          break;
-        }
-      }
+    if (queryMap.containsKey(qid)) {
+      Query query = queryMap.get(qid);
+      query.addDocument(document);
     }
-    if (queries.isEmpty() || !queryFound) {
-      Query newQuery = new Query();
-      newQuery.addDocument(document);
-      newQuery.setQueryId(qid);
-      queries.add(newQuery);
+    else {
+      Query query = new Query();
+      query.addDocument(document);
+      query.setQueryId(qid);
+      this.addQuery(query);
     }
   }
 
