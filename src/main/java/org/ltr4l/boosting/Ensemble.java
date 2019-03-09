@@ -102,7 +102,7 @@ public class Ensemble extends Ranker<Ensemble.TreeConfig> {
     public int getNumSteps() { return getInt(params, "numSteps", 0); } //TODO: OK default value?
   }
 
-  protected static class SavedModel {
+  public static class SavedModel {
 
     public TreeConfig config;
     public RegressionTree.SavedModel[] treeModels;

@@ -114,7 +114,7 @@ public class RegressionTree extends Ranker<Ensemble.TreeConfig>{
   protected enum IntProp {FEATURE, ID}
   protected enum DoubleProp {THRESHOLD, SCORE}
 
-  protected static class SavedModel {
+  public static class SavedModel {
 
     public Ensemble.TreeConfig config;
     public List<Integer> leafIds;
