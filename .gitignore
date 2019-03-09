@@ -11,3 +11,4 @@ jacoco-report
 javadocs
 comparison
 out
+temp*
