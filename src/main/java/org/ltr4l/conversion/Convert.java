@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Convert {
-  public static final String DEFAULT_OUTPUT_DIR = "model/solr-models/";
+  public static final String DEFAULT_OUTPUT_DIR = "solr-models/";
   public static void main(String[] args) throws IOException {
     if (args.length != 3) {
-      throw new IllegalArgumentException("Please provide two arguments as follows: <algorithmName> <modelPath> <featuresKeyPath>" );
+      throw new IllegalArgumentException("Please provide arguments as follows: <algorithmName> <modelPath> <featuresKeyPath>" );
     }
     String algorithm = args[0];
     String path = args[1];
@@ -35,6 +35,10 @@ public class Convert {
     LTRModelConverter converter = LTRModelConverter.get(algorithm);
     BufferedReader featuresReader = Files.newBufferedReader(Paths.get(featuresPath));
     String line = featuresReader.readLine();
+    while (line != null && !line.startsWith("1"))
+      line = featuresReader.readLine();
+    if (line == null)
+      throw new IllegalArgumentException("File did not contain a line containing features in LETOR format (1:feat1 2:feat2 ...)!");
     featuresReader.close();
     String[] feats = line.split(" ");
     List<String> features = Arrays.stream(feats).map(f -> f.split(":")[1])

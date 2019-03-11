@@ -84,7 +84,7 @@ public class LambdaMARTModelConverter implements LTRModelConverter {
 
 
   public static class MARTree {
-    public final double weight = 1;
+    public final double weight = 1.0d;
     public MARTnode root;
 
   }
