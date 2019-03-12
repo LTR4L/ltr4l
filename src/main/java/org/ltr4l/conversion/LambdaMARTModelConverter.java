@@ -44,6 +44,7 @@ public class LambdaMARTModelConverter implements LTRModelConverter {
     SolrLTRModel solrModel = new SolrLTRModel();
     solrModel.clazz = "org.apache.solr.ltr.model.MultipleAdditiveTreesModel";
     solrModel.name = "lambdamartmodel";
+    solrModel.store = "ltrFeaturesModel"; //TODO: hardcoded...
     List<SolrLTRModel.Feature> features1 = features.stream()
         .map(SolrLTRModel.Feature::new)
         .collect(Collectors.toCollection(ArrayList::new));
@@ -84,14 +85,14 @@ public class LambdaMARTModelConverter implements LTRModelConverter {
 
 
   public static class MARTree {
-    public final double weight = 1.0d;
+    public final String weight = "1.0";
     public MARTnode root;
 
   }
 
   public static class MARTnode {
     public String feature;
-    public double threshold;
+    public String threshold;
     public Object left;
     public Object right;
     @JsonIgnore
@@ -99,7 +100,7 @@ public class LambdaMARTModelConverter implements LTRModelConverter {
 
     MARTnode(int idx, double threshold, String feature) {
       this.feature = feature;
-      this.threshold = threshold;
+      this.threshold = String.valueOf(threshold);
       this.idx = idx;
     }
 
@@ -137,10 +138,10 @@ public class LambdaMARTModelConverter implements LTRModelConverter {
   }
 
   public static class Terminal {
-    public double value;
+    public String value;
 
     Terminal(double value) {
-      this.value = value;
+      this.value = String.valueOf(value);
     }
   }
 
