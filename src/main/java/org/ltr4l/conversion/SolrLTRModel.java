@@ -22,6 +22,8 @@ import java.util.Map;
 
 
 public class SolrLTRModel {
+  @JsonProperty("store")
+  public String store;
   @JsonProperty("class")
   public String clazz;
   @JsonProperty("name")
