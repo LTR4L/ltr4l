@@ -44,7 +44,7 @@ public class LambdaMARTModelConverter implements LTRModelConverter {
     SolrLTRModel solrModel = new SolrLTRModel();
     solrModel.clazz = "org.apache.solr.ltr.model.MultipleAdditiveTreesModel";
     solrModel.name = "lambdamartmodel";
-    solrModel.store = "ltrFeaturesModel"; //TODO: hardcoded...
+    solrModel.store = "ltrFeatureStore"; //TODO: hardcoded...
     List<SolrLTRModel.Feature> features1 = features.stream()
         .map(SolrLTRModel.Feature::new)
         .collect(Collectors.toCollection(ArrayList::new));
