@@ -26,12 +26,15 @@ import java.util.stream.Collectors;
 public class Convert {
   public static final String DEFAULT_OUTPUT_DIR = "solr-models/";
   public static void main(String[] args) throws IOException {
-    if (args.length != 3) {
-      throw new IllegalArgumentException("Please provide arguments as follows: <algorithmName> <modelPath> <featuresKeyPath>" );
+    if (args.length < 3) {
+      throw new IllegalArgumentException("Please provide arguments as follows: <algorithmName> <LTR4LmodelPath> <featuresKeyPath> <solr-model-output>. \n" +
+          "Model-output is an optional parameter, and by default will be saved in solr-models/*-smodel.json");
     }
     String algorithm = args[0];
     String path = args[1];
     String featuresPath = args[2];
+    String output = args.length >= 4 ? args[3] : DEFAULT_OUTPUT_DIR + algorithm + "-smodel.json";
+
     LTRModelConverter converter = LTRModelConverter.get(algorithm);
     BufferedReader featuresReader = Files.newBufferedReader(Paths.get(featuresPath));
     String line = featuresReader.readLine();
@@ -48,10 +51,10 @@ public class Convert {
     SolrLTRModel model = converter.convert(reader, features);
     reader.close();
 
-    File file = new File(DEFAULT_OUTPUT_DIR);
-    file.mkdirs();
+    File file = new File(output);
+    if (file.getParentFile() != null)
+      file.getParentFile().mkdirs();
 
-    String output = DEFAULT_OUTPUT_DIR + algorithm + "-smodel.json";
     Writer writer = Files.newBufferedWriter(Paths.get(output));
     converter.write(model, writer);
   }
