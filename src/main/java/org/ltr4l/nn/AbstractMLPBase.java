@@ -170,7 +170,7 @@ public abstract class AbstractMLPBase <N extends AbstractNode, E extends Abstrac
     }
   }
 
-  protected static class SavedModel {
+  public static class SavedModel {
 
     public MLPTrainer.MLPConfig config;
     public List<List<List<Double>>> weights;

@@ -32,6 +32,8 @@ public interface LTRModelConverter {
     switch (lName) {
       case "lambdamart":
         return new LambdaMARTModelConverter();
+      case "ranknet":
+        return new RankNetModelConverter();
       default:
         throw new IllegalArgumentException("No converter available for " + algorithm);
     }
