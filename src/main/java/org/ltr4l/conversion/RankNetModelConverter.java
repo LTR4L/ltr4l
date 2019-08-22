@@ -59,8 +59,13 @@ public class RankNetModelConverter implements LTRModelConverter {
       int numLayers = ltr4lNNModel.weights.size();
       List<Map<String, Object>> layersSetting = (List<Map<String, Object>>)ltr4lNNModel.config.params.get("layers");
       for (int i = 0; i < numLayers; i++) {
-        Map<String, Object> layerParams = layersSetting.get(i);
-        String activation = (String) layerParams.get("activator");
+        String activation;
+        if (i == numLayers - 1)
+          activation = "sigmoid";
+        else {
+          Map<String, Object> layerParams = layersSetting.get(i);
+          activation = (String) layerParams.get("activator");
+        }
         layers.add(convertLayer(ltr4lNNModel.getLayer(i), activation));
       }
       return solrModel;
