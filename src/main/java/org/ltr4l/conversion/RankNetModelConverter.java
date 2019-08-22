@@ -64,7 +64,7 @@ public class RankNetModelConverter implements LTRModelConverter {
           activation = "sigmoid";
         else {
           Map<String, Object> layerParams = layersSetting.get(i);
-          activation = (String) layerParams.get("activator");
+          activation = ((String) layerParams.get("activator")).toLowerCase();
         }
         layers.add(convertLayer(ltr4lNNModel.getLayer(i), activation));
       }
