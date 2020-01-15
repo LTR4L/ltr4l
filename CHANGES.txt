@@ -20,6 +20,8 @@ Deprecated/Deleted Features
 
 Others
 
+* Use Lucene/Solr 8.4.1
+
 ========== 0.1.0 / 2018-08-17 ===================================
 
 Important Notice
