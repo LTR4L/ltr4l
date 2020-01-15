@@ -28,4 +28,9 @@ public class DefaultLTRScorer extends AbstractLTRScorer {
                                     DocIdSetIterator iterator, Ranker ranker){
     super(luceneWeight, featuresSpec, iterator, ranker);
   }
+
+  @Override
+  public float getMaxScore(int upTo) {
+    return Float.POSITIVE_INFINITY;
+  }
 }
