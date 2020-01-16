@@ -36,11 +36,11 @@
     </dependency>
     <dependency org="${ivy.jar.httpcomponents.org}" name="${ivy.jar.httpcomponents-core.name}" rev="${ivy.jar.httpcomponents-core.rev}">
       <artifact name="${ivy.jar.httpcomponents-core.name}" type="jar"
-                url="http://central.maven.org/maven2/org/apache/httpcomponents/${ivy.jar.httpcomponents-core.name}/${ivy.jar.httpcomponents-core.rev}/${ivy.jar.httpcomponents-core.name}-${ivy.jar.httpcomponents-core.rev}.jar"/>
+                url="https://central.maven.org/maven2/org/apache/httpcomponents/${ivy.jar.httpcomponents-core.name}/${ivy.jar.httpcomponents-core.rev}/${ivy.jar.httpcomponents-core.name}-${ivy.jar.httpcomponents-core.rev}.jar"/>
     </dependency>
     <dependency org="${ivy.jar.httpcomponents.org}" name="${ivy.jar.httpcomponents-client.name}" rev="${ivy.jar.httpcomponents-client.rev}">
       <artifact name="${ivy.jar.httpcomponents-client.name}" type="jar"
-                url="http://central.maven.org/maven2/org/apache/httpcomponents/${ivy.jar.httpcomponents-client.name}/${ivy.jar.httpcomponents-client.rev}/${ivy.jar.httpcomponents-client.name}-${ivy.jar.httpcomponents-client.rev}.jar"/>
+                url="https://central.maven.org/maven2/org/apache/httpcomponents/${ivy.jar.httpcomponents-client.name}/${ivy.jar.httpcomponents-client.rev}/${ivy.jar.httpcomponents-client.name}-${ivy.jar.httpcomponents-client.rev}.jar"/>
     </dependency>
     <dependency org="${ivy.jar.hamcrest.org}" name="${ivy.jar.hamcrest.name}" rev="${ivy.jar.hamcrest.rev}">
       <artifact name="${ivy.jar.hamcrest.name}" type="jar"
@@ -53,7 +53,7 @@
     <!-- For HttpClients -->
     <dependency org="${ivy.jar.commons-logging.org}" name="${ivy.jar.commons-logging.name}" rev="${ivy.jar.commons-logging.rev}">
       <artifact name="${ivy.jar.commons-logging.name}" type="jar"
-                url="http://central.maven.org/maven2/commons-logging/${ivy.jar.commons-logging.name}/${ivy.jar.commons-logging.rev}/${ivy.jar.commons-logging.name}-${ivy.jar.commons-logging.rev}.jar"/>
+                url="https://central.maven.org/maven2/commons-logging/${ivy.jar.commons-logging.name}/${ivy.jar.commons-logging.rev}/${ivy.jar.commons-logging.name}-${ivy.jar.commons-logging.rev}.jar"/>
     </dependency>
   </dependencies>
 </ivy-module>
