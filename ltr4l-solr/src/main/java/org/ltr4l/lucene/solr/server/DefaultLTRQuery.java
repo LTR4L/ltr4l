@@ -41,9 +41,8 @@ public class DefaultLTRQuery extends AbstractLTRQuery {
     return result;
   }
 
-
   @Override
-  public Weight createWeight(IndexSearcher searcher, boolean needsScores, float boost) throws IOException {
+  public Weight createWeight(IndexSearcher searcher, ScoreMode scoreMode, float boost) throws IOException {
     return new DefaultLTRQuery.DefaultLTRWeight(this);
   }
 
