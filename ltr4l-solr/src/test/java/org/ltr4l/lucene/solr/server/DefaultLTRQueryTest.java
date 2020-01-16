@@ -71,16 +71,16 @@ public class DefaultLTRQueryTest extends AbstractLTRQueryTestCase {
 
     IndexSearcher searcher = new IndexSearcher(reader);
     TopDocs topDocs = searcher.search(dlQuery, 10);
-    assertEquals(2, topDocs.totalHits);
+    assertEquals(2L, topDocs.totalHits.value);
 
     // title: foo, body:bar
     assertEquals("bar", searcher.doc(topDocs.scoreDocs[0].doc).get("body"));
-    float expectedScore = -0.01570431888103485f;
+    float expectedScore = 0.49607399106025696f;
     assertEquals(expectedScore, topDocs.scoreDocs[0].score, 0.0);
 
     // title: foo, body:foo
     assertEquals("foo", searcher.doc(topDocs.scoreDocs[1].doc).get("body"));
-    expectedScore = -0.015871187672019005f;
+    expectedScore = 0.4960322976112366f;
     assertEquals(expectedScore, topDocs.scoreDocs[1].score, 0.0);
 
     IOUtils.close(reader, w, dir);

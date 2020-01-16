@@ -20,6 +20,7 @@ import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Weight;
+import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.ltr4l.Ranker;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ public abstract class AbstractLTRScorer extends Scorer {
     return expls;
   }
 
-  public float predict() throws IOException {
+  public double predict() throws IOException {
     final int target = docID();
     int idx = 0;
     List<Double> features = new ArrayList<>();
@@ -66,7 +67,7 @@ public abstract class AbstractLTRScorer extends Scorer {
       idx++;
     }
 
-    return (float)ranker.predict(features);
+    return ranker.predict(features);
   }
 
   @Override
@@ -81,6 +82,7 @@ public abstract class AbstractLTRScorer extends Scorer {
 
   @Override
   public float score() throws IOException {
-    return predict();
+    Sigmoid s = new Sigmoid();
+    return (float)s.value(predict());
   }
 }

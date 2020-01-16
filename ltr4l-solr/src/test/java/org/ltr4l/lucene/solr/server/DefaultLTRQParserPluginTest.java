@@ -46,7 +46,7 @@ public class DefaultLTRQParserPluginTest extends SolrTestCaseJ4 {
     params.add("q", "{!nn}title body").add("fl", "*,score");
     assertQ(req(params, "indent", "on"), "*[count(//doc)=1]",
             "//result/doc[1]/str[@name='id'][.='1']",
-            "//result/doc[1]/float[@name='score'][.='-0.015751183']"
+            "//result/doc[1]/float[@name='score'][.='0.49606228']"
     );
   }
 
@@ -60,7 +60,7 @@ public class DefaultLTRQParserPluginTest extends SolrTestCaseJ4 {
     params.add("rqq", "{!nn}title body").add("fl","*,score");
     assertQ(req(params, "indent", "on"), "*[count(//doc)=1]",
             "//result/doc[1]/str[@name='id'][.='1']",
-            "//result/doc[1]/float[@name='score'][.='0.96849763']" // 1.0 - (0.015751183 * 2)
+            "//result/doc[1]/float[@name='score'][.='1.9921246']" // 1.0 + (0.49606228 * 2)
     );
   }
 }
