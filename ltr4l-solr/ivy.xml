@@ -20,7 +20,7 @@
     <dependencies>
       <dependency org="${ivy.jar.slf4j.org}" name="${ivy.jar.slf4j-api.name}" rev="${ivy.jar.slf4j.rev}">
         <artifact name="${ivy.jar.slf4j-api.name}" type="jar"
-                  url="https://central.maven.org/maven2/org/slf4j/${ivy.jar.slf4j-api.name}/${ivy.jar.slf4j.rev}/${ivy.jar.slf4j-api.name}-${ivy.jar.slf4j.rev}.jar"/>
+                  url="https://repo1.maven.org/maven2/org/slf4j/${ivy.jar.slf4j-api.name}/${ivy.jar.slf4j.rev}/${ivy.jar.slf4j-api.name}-${ivy.jar.slf4j.rev}.jar"/>
       </dependency>
       <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-core.name}" rev="${lucene-solr.version}"/>
       <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-analyzers-common.name}" rev="${lucene-solr.version}"/>
@@ -31,7 +31,7 @@
       <dependency org="${ivy.jar.solr.org}" name="${ivy.jar.solr-test-framework.name}" rev="${lucene-solr.version}"/>
       <dependency org="${ivy.jar.commons-io.org}" name="${ivy.jar.commons-io.name}" rev="${ivy.jar.commons-io.rev}">
         <artifact name="${ivy.jar.commons-io.name}" type="jar"
-                  url="https://central.maven.org/maven2/commons-io/${ivy.jar.commons-io.name}/${ivy.jar.commons-io.rev}/${ivy.jar.commons-io.name}-${ivy.jar.commons-io.rev}.jar"/>
+                  url="https://repo1.maven.org/maven2/commons-io/${ivy.jar.commons-io.name}/${ivy.jar.commons-io.rev}/${ivy.jar.commons-io.name}-${ivy.jar.commons-io.rev}.jar"/>
       </dependency>
       <dependency org="${ivy.jar.commons-math3.org}" name="${ivy.jar.commons-math3.name}" rev="${ivy.jar.commons-math3.rev}"/>
     </dependencies>
