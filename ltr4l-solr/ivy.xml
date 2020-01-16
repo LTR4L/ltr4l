@@ -20,7 +20,7 @@
     <dependencies>
       <dependency org="${ivy.jar.slf4j.org}" name="${ivy.jar.slf4j-api.name}" rev="${ivy.jar.slf4j.rev}">
         <artifact name="${ivy.jar.slf4j-api.name}" type="jar"
-                  url="http://central.maven.org/maven2/org/slf4j/${ivy.jar.slf4j-api.name}/${ivy.jar.slf4j.rev}/${ivy.jar.slf4j-api.name}-${ivy.jar.slf4j.rev}.jar"/>
+                  url="https://central.maven.org/maven2/org/slf4j/${ivy.jar.slf4j-api.name}/${ivy.jar.slf4j.rev}/${ivy.jar.slf4j-api.name}-${ivy.jar.slf4j.rev}.jar"/>
       </dependency>
       <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-core.name}" rev="${lucene-solr.version}"/>
       <dependency org="${ivy.jar.lucene.org}" name="${ivy.jar.lucene-analyzers-common.name}" rev="${lucene-solr.version}"/>

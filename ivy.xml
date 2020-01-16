@@ -20,19 +20,19 @@
   <dependencies>
     <dependency org="${ivy.jar.junit.org}" name="${ivy.jar.junit.name}" rev="${ivy.jar.junit.rev}">
       <artifact name="${ivy.jar.junit.name}" type="jar"
-                url="http://repo1.maven.org/maven2/junit/${ivy.jar.junit.name}/${ivy.jar.junit.rev}/${ivy.jar.junit.name}-${ivy.jar.junit.rev}.jar"/>
+                url="https://repo1.maven.org/maven2/junit/${ivy.jar.junit.name}/${ivy.jar.junit.rev}/${ivy.jar.junit.name}-${ivy.jar.junit.rev}.jar"/>
     </dependency>
     <dependency org="${ivy.jar.jackson-core.org}" name="${ivy.jar.jackson-core.name}" rev="${ivy.jar.jackson.rev}">
       <artifact name="${ivy.jar.jackson-core.name}" type="jar"
-                url="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/${ivy.jar.jackson-core.name}/${ivy.jar.jackson.rev}/${ivy.jar.jackson-core.name}-${ivy.jar.jackson.rev}.jar"/>
+                url="https://repo1.maven.org/maven2/com/fasterxml/jackson/core/${ivy.jar.jackson-core.name}/${ivy.jar.jackson.rev}/${ivy.jar.jackson-core.name}-${ivy.jar.jackson.rev}.jar"/>
     </dependency>
     <dependency org="${ivy.jar.jackson-databind.org}" name="${ivy.jar.jackson-databind.name}" rev="${ivy.jar.jackson.rev}">
       <artifact name="${ivy.jar.jackson-databind.name}" type="jar"
-                url="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/${ivy.jar.jackson-databind.name}/${ivy.jar.jackson.rev}/${ivy.jar.jackson-databind.name}-${ivy.jar.jackson.rev}.jar"/>
+                url="https://repo1.maven.org/maven2/com/fasterxml/jackson/core/${ivy.jar.jackson-databind.name}/${ivy.jar.jackson.rev}/${ivy.jar.jackson-databind.name}-${ivy.jar.jackson.rev}.jar"/>
     </dependency>
     <dependency org="${ivy.jar.jackson-annotations.org}" name="${ivy.jar.jackson-annotations.name}" rev="${ivy.jar.jackson.rev}">
       <artifact name="${ivy.jar.jackson-annotations.name}" type="jar"
-                url="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/${ivy.jar.jackson-annotations.name}/${ivy.jar.jackson.rev}/${ivy.jar.jackson-annotations.name}-${ivy.jar.jackson.rev}.jar"/>
+                url="https://repo1.maven.org/maven2/com/fasterxml/jackson/core/${ivy.jar.jackson-annotations.name}/${ivy.jar.jackson.rev}/${ivy.jar.jackson-annotations.name}-${ivy.jar.jackson.rev}.jar"/>
     </dependency>
     <dependency org="${ivy.jar.httpcomponents.org}" name="${ivy.jar.httpcomponents-core.name}" rev="${ivy.jar.httpcomponents-core.rev}">
       <artifact name="${ivy.jar.httpcomponents-core.name}" type="jar"
@@ -44,11 +44,11 @@
     </dependency>
     <dependency org="${ivy.jar.hamcrest.org}" name="${ivy.jar.hamcrest.name}" rev="${ivy.jar.hamcrest.rev}">
       <artifact name="${ivy.jar.hamcrest.name}" type="jar"
-                url="http://repo1.maven.org/maven2/org/hamcrest/${ivy.jar.hamcrest.name}/${ivy.jar.hamcrest.rev}/${ivy.jar.hamcrest.name}-${ivy.jar.hamcrest.rev}.jar"/>
+                url="https://repo1.maven.org/maven2/org/hamcrest/${ivy.jar.hamcrest.name}/${ivy.jar.hamcrest.rev}/${ivy.jar.hamcrest.name}-${ivy.jar.hamcrest.rev}.jar"/>
     </dependency>
     <dependency org="${ivy.jar.commons-cli.org}" name="${ivy.jar.commons-cli.name}" rev="${ivy.jar.commons-cli.rev}">
       <artifact name="${ivy.jar.commons-cli.name}" type="jar"
-                url="http://repo1.maven.org/maven2/commons-cli/${ivy.jar.commons-cli.name}/${ivy.jar.commons-cli.rev}/${ivy.jar.commons-cli.name}-${ivy.jar.commons-cli.rev}.jar"/>
+                url="https://repo1.maven.org/maven2/commons-cli/${ivy.jar.commons-cli.name}/${ivy.jar.commons-cli.rev}/${ivy.jar.commons-cli.name}-${ivy.jar.commons-cli.rev}.jar"/>
     </dependency>
     <!-- For HttpClients -->
     <dependency org="${ivy.jar.commons-logging.org}" name="${ivy.jar.commons-logging.name}" rev="${ivy.jar.commons-logging.rev}">
