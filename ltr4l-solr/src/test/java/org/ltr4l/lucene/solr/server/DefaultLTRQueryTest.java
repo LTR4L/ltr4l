@@ -71,7 +71,7 @@ public class DefaultLTRQueryTest extends AbstractLTRQueryTestCase {
 
     IndexSearcher searcher = new IndexSearcher(reader);
     TopDocs topDocs = searcher.search(dlQuery, 10);
-    assertEquals(2, topDocs.totalHits.value);
+    assertEquals(2L, topDocs.totalHits.value);
 
     // title: foo, body:bar
     assertEquals("bar", searcher.doc(topDocs.scoreDocs[0].doc).get("body"));
