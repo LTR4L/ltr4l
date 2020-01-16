@@ -23,6 +23,6 @@ public class VersionTest {
 
   @Test
   public void test() throws Exception {
-    Assert.assertEquals("0.2", Version.version);
+    Assert.assertEquals("0.2.1", Version.version);
   }
 }

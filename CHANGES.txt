@@ -1,5 +1,26 @@
 LTR4L change history
 
+========== 0.2.1 / YYYY-MM-DD ===================================
+
+ Important Notice
+
+ New Features & Improvements
+
+ Bug Fixes
+
+ API Changes
+
+ Javadoc Fixes
+
+ Project environments
+
+ Tests
+
+ Deprecated/Deleted Features
+
+ Others
+
+
 ========== 0.2 / 2020-01-16 ===================================
 
 Important Notice
