@@ -80,13 +80,11 @@ public class RankNetModelConverter implements LTRModelConverter {
     List<List<Double>> matrix = new ArrayList<>();
     for(List<Double> nodeEdges : ltr4lLayer) {
       biases.add(nodeEdges.get(0));
-      for (int i = 1; i < nodeEdges.size(); i++) {
-        matrix.add(nodeEdges.subList(1, nodeEdges.size()));
-      }
+      matrix.add(nodeEdges.subList(1, nodeEdges.size()));
     }
     Layer solrLayer = new Layer();
     solrLayer.activation = activation;
-    solrLayer.biases = biases;
+    solrLayer.bias = biases;
     solrLayer.matrix = matrix;
     return solrLayer;
   }
@@ -94,7 +92,7 @@ public class RankNetModelConverter implements LTRModelConverter {
 
   public static class Layer {
     public List<List<Double>> matrix;
-    public List<Double> biases;
+    public List<Double> bias;
     public String activation;
   }
 
