@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 public interface LTRModelConverter {
-  public SolrLTRModel convert(Reader reader, List<String> featureNames);
+  public SolrLTRModel convert(Reader reader, List<String> featureNames, String modelStore, String featureStore);
 
   public void write(SolrLTRModel model, Writer writer) throws IOException;
 
